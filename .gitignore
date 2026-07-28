@@ -1,0 +1,8 @@
+# Local-only reference material and generated PDF artifacts.
+# Keep reviewed Markdown in docs/hardware/, docs/design/, docs/requirements/, and docs/reviewed/ under version control.
+/docs/source-pdf/
+/docs/extracted/
+/docs/.cache/
+
+# Local runtime state, serial captures, and tool-discovery metadata created by embeddedskills.
+/.embeddedskills/
