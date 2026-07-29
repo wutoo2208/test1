@@ -19,3 +19,12 @@
 2. 表中标为“待确认”的内容不得直接用于接线或修改 `.syscfg`。
 3. 任何 GPIO 最终配置必须同时通过原理图、引脚图、MSPM0 SDK/SysConfig 和实际接线复核。
 4. 不要直接修改由 SysConfig 生成的 `ti_msp_dl_config.c/.h` 文件。
+## 模块资料（已整理，未确认接线）
+
+- [modules/nrf24l01p.md](modules/nrf24l01p.md)
+- [modules/line-sensor-8ch.md](modules/line-sensor-8ch.md)
+- [modules/mpu6000a.md](modules/mpu6000a.md)
+- [modules/drv8870-dual.md](modules/drv8870-dual.md)
+- [modules/tianmengxing-expansion-board-v2.md](modules/tianmengxing-expansion-board-v2.md)
+- [modules/mp1584en-adjustable-step-down.md](modules/mp1584en-adjustable-step-down.md)
+- [module-questions.md](module-questions.md)
