@@ -27,4 +27,7 @@
 - [modules/drv8870-dual.md](modules/drv8870-dual.md)
 - [modules/tianmengxing-expansion-board-v2.md](modules/tianmengxing-expansion-board-v2.md)
 - [modules/mp1584en-adjustable-step-down.md](modules/mp1584en-adjustable-step-down.md)
+- [modules/k230-target-tracking.md](modules/k230-target-tracking.md)
+- [modules/ms42cg-encoder.md](modules/ms42cg-encoder.md)
+- [modules/d36a-dual-stepper-driver.md](modules/d36a-dual-stepper-driver.md)
 - [module-questions.md](module-questions.md)
