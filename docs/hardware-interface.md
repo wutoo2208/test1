@@ -136,3 +136,34 @@ Reviewed by:
 | D36A 双路步进驱动 | `docs/hardware/modules/d36a-dual-stepper-driver.md` | 两路 STEP/DIR/EN，外部 12 V 示例、4 线两相步进输出，细分/电流拨码共用。 | 实际步进电机型号/相电流、控制电平时序、供电保护、热与物理连接。 |
 
 最终接线仍应只登记在本文件“已确认接线矩阵”中；在用户回答 `docs/hardware/module-questions.md` 的问题前，不得写入 `.syscfg` 或接线结论。
+
+## 10. 最终 Pin Plan v1.0 设计登记（未接线）
+
+> **状态含义**：下表为 `[已确认设计|用户确认+静态核验][未接线]`。它确认资源与目标端点，不证明 PCB 已切线、线束已制作、模块可直连或硬件已通过。权威细节见 `docs/pin-plan/mspm0g3507-pin-plan-frozen-v1.0.md` 和配套 harness。
+
+| Interface ID | 模块/接口 | MCU / 外设 | 物理路径 | 当前开放条件 |
+|---|---|---|---|---|
+| `IF-V1-I2C0` | OLED U8 | PA0/PA1，I2C0 | U8 pad4/pad3 | 供电、地址、3.3V 上拉与实物线序 |
+| `IF-V1-I2C1` | MPU6050/GY | PB2/PB3，I2C1 | GY_SCL/GY_SDA | 模块版本、供电、3.3V 上拉与安装轴向 |
+| `IF-V1-UART1` | K230 | PA8/PA9，UART1 | USART1 pin2/pin1 | 电平、波特率、帧格式、供电及完整图传链 |
+| `IF-V1-LINE` | 五路 TCRT5000 | PB19/PB17/PA16/PA14/PB20 | H10 pin1–5；pin6–8 DNC | OUT 高低电平、输出结构、极性和左右顺序 |
+| `IF-V1-DRV-LOGIC` | 双路 DRV8870 | PB14/PB12/PA7/PB24 | U2 三隔离、三桥接、一保留后接 H3 pin1/3/2/4 | 切线点、H3 观察面、默认态和真值台架验证 |
+| `IF-V1-DRV-PWR` | DRV 与左右轮 | 无 MCU 引脚 | VIN/GND 与 AOUT/BOUT 独立重载线，绕过拓展板功率铜线 | 保险、线径、限流、温升、左右轮方向 |
+| `IF-V1-ENC-R` | 右轮编码器 U6 | PB10/PB11，TIMG8 QEI | U6 pin4/pin3；pin1/6 DNC | 实物方向、PPR/CPR、相位和最高边沿频率 |
+| `IF-V1-ENC-L` | 左轮编码器 U16 | PB4/PB5，TIMA1 双 Capture | U16 pin4/pin3；pin1/6 DNC | 软件正交策略、PPR/CPR、相位和频率 |
+| `IF-V1-D36A` | D36A 通道1 | PA26/PA24/PB0 | H1.19/H1.18/H2.6 → ST1/DIR1/EN1 | 输入门限、时序、EN/ST 硬件偏置、供电/热/限位 |
+| `IF-V1-MS42` | MS42CG V2 | PA12/PA13/PB26/PB23 | H3.15/H4.15/H4.16/H3.16 → A/B/PWM/Z | 六针观察面、3.3V 输出、PWM 周期、Z 脉宽和方向 |
+| `IF-V1-BEEP` | H13 | PB27 GPIO | H13 pin2 | 仅低电流有源模块；无源方案另审 |
+| `IF-V1-UART2-RSV` | USART2 | PB15/PB16 | 全口 DNC | future-reserved；当前 NO-SYSCFG |
+
+### v1.0 DNC / 禁止接入
+
+- U3、U12、H8；
+- 拓展板 KEY1–KEY4、LED1–LED2，以及开发板 PB21/PB22 KEY/LED；
+- U6/U16 pin1、pin6；
+- H10 pin6–8；
+- D36A 5V/ADC/第二通道；
+- USART0 外接座、USART1 5V、USART2 全口；
+- 旧无线 SPI 和 RC 舵机路线。
+
+`empty.syscfg` 尚未按 v1.0 修改；本节不授权接线或上电。
