@@ -1,6 +1,7 @@
-# MSPM0G3507 最终 Pin Plan v1.0
+﻿# MSPM0G3507 最终 Pin Plan v1.0（历史冻结版）
 
-> **状态**：`FROZEN-DESIGN / USER-ACCEPTED / NOT WIRED`。  
+> **状态**：`SUPERSEDED BY mspm0g3507-pin-plan-frozen-v1.2.md / HISTORICAL / NOT FOR CURRENT USE`。
+> **禁止**：本文件仅供历史追溯，不得用于当前 SysConfig、接线、线束制作或施工；所有模块以 v1.2 最新版为准。
 > **冻结日期**：2026-07-30。  
 > **适用硬件**：天猛星 MSPM0G3507 LQFP-64 + 天猛星拓展板 V2 + 双路 DRV8870 + U6/U16 车轮编码器 + 五路 TCRT5000 + OLED + MPU6050 + K230 + D36A 单通道 + MS42CG V2。  
 > **工具基线**：MSPM0 SDK `2.11.00.07`；当前 `empty.syscfg` 尚未按本计划配置，只保留历史 PB22 LED 空工程。  

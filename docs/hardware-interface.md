@@ -1,4 +1,4 @@
-# 硬件接口与接线登记
+﻿# 硬件接口与接线登记
 
 > 初始化日期：2026-07-28  
 > 本文档区分“板级已复核事实”“候选接口”和“最终接线”。当前没有已确认的外接模块接线。
@@ -137,9 +137,9 @@ Reviewed by:
 
 最终接线仍应只登记在本文件“已确认接线矩阵”中；在用户回答 `docs/hardware/module-questions.md` 的问题前，不得写入 `.syscfg` 或接线结论。
 
-## 10. 最终 Pin Plan v1.0 设计登记（未接线）
+## 10. 最终 Pin Plan v1.0 设计登记（历史记录，已被 v1.2 取代）
 
-> **状态含义**：下表为 `[已确认设计|用户确认+静态核验][未接线]`。它确认资源与目标端点，不证明 PCB 已切线、线束已制作、模块可直连或硬件已通过。权威细节见 `docs/pin-plan/mspm0g3507-pin-plan-frozen-v1.0.md` 和配套 harness。
+> **历史状态**：下表只记录 v1.0 曾冻结的设计，已被 v1.2 取代，不得作为当前 SysConfig、接线或施工依据。当前权威文件见第 12 节。
 
 | Interface ID | 模块/接口 | MCU / 外设 | 物理路径 | 当前开放条件 |
 |---|---|---|---|---|
@@ -166,4 +166,31 @@ Reviewed by:
 - USART0 外接座、USART1 5V、USART2 全口；
 - 旧无线 SPI 和 RC 舵机路线。
 
-`empty.syscfg` 尚未按 v1.0 修改；本节不授权接线或上电。
+`empty.syscfg` 未按本历史表修改；本节仅供追溯，不授权接线或上电。
+## 11. 无线 SPI0 v1.1 候选（已否决）
+
+> 该节是对 Pin Plan v1.0 的局部候选修订，不覆盖 v1.0 的其他冻结项。详见 `docs/pin-plan/mspm0g3507-pin-plan-wireless-spi0-v1.1-candidate.md`。
+>
+> **否决原因**：用户确认 PB18 为 KEY3，不可用于 SPI0 SCLK；不得按本节接线或配置。
+
+| Interface ID | 模块/接口 | MCU / 外设 | 物理路径 | 当前开放条件 |
+|---|---|---|---|---|
+| `IF-V1.1-RADIO-SPI` | 改装无线模块 pin3/5/6/8 | PB25/PB17/PB18/PB19，SPI0 CS0/PICO/SCLK/POCI | H10 pin6/pin2、U22 PB18 原始飞线、H10 pin1 | 模块 pin1/2、供电、电平、SPI mode、U22 观察面与飞线可达性 |
+| `IF-V1.1-RADIO-CE` | 改装无线模块 pin4 CE | PB1 GPIO output | H1 pin6 | 默认低、模块逻辑电平与物理线束确认 |
+| `IF-V1.1-RADIO-IRQ` | 改装无线模块 pin7 IRQ（低有效） | PB16 GPIO input / IRQ 候选 | H3 pin7 | 用户已释放 UART2 PB16；确认输出类型、上拉与无效电平 |
+| `IF-V1.1-TCRT-REWIRE` | 五路 TCRT5000 | PA25/PA27/PA16/PA14/PB20 | H10 pin7/pin8/pin3/pin4/pin5 | 输出电平、极性、模块物理左右顺序和改线线束 |
+
+禁止把无线模块 pin1/pin2 接到任何电源或地；v1.1 已否决，禁止按本候选修改 `.syscfg`、接线或上电。
+## 12. 最终 Pin Plan v1.2 设计登记（当前唯一最新版，未接线）
+
+> **状态含义**：v1.2 已获用户批准并冻结为设计，但尚未接线。当前唯一权威文件是 `docs/pin-plan/mspm0g3507-pin-plan-frozen-v1.2.md` 与 `docs/pin-plan/mspm0g3507-adapter-harness-v1.2.md`。每个模块的 MCU 引脚、拓展板针位、线束端点和 DNC 只以这两个最新版文件为准。
+
+| Interface ID | 模块/接口 | MCU / 外设 | 物理路径 | 当前开放条件 |
+|---|---|---|---|---|
+| `IF-V1.2-RADIO-SPI` | 改装无线 pin3/5/6/8 | PB25/PB17/PA12/PB19，SPI0 CS0/PICO/SCLK/POCI | H10 pin6/pin2、H3 pin15、H10 pin1 | 模块 pin1/pin2/供电、电平、SPI mode/频率和线束仍待关闭 |
+| `IF-V1.2-RADIO-CE` | 无线 pin4 CE | PB1 GPIO | H1 pin6 | 默认低与模块逻辑确认 |
+| `IF-V1.2-RADIO-IRQ` | 无线 pin7 IRQ | PB16 GPIO IRQ | H3 pin7 | 输出结构、上拉、无效电平和触发策略 |
+| `IF-V1.2-TCRT` | 五路 TCRT5000 | PA25/PA27/PA16/PA14/PB20 | H10 pin7/pin8/pin3/pin4/pin5 | 改线、输出电平/极性和物理顺序 |
+| `IF-V1.2-MS42` | MS42CG A/B/PWM/Z | PA29/PA30/PA13/PB23 | H4 pin17/H2 pin7/H4 pin15/H3 pin16 | Timer 捕获隔离验证、边沿频率、PWM 周期与线束 |
+
+`PB18` 按用户现场陈述标记为 `KEY3 / FORBIDDEN-FOR-RADIO`。v1.2 冻结只确认设计资源，不授权修改 `.syscfg`、接线、供电、构建、烧录或硬件测试。

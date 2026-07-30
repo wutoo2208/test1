@@ -90,7 +90,7 @@ K230 教程确认了示例使用 `TXD(IO9)`、`RXD(IO10)` 连接到教程 MSPM0 
 
 ## 2026-07-30 Pin Plan v1.0 Resolution
 
-> 下列内容关闭的是**设计选择**，不是硬件实测。最终资源见 `docs/pin-plan/mspm0g3507-pin-plan-frozen-v1.0.md`。
+> 下列内容关闭的是**设计选择**，不是硬件实测。当前唯一资源基线见 `docs/pin-plan/mspm0g3507-pin-plan-frozen-v1.2.md` 和 `docs/pin-plan/mspm0g3507-adapter-harness-v1.2.md`。
 
 ### 已关闭的设计选择
 
@@ -116,3 +116,36 @@ K230 教程确认了示例使用 `TXD(IO9)`、`RXD(IO10)` 连接到教程 MSPM0 
 9. 电源：MP1584 实际输出、BMS、保险、回流、峰值能力和各模块负载瞬态。
 
 这些开放项关闭前，不执行 PCB 切线、接线、`.syscfg`、上电或运动测试。
+## Q-009 - 无线 SPI0 v1.1 候选（已否决）
+
+**Q-009 状态**：PB18 已由用户确认连接 KEY3，本方案不得实施；后继见 Q-010。
+
+用户已同意：TCRT 可迁移到 OUT6/OUT7/OUT8 网络，并释放 UART2 的 PB16 作为无线 IRQ 候选。以下历史问题保留：
+
+1. 无线模块的正反面、pin 1 标记、pin1/pin2 的权威功能、供电范围和 GND；在此之前 pin1/pin2 必须 DNC。
+2. 无线模块 pin7 IRQ 是否为开漏或推挽、无效电平和上拉需求；PB16/H3 pin7 当前仅为候选。
+3. 是否接受：TCRT OUT1→H10 pin7/PA25、OUT2→H10 pin8/PA27，且以改线后的物理顺序作为软件通道顺序。
+4. 是否能从开发板 U22 原始 PB18 针安全飞线到无线 SCK；请提供 U22 实物近照和扩展板装配后的可达性照片。
+5. 无线链路的对端、SPI mode、SCLK 频率、包协议、CE/CSN 默认态，以及是否仅用于开发期低速遥测/参数导出。
+
+在以上问题关闭、用户接受 v1.1 候选并另行授权前，不得修改 SysConfig、接线、上电或访问 SPI。
+## Q-010 - 无线 SPI0 v1.2（已批准并冻结设计）
+
+**Q-010 状态**：用户已批准 v1.2 资源与端点设计，并已生成 `docs/pin-plan/mspm0g3507-pin-plan-frozen-v1.2.md` 与 `docs/pin-plan/mspm0g3507-adapter-harness-v1.2.md`。这只关闭 Pin Plan 设计审批，不代表已完成 SysConfig、接线、供电或通信验证。
+
+已冻结的设计结论：
+
+1. 无线 SPI0 使用 `PB25 CSN`、`PB17 MOSI/PICO`、`PA12 SCK`、`PB19 MISO/POCI`，`PB1 CE`，`PB16 IRQ`。
+2. `PB18=KEY3 / FORBIDDEN-FOR-RADIO`，不得用于无线。
+3. TCRT OUT1/OUT2 改走 H10 pin7/pin8，即 `PA25/PA27`；OUT3/OUT4/OUT5 保持 `PA16/PA14/PB20`。
+4. MS42CG A/B/PWM/Z 使用 `PA29/PA30/PA13/PB23`；TIMG6 负责 A/B 双 Capture，TIMG0 CCP1 的 PWM 单输入双边沿捕获仍需未来 SysConfig 隔离验证。
+
+冻结后的实施门槛仍未关闭：
+
+1. 无线模块正反面、Pin 1 标记、pin1/pin2 权威功能、供电范围和 GND；关闭前 pin1/pin2 必须 DNC，整个无线模块不供电、不接线。
+2. IRQ 输出是开漏还是推挽、无效电平、上拉需求和中断触发策略。
+3. SPI mode、允许的 SCLK 频率、对端、包协议、CE/CSN 默认态和通信失效行为。
+4. TCRT 输出电平、推挽/开漏、有效极性、车体物理左右顺序以及交叉线束连续性。
+5. MS42CG PWM 的周期/占空比范围、最高边沿频率，以及 TIMG0 单通道双边沿捕获的 SysConfig 可生成性。
+
+当前不授权修改 `.syscfg`、接线、上电、构建、烧录、串口、SPI 或硬件动作。

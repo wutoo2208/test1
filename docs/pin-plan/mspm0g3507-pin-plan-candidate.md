@@ -1,6 +1,6 @@
 # MSPM0G3507 Pin Plan — 最终候选快照
 
-> **状态**：`SUPERSEDED BY mspm0g3507-pin-plan-frozen-v1.0.md`。
+> **状态**：`HISTORICAL / SUPERSEDED BY mspm0g3507-pin-plan-frozen-v1.2.md`。
 > **日期**：2026-07-30。
 > **用途**：保留最终冻结前的收敛过程；**不得作为施工或 SysConfig 配置依据**。
 > **当前工程事实**：`empty.syscfg` 仍只配置历史 `PB22` LED，本文件未修改该配置。

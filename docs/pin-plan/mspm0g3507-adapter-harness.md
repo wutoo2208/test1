@@ -1,7 +1,8 @@
-# MSPM0G3507 最终转接线与改线矩阵
+# MSPM0G3507 最终转接线与改线矩阵（v1.0 历史版）
 
 > **版本**：配套 `mspm0g3507-pin-plan-frozen-v1.0.md`，2026-07-30。
-> **状态**：`FROZEN-DESIGN / NOT WIRED`。
+> **状态**：`SUPERSEDED BY mspm0g3507-adapter-harness-v1.2.md / HISTORICAL / NOT FOR CURRENT USE`。
+> **禁止**：本文件不得用于当前接线、线束制作或施工；所有模块接线以 v1.2 最新版为准。
 > **边界**：本文冻结端点和 DNC，不代表已切线、已接线或已上电。
 
 ## 1. 统一施工规则
