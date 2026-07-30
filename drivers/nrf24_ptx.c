@@ -308,6 +308,14 @@ static void queueReset(void)
     gQueueCount = 0U;
 }
 
+static void enterFault(void)
+{
+    gArmed = false;
+    queueReset();
+    forceSafe();
+    gState = RADIO_STATE_FAULT;
+}
+
 static void popFrame(void)
 {
     if (gQueueCount != 0U) {
@@ -471,7 +479,7 @@ void Nrf24Ptx_service(void)
                     gState = RADIO_STATE_POWERUP_WAIT;
                     gDeadline = nowMs + RADIO_POWERUP_DELAY_MS;
                 } else {
-                    gState = RADIO_STATE_FAULT;
+                    enterFault();
                 }
             }
             break;
@@ -489,15 +497,13 @@ void Nrf24Ptx_service(void)
             }
             if (gQueueCount != 0U) {
                 if (!startFrame(&gQueue[gQueueHead])) {
-                    gState = RADIO_STATE_FAULT;
-                    forceSafe();
+                    enterFault();
                 }
             }
             break;
         case RADIO_STATE_WAIT_RESULT:
             if (!command(NRF_CMD_NOP, &status)) {
-                gState = RADIO_STATE_FAULT;
-                forceSafe();
+                enterFault();
             } else if ((status & NRF_STATUS_TX_DS) != 0U) {
                 (void) writeRegister(NRF_REG_STATUS, NRF_STATUS_TX_DS);
                 gStats.txSuccess++;
@@ -522,8 +528,7 @@ void Nrf24Ptx_service(void)
             } else if (Timebase_reached(nowMs, gDeadline)) {
                 (void) command(NRF_CMD_FLUSH_TX, &status);
                 gStats.txTimeout++;
-                gState = RADIO_STATE_FAULT;
-                forceSafe();
+                enterFault();
             }
             break;
         case RADIO_STATE_DISABLED:

@@ -32,4 +32,8 @@ PB27 is absent from SysConfig and is DNC. Firmware does not intentionally drive 
 - Standalone SysConfig 1.26.2 generation: PASS; informational STOP/STANDBY retention notices for SPI0, TIMG8 QEI, and TIMA1 Capture.
 - CCS managed clean/full build, TI clang 5.1.1 LTS: PASS, 0 errors and 0 warnings.
 - Link map after final fixes: FLASH `0x8538 / 0x20000`; SRAM `0x07bf / 0x8000`.
-- Hardware, flash, probe, serial, and motion validation: **NOT RUN**.
+- Wireless CMSIS-DAP/OpenOCD probe: PASS at 1 MHz (`DPIDR=0x6ba02477`, Cortex-M0+ r0p1).
+- OpenOCD flash and binary fallback verification: PASS at 500 kHz; target-side CRC acceleration timed out, then byte comparison reported no differences and `reset run` completed.
+- DAP virtual UART COM8 at 115200: firmware `req002-safe-0.3` observed; software safe-output self-test PASS, motor `00/00`, D36A disabled, REQ-002 actuator lock active with all physical/control gates `0`.
+- RF SPI register access: PASS (`CONFIG=0x0E`, `RF_CH=0x00`, `RF_SETUP=0x08`); one-shot ended in `MAX_RT`, then safely disarmed with queue empty. RF reception was not proven.
+- PB21 physical press, TCRT polarity/order, encoder movement, OLED, buzzer, motor, D36A, and vehicle motion validation: **NOT RUN**.

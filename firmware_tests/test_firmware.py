@@ -38,6 +38,12 @@ class FirmwareSafetyTests(unittest.TestCase):
                         app.index("Nrf24Ptx_init();"))
         max_rt = radio[radio.index("NRF_STATUS_MAX_RT", radio.index("void Nrf24Ptx_service")):]
         self.assertIn("Nrf24Ptx_disarm();", max_rt)
+        self.assertIn("static void enterFault(void)", radio)
+        fault_body = radio[radio.index("static void enterFault(void)"):
+                           radio.index("static void popFrame(void)")]
+        self.assertIn("gArmed = false;", fault_body)
+        self.assertIn("queueReset();", fault_body)
+        self.assertIn("forceSafe();", fault_body)
 
     def test_req002_gates_are_false_and_uart_has_status_only(self) -> None:
         config = text("config/firmware_config.h")
