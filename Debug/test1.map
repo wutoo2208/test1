@@ -1,18 +1,18 @@
 ******************************************************************************
             TI ARM Clang Linker PC v5.1.1                      
 ******************************************************************************
->> Linked Thu Jul 30 19:51:45 2026
+>> Linked Thu Jul 30 23:00:23 2026
 
 OUTPUT FILE NAME:   <test1.out>
-ENTRY POINT SYMBOL: "_c_int00_noargs"  address: 0000583d
+ENTRY POINT SYMBOL: "_c_int00_noargs"  address: 00007c09
 
 
 MEMORY CONFIGURATION
 
          name            origin    length      used     unused   attr    fill
 ----------------------  --------  ---------  --------  --------  ----  --------
-  FLASH                 00000000   00020000  00005f70  0001a090  R  X
-  SRAM                  20200000   00008000  00000478  00007b88  RW X
+  FLASH                 00000000   00020000  00008538  00017ac8  R  X
+  SRAM                  20200000   00008000  000007bf  00007841  RW X
   BCR_CONFIG            41c00000   000000ff  00000000  000000ff  R   
   BSL_CONFIG            41c00100   00000080  00000000  00000080  R   
 
@@ -21,14 +21,13 @@ SEGMENT ALLOCATION MAP
 
 run origin  load origin   length   init length attrs members
 ----------  ----------- ---------- ----------- ----- -------
-00000000    00000000    00005f70   00005f70    r-x
+00000000    00000000    00008538   00008538    r-x
   00000000    00000000    000000c0   000000c0    r-- .intvecs
-  000000c0    000000c0    000058e0   000058e0    r-x .text
-  000059a0    000059a0    000005a0   000005a0    r-- .rodata
-  00005f40    00005f40    00000030   00000030    r-- .cinit
-20200000    20200000    00000278   00000000    rw-
-  20200000    20200000    00000277   00000000    rw- .bss
-  20200277    20200277    00000001   00000000    rw- .data
+  000000c0    000000c0    00007d80   00007d80    r-x .text
+  00007e40    00007e40    000006e0   000006e0    r-- .rodata
+  00008520    00008520    00000018   00000018    r-- .cinit
+20200000    20200000    000005bf   00000000    rw-
+  20200000    20200000    000005bf   00000000    rw- .bss
 20207e00    20207e00    00000200   00000000    rw-
   20207e00    20207e00    00000200   00000000    rw- .stack
 
@@ -41,187 +40,241 @@ section   page    origin      length       input sections
 .intvecs   0    00000000    000000c0     
                   00000000    000000c0     startup_mspm0g350x_ticlang.o (.intvecs)
 
-.text      0    000000c0    000058e0     
-                  000000c0    000030d4     empty.o (.text.main)
-                  00003194    00001034     empty.o (.text.reportRadioStatus)
-                  000041c8    00000618     empty.o (.text.reportStatus)
-                  000047e0    000003d0     empty.o (.text.reportLine)
-                  00004bb0    00000288     empty.o (.text.uartWriteU32)
-                  00004e38    00000148     empty.o (.text.radioReadRegister)
-                  00004f80    000000d0     ti_msp_dl_config.o (.text.SYSCFG_DL_GPIO_init)
-                  00005050    000000b0     ti_msp_dl_config.o (.text.SYSCFG_DL_LEFT_CAPTURE_init)
-                  00005100    0000009a     libc.a : memcpy16.S.obj (.text:memcpy)
-                  0000519a    00000002     startup_mspm0g350x_ticlang.o (.text.Default_Handler)
-                  0000519c    0000008c     ti_msp_dl_config.o (.text.SYSCFG_DL_DIAG_UART_init)
-                  00005228    00000084     empty.o (.text.TIMA1_IRQHandler)
-                  000052ac    0000007c     libc.a : copy_decompress_lzss.c.obj (.text:decompress:lzss)
-                  00005328    00000070     ti_msp_dl_config.o (.text.SYSCFG_DL_initPower)
-                  00005398    0000005e     driverlib.a : dl_i2c.o (.text.DL_I2C_fillControllerTXFIFO)
-                  000053f6    00000002     libclang_rt.builtins.a : aeabi_div0.c.obj (.text.__aeabi_idiv0)
-                  000053f8    0000005c     ti_msp_dl_config.o (.text.SYSCFG_DL_RIGHT_QEI_init)
-                  00005454    0000005c     empty.o (.text.UART0_IRQHandler)
-                  000054b0    00000054     driverlib.a : dl_spi.o (.text.DL_SPI_drainRXFIFO8)
-                  00005504    00000054     ti_msp_dl_config.o (.text.SYSCFG_DL_MPU_I2C_init)
-                  00005558    00000054     ti_msp_dl_config.o (.text.SYSCFG_DL_OLED_I2C_init)
-                  000055ac    0000004c     ti_msp_dl_config.o (.text.SYSCFG_DL_RADIO_SPI_init)
-                  000055f8    00000048     driverlib.a : dl_uart.o (.text.DL_UART_init)
-                  00005640    00000048     ti_msp_dl_config.o (.text.SYSCFG_DL_init)
-                  00005688    00000044     driverlib.a : dl_spi.o (.text.DL_SPI_init)
-                  000056cc    00000040     libclang_rt.builtins.a : aeabi_uidivmod.S.obj (.text)
-                  0000570c    0000003c     driverlib.a : dl_i2c.o (.text.DL_I2C_flushControllerTXFIFO)
-                  00005748    0000003c     libc.a : autoinit.c.obj (.text:__TI_auto_init_nobinit_nopinit)
-                  00005784    00000030     driverlib.a : dl_i2c.o (.text.DL_I2C_flushControllerRXFIFO)
-                  000057b4    00000030                 : dl_uart.o (.text.DL_UART_transmitDataBlocking)
-                  000057e4    00000030     ti_msp_dl_config.o (.text.SYSCFG_DL_SYSCTL_init)
-                  00005814    00000028     driverlib.a : dl_timer.o (.text.DL_Timer_setCaptureCompareCtl)
-                  0000583c    00000028     libc.a : boot_cortex_m.c.obj (.text:_c_int00_noargs)
-                  00005864    00000026     driverlib.a : dl_i2c.o (.text.DL_I2C_setClockConfig)
-                  0000588a    00000020     libc.a : memcmp.c.obj (.text.memcmp)
-                  000058aa    00000002     --HOLE-- [fill = 0]
-                  000058ac    0000001c     driverlib.a : dl_spi.o (.text.DL_SPI_receiveDataCheck8)
-                  000058c8    0000001c                 : dl_spi.o (.text.DL_SPI_transmitDataCheck8)
-                  000058e4    0000001c                 : dl_timer.o (.text.DL_Timer_setClockConfig)
-                  00005900    0000001a                 : dl_timer.o (.text.DL_Timer_setCaptureCompareInput)
-                  0000591a    00000016     libc.a : copy_zero_init.c.obj (.text:decompress:ZI:__TI_zero_init_nomemset)
-                  00005930    00000012     driverlib.a : dl_spi.o (.text.DL_SPI_setClockConfig)
-                  00005942    00000012                 : dl_uart.o (.text.DL_UART_setClockConfig)
-                  00005954    00000012     libc.a : copy_decompress_none.c.obj (.text:decompress:none)
-                  00005966    00000002     --HOLE-- [fill = 0]
-                  00005968    00000010     empty.o (.text.SysTick_Handler)
-                  00005978    0000000a     driverlib.a : dl_common.o (.text.DL_Common_delayCycles)
-                  00005982    00000002     --HOLE-- [fill = 0]
-                  00005984    00000008     libclang_rt.builtins.a : aeabi_memcpy.S.obj (.text)
-                  0000598c    00000006     libc.a : exit.c.obj (.text:abort)
-                  00005992    00000004     libsysbm.a : hostexit.c.obj (.text.HOSTexit)
-                  00005996    00000004     startup_mspm0g350x_ticlang.o (.text.Reset_Handler)
-                  0000599a    00000004     libc.a : pre_init.c.obj (.text._system_pre_init)
-                  0000599e    00000002     --HOLE-- [fill = 0]
+.text      0    000000c0    00007d80     
+                  000000c0    00001fa4     diag_console.o (.text.DiagConsole_service)
+                  00002064    00001948     diag_console.o (.text.reportReq002)
+                  000039ac    000016fc     diag_console.o (.text.reportRadioStatus)
+                  000050a8    00000814     diag_console.o (.text.reportStatus)
+                  000058bc    0000044c     nrf24_ptx.o (.text.Nrf24Ptx_service)
+                  00005d08    00000338     diag_console.o (.text.reportLine)
+                  00006040    000002fc     diag_console.o (.text.runSelfTest)
+                  0000633c    000001a4     i2c_diag.o (.text.I2cDiag_readMpuWhoAmI)
+                  000064e0    0000019c     diag_console.o (.text.DiagConsole_reportBoot)
+                  0000667c    00000188     i2c_diag.o (.text.I2cDiag_scan)
+                  00006804    00000184     nrf24_ptx.o (.text.transaction)
+                  00006988    00000154     diag_console.o (.text.writeU32)
+                  00006adc    0000011c     nrf24_ptx.o (.text.Nrf24Ptx_captureDiagnosticChar)
+                  00006bf8    000000ec     nrf24_ptx.o (.text.command)
+                  00006ce4    000000dc     ti_msp_dl_config.o (.text.SYSCFG_DL_GPIO_init)
+                  00006dc0    000000b0     ti_msp_dl_config.o (.text.SYSCFG_DL_LEFT_CAPTURE_init)
+                  00006e70    0000009a     libc.a : memcpy16.S.obj (.text:memcpy)
+                  00006f0a    00000002     startup_mspm0g350x_ticlang.o (.text.Default_Handler)
+                  00006f0c    0000008c     ti_msp_dl_config.o (.text.SYSCFG_DL_DIAG_UART_init)
+                  00006f98    00000084     encoders.o (.text.Encoders_onLeftCaptureInterrupt)
+                  0000701c    00000084     nrf24_ptx.o (.text.Nrf24Ptx_init)
+                  000070a0    00000078     diag_console.o (.text.writeText)
+                  00007118    00000074     req002.o (.text.Req002_service)
+                  0000718c    00000070     ti_msp_dl_config.o (.text.SYSCFG_DL_initPower)
+                  000071fc    00000064     encoders.o (.text.Encoders_init)
+                  00007260    00000064     nrf24_ptx.o (.text.writeRegistersAndVerify)
+                  000072c4    00000062     libc.a : memset16.S.obj (.text:memset)
+                  00007326    0000005e     driverlib.a : dl_i2c.o (.text.DL_I2C_fillControllerTXFIFO)
+                  00007384    0000005c     diag_console.o (.text.DiagConsole_onUartInterrupt)
+                  000073e0    0000005c     encoders.o (.text.Encoders_snapshot)
+                  0000743c    0000005c     ti_msp_dl_config.o (.text.SYSCFG_DL_RIGHT_QEI_init)
+                  00007498    00000054     driverlib.a : dl_spi.o (.text.DL_SPI_drainRXFIFO8)
+                  000074ec    00000054     nrf24_ptx.o (.text.Nrf24Ptx_getStatus)
+                  00007540    00000054     nrf24_ptx.o (.text.Nrf24Ptx_readCoreRegisters)
+                  00007594    00000054     ti_msp_dl_config.o (.text.SYSCFG_DL_MPU_I2C_init)
+                  000075e8    00000054     ti_msp_dl_config.o (.text.SYSCFG_DL_OLED_I2C_init)
+                  0000763c    00000050     nrf24_ptx.o (.text.Nrf24Ptx_arm)
+                  0000768c    0000004c     ti_msp_dl_config.o (.text.SYSCFG_DL_RADIO_SPI_init)
+                  000076d8    0000004c     start_button.o (.text.StartButton_poll)
+                  00007724    00000048     board_safety.o (.text.BoardSafety_outputsLocked)
+                  0000776c    00000048     driverlib.a : dl_uart.o (.text.DL_UART_init)
+                  000077b4    00000048     diag_console.o (.text.DiagConsole_init)
+                  000077fc    00000048     ti_msp_dl_config.o (.text.SYSCFG_DL_init)
+                  00007844    00000048     nrf24_ptx.o (.text.writeAndVerify)
+                  0000788c    00000044     driverlib.a : dl_spi.o (.text.DL_SPI_init)
+                  000078d0    00000040     libclang_rt.builtins.a : aeabi_uidivmod.S.obj (.text)
+                  00007910    0000003c     app.o (.text.App_service)
+                  0000794c    0000003c     driverlib.a : dl_i2c.o (.text.DL_I2C_flushControllerTXFIFO)
+                  00007988    0000003c     line_sensors.o (.text.LineSensors_readRawBits)
+                  000079c4    0000003c     nrf24_ptx.o (.text.Nrf24Ptx_disarm)
+                  00007a00    0000003c     libc.a : autoinit.c.obj (.text:__TI_auto_init_nobinit_nopinit)
+                  00007a3c    00000038     diag_console.o (.text.newLine)
+                  00007a74    00000034     app.o (.text.App_init)
+                  00007aa8    00000030     driverlib.a : dl_i2c.o (.text.DL_I2C_flushControllerRXFIFO)
+                  00007ad8    00000030                 : dl_uart.o (.text.DL_UART_transmitDataBlocking)
+                  00007b08    00000030     ti_msp_dl_config.o (.text.SYSCFG_DL_SYSCTL_init)
+                  00007b38    00000030     timebase.o (.text.Timebase_init)
+                  00007b68    00000028     board_safety.o (.text.BoardSafety_init)
+                  00007b90    00000028     board_safety.o (.text.BoardSafety_service)
+                  00007bb8    00000028     driverlib.a : dl_timer.o (.text.DL_Timer_setCaptureCompareCtl)
+                  00007be0    00000028     req002.o (.text.Req002_init)
+                  00007c08    00000028     libc.a : boot_cortex_m.c.obj (.text:_c_int00_noargs)
+                  00007c30    00000026     driverlib.a : dl_i2c.o (.text.DL_I2C_setClockConfig)
+                  00007c56    00000002     libclang_rt.builtins.a : aeabi_div0.c.obj (.text.__aeabi_idiv0)
+                  00007c58    00000024     nrf24_ptx.o (.text.Nrf24Ptx_safeWhenDisarmed)
+                  00007c7c    00000020     start_button.o (.text.StartButton_init)
+                  00007c9c    00000020     libc.a : memcmp.c.obj (.text.memcmp)
+                  00007cbc    0000001c     driverlib.a : dl_spi.o (.text.DL_SPI_receiveDataCheck8)
+                  00007cd8    0000001c                 : dl_spi.o (.text.DL_SPI_transmitDataCheck8)
+                  00007cf4    0000001c                 : dl_timer.o (.text.DL_Timer_setClockConfig)
+                  00007d10    0000001a                 : dl_timer.o (.text.DL_Timer_setCaptureCompareInput)
+                  00007d2a    00000002     --HOLE-- [fill = 0]
+                  00007d2c    0000001a     libclang_rt.builtins.a : aeabi_memset.S.obj (.text)
+                  00007d46    00000002     --HOLE-- [fill = 0]
+                  00007d48    00000018     req002.o (.text.Req002_blockReasonName)
+                  00007d60    00000018     req002.o (.text.Req002_stateName)
+                  00007d78    00000016     empty.o (.text.main)
+                  00007d8e    00000012     driverlib.a : dl_spi.o (.text.DL_SPI_setClockConfig)
+                  00007da0    00000012                 : dl_uart.o (.text.DL_UART_setClockConfig)
+                  00007db2    00000002     --HOLE-- [fill = 0]
+                  00007db4    00000010     timebase.o (.text.Timebase_onSysTick)
+                  00007dc4    00000010     libc.a : copy_zero_init.c.obj (.text:decompress:ZI)
+                  00007dd4    0000000c     timebase.o (.text.Timebase_nowMs)
+                  00007de0    0000000a     driverlib.a : dl_common.o (.text.DL_Common_delayCycles)
+                  00007dea    0000000a     start_button.o (.text.StartButton_takePress)
+                  00007df4    00000008     board_safety.o (.text.BoardSafety_buzzerPolicy)
+                  00007dfc    00000008     req002.o (.text.Req002_getStatus)
+                  00007e04    00000008     empty.o (.text.SysTick_Handler)
+                  00007e0c    00000008     empty.o (.text.TIMA1_IRQHandler)
+                  00007e14    00000008     timebase.o (.text.Timebase_reached)
+                  00007e1c    00000008     empty.o (.text.UART0_IRQHandler)
+                  00007e24    00000008     libclang_rt.builtins.a : aeabi_memcpy.S.obj (.text)
+                  00007e2c    00000006     libc.a : exit.c.obj (.text:abort)
+                  00007e32    00000004     libsysbm.a : hostexit.c.obj (.text.HOSTexit)
+                  00007e36    00000004     startup_mspm0g350x_ticlang.o (.text.Reset_Handler)
+                  00007e3a    00000004     libc.a : pre_init.c.obj (.text._system_pre_init)
+                  00007e3e    00000002     --HOLE-- [fill = 0]
 
-.cinit     0    00005f40    00000030     
-                  00005f40    0000000c     (__TI_handler_table)
-                  00005f4c    00000008     (.cinit..bss.load) [load image, compression = zero_init]
-                  00005f54    00000005     (.cinit..data.load) [load image, compression = lzss]
-                  00005f59    00000003     --HOLE-- [fill = 0]
-                  00005f5c    00000010     (__TI_cinit_table)
-                  00005f6c    00000004     --HOLE-- [fill = 0]
+.cinit     0    00008520    00000018     
+                  00008520    00000008     (.cinit..bss.load) [load image, compression = zero_init]
+                  00008528    00000004     (__TI_handler_table)
+                  0000852c    00000008     (__TI_cinit_table)
+                  00008534    00000004     --HOLE-- [fill = 0]
 
-.rodata    0    000059a0    000005a0     
-                  000059a0    00000079     empty.o (.rodata.str1.9304625059846063805.1)
-                  00005a19    00000062     empty.o (.rodata.str1.9517790425240694019.1)
-                  00005a7b    0000003b     empty.o (.rodata.str1.17786695056113905174.1)
-                  00005ab6    00000038     empty.o (.rodata.str1.17669528882079347314.1)
-                  00005aee    00000036     empty.o (.rodata.str1.16839123753901408871.1)
-                  00005b24    0000002f     empty.o (.rodata.str1.14931662825238665165.1)
-                  00005b53    00000028     empty.o (.rodata.str1.17148641475501637896.1)
-                  00005b7b    00000026     empty.o (.rodata.str1.18267063360953640005.1)
-                  00005ba1    00000025     empty.o (.rodata.str1.14685083708502177989.1)
-                  00005bc6    00000023     empty.o (.rodata.str1.16192402325983758976.1)
-                  00005be9    0000001f     empty.o (.rodata.str1.2892978838402939976.1)
-                  00005c08    0000001e     empty.o (.rodata.str1.7147280526036588317.1)
-                  00005c26    0000001a     empty.o (.rodata.str1.10059295903439925133.1)
-                  00005c40    00000018     empty.o (.rodata.str1.8559863785409492687.1)
-                  00005c58    00000016     empty.o (.rodata.str1.11898133897667081452.1)
-                  00005c6e    00000016     empty.o (.rodata.str1.2467217919153558631.1)
-                  00005c84    00000014     empty.o (.rodata.str1.9273880872327455443.1)
-                  00005c98    00000013     empty.o (.rodata.str1.3248470395234012952.1)
-                  00005cab    00000011     empty.o (.rodata.str1.13177478454970921860.1)
-                  00005cbc    00000010     empty.o (.rodata.cst16)
-                  00005ccc    00000010     empty.o (.rodata.str1.1244225466151674491.1)
-                  00005cdc    00000010     empty.o (.rodata.str1.16704889451495720520.1)
-                  00005cec    00000010     empty.o (.rodata.str1.5792233746214848027.1)
-                  00005cfc    0000000f     empty.o (.rodata.str1.12202765150295805230.1)
-                  00005d0b    0000000f     empty.o (.rodata.str1.16870492610791449319.1)
-                  00005d1a    0000000f     empty.o (.rodata.str1.8246038351886174000.1)
-                  00005d29    0000000e     empty.o (.rodata.str1.10416541500538677707.1)
-                  00005d37    0000000e     empty.o (.rodata.str1.15170238581331914936.1)
-                  00005d45    0000000e     empty.o (.rodata.str1.1730803286939908101.1)
-                  00005d53    0000000e     empty.o (.rodata.str1.7401042497206923953.1)
-                  00005d61    0000000d     empty.o (.rodata.str1.12067090720680436770.1)
-                  00005d6e    0000000d     empty.o (.rodata.str1.12305241226414632430.1)
-                  00005d7b    0000000d     empty.o (.rodata.str1.12644424118344001522.1)
-                  00005d88    0000000d     empty.o (.rodata.str1.14827682599886951907.1)
-                  00005d95    0000000d     empty.o (.rodata.str1.1587754595168042356.1)
-                  00005da2    0000000d     empty.o (.rodata.str1.17763237346163150421.1)
-                  00005daf    0000000d     empty.o (.rodata.str1.18230774644621384456.1)
-                  00005dbc    0000000d     empty.o (.rodata.str1.5555817129655366984.1)
-                  00005dc9    0000000c     empty.o (.rodata.str1.2340806013034298120.1)
-                  00005dd5    0000000b     empty.o (.rodata.str1.101204432782223354.1)
-                  00005de0    0000000b     empty.o (.rodata.str1.11822412164550770238.1)
-                  00005deb    0000000b     empty.o (.rodata.str1.12152362843975802927.1)
-                  00005df6    0000000b     empty.o (.rodata.str1.13247436401465020295.1)
-                  00005e01    0000000b     empty.o (.rodata.str1.14817357642613375509.1)
-                  00005e0c    0000000b     empty.o (.rodata.str1.17886131730342418705.1)
-                  00005e17    0000000b     empty.o (.rodata.str1.487671331081980564.1)
-                  00005e22    0000000b     empty.o (.rodata.str1.61555989498057138.1)
-                  00005e2d    0000000b     empty.o (.rodata.str1.9536676030432917228.1)
-                  00005e38    0000000a     ti_msp_dl_config.o (.rodata.gDIAG_UARTConfig)
-                  00005e42    0000000a     ti_msp_dl_config.o (.rodata.gRADIO_SPI_config)
-                  00005e4c    0000000a     empty.o (.rodata.str1.11006992818822836455.1)
-                  00005e56    0000000a     empty.o (.rodata.str1.11630185570270578052.1)
-                  00005e60    0000000a     empty.o (.rodata.str1.11715496320028086549.1)
-                  00005e6a    0000000a     empty.o (.rodata.str1.11869693434137641263.1)
-                  00005e74    0000000a     empty.o (.rodata.str1.15486159998237592746.1)
-                  00005e7e    0000000a     empty.o (.rodata.str1.6969777895189110550.1)
-                  00005e88    0000000a     empty.o (.rodata.str1.7495650265820658336.1)
-                  00005e92    00000009     empty.o (.rodata.str1.1204102649501173409.1)
-                  00005e9b    00000009     empty.o (.rodata.str1.13261240389824687667.1)
-                  00005ea4    00000009     empty.o (.rodata.str1.16709903642768270689.1)
-                  00005ead    00000009     empty.o (.rodata.str1.18040426568881102326.1)
-                  00005eb6    00000009     empty.o (.rodata.str1.5100843677217179155.1)
-                  00005ebf    00000009     empty.o (.rodata.str1.7079713434352825882.1)
-                  00005ec8    00000009     empty.o (.rodata.str1.7386103758396746866.1)
-                  00005ed1    00000009     empty.o (.rodata.str1.9273257273993397785.1)
-                  00005eda    00000008     empty.o (.rodata.str1.15930989295766594416.1)
-                  00005ee2    00000008     empty.o (.rodata.str1.4000995719088696555.1)
-                  00005eea    00000008     empty.o (.rodata.str1.9439672824749741859.1)
-                  00005ef2    00000007     empty.o (.rodata.str1.17676052816137622666.1)
-                  00005ef9    00000006     empty.o (.rodata.str1.217653763239674886.1)
-                  00005eff    00000005     empty.o (.rodata.str1.11166133652247964704.1)
-                  00005f04    00000005     empty.o (.rodata.str1.11907275790119612123.1)
-                  00005f09    00000005     empty.o (.rodata.str1.1253969330244694382.1)
-                  00005f0e    00000005     empty.o (.rodata.str1.14873186988251546639.1)
-                  00005f13    00000005     empty.o (.rodata.str1.16001313287400794920.1)
-                  00005f18    00000005     empty.o (.rodata.str1.1644458454814909739.1)
-                  00005f1d    00000005     empty.o (.rodata.str1.17102900359786703537.1)
-                  00005f22    00000005     empty.o (.rodata.str1.7048729596307760267.1)
-                  00005f27    00000004     empty.o (.rodata.str1.17064901357395550654.1)
-                  00005f2b    00000003     ti_msp_dl_config.o (.rodata.gLEFT_CAPTUREClockConfig)
-                  00005f2e    00000003     ti_msp_dl_config.o (.rodata.gRIGHT_QEIClockConfig)
-                  00005f31    00000003     empty.o (.rodata.str1.14262319235943454376.1)
-                  00005f34    00000002     ti_msp_dl_config.o (.rodata.gDIAG_UARTClockConfig)
-                  00005f36    00000002     ti_msp_dl_config.o (.rodata.gMPU_I2CClockConfig)
-                  00005f38    00000002     ti_msp_dl_config.o (.rodata.gOLED_I2CClockConfig)
-                  00005f3a    00000002     ti_msp_dl_config.o (.rodata.gRADIO_SPI_clockConfig)
-                  00005f3c    00000004     --HOLE-- [fill = 0]
+.rodata    0    00007e40    000006e0     
+                  00007e40    0000008e     diag_console.o (.rodata.str1.4088845919059740246.1)
+                  00007ece    00000063     diag_console.o (.rodata.str1.7732308573000650393.1)
+                  00007f31    0000003b     diag_console.o (.rodata.str1.9757831788182070933.1)
+                  00007f6c    00000038     diag_console.o (.rodata.str1.6718555251542537173.1)
+                  00007fa4    00000036     diag_console.o (.rodata.str1.4753132208752387408.1)
+                  00007fda    00000035     diag_console.o (.rodata.str1.16786332400914981058.1)
+                  0000800f    00000032     board_safety.o (.rodata.str1.1461871966798876460.1)
+                  00008041    00000031     diag_console.o (.rodata.str1.11000238090859226487.1)
+                  00008072    0000002f     diag_console.o (.rodata.str1.12889734105675417804.1)
+                  000080a1    00000028     diag_console.o (.rodata.str1.11175911738739839896.1)
+                  000080c9    00000028     diag_console.o (.rodata.str1.261250501884579427.1)
+                  000080f1    00000026     diag_console.o (.rodata.str1.1008767523004470630.1)
+                  00008117    00000026     diag_console.o (.rodata.str1.7357183369378266487.1)
+                  0000813d    00000003     ti_msp_dl_config.o (.rodata.gLEFT_CAPTUREClockConfig)
+                  00008140    00000024     req002.o (.rodata..Lswitch.table.Req002_stateName)
+                  00008164    00000023     diag_console.o (.rodata.str1.10092175090239738319.1)
+                  00008187    00000023     diag_console.o (.rodata.str1.14265534512352903045.1)
+                  000081aa    00000023     diag_console.o (.rodata.str1.810607564276269461.1)
+                  000081cd    0000001f     diag_console.o (.rodata.str1.9009639935792097996.1)
+                  000081ec    0000001c     req002.o (.rodata.str1.9213031953659428922.1)
+                  00008208    0000001a     req002.o (.rodata.str1.11801953346847374107.1)
+                  00008222    0000001a     diag_console.o (.rodata.str1.2111541797422310849.1)
+                  0000823c    00000019     nrf24_ptx.o (.rodata.str1.6094559527043233380.4)
+                  00008255    00000003     ti_msp_dl_config.o (.rodata.gRIGHT_QEIClockConfig)
+                  00008258    00000018     nrf24_ptx.o (.rodata..Lswitch.table.Nrf24Ptx_getStatus)
+                  00008270    00000018     diag_console.o (.rodata.str1.586156461584364517.1)
+                  00008288    00000017     diag_console.o (.rodata.str1.1424010353822986971.1)
+                  0000829f    00000017     req002.o (.rodata.str1.246851255980436067.1)
+                  000082b6    00000016     diag_console.o (.rodata.str1.2181998341318385279.1)
+                  000082cc    00000014     req002.o (.rodata.str1.1536853367382378965.1)
+                  000082e0    00000014     diag_console.o (.rodata.str1.719103272933316442.1)
+                  000082f4    00000014     req002.o (.rodata.str1.7316036974658646067.1)
+                  00008308    00000013     diag_console.o (.rodata.str1.7768218676934970796.1)
+                  0000831b    00000011     diag_console.o (.rodata.str1.9305979691969886280.1)
+                  0000832c    00000010     req002.o (.rodata..Lswitch.table.Req002_blockReasonName)
+                  0000833c    00000010     encoders.o (.rodata.cst16)
+                  0000834c    00000010     nrf24_ptx.o (.rodata.str1.17419335730769077557.1)
+                  0000835c    0000000e     nrf24_ptx.o (.rodata.gProfile)
+                  0000836a    0000000e     diag_console.o (.rodata.str1.10020677278003191597.1)
+                  00008378    0000000e     req002.o (.rodata.str1.11012809159570234960.1)
+                  00008386    0000000e     diag_console.o (.rodata.str1.15947943532119924092.1)
+                  00008394    0000000d     diag_console.o (.rodata.str1.15307067426115469236.1)
+                  000083a1    0000000d     diag_console.o (.rodata.str1.17217747830118470281.1)
+                  000083ae    0000000d     diag_console.o (.rodata.str1.17570078357027493973.1)
+                  000083bb    0000000d     diag_console.o (.rodata.str1.3586807474570239301.1)
+                  000083c8    0000000d     nrf24_ptx.o (.rodata.str1.632614121974113092.1)
+                  000083d5    0000000c     req002.o (.rodata.str1.14163026172649738486.1)
+                  000083e1    0000000c     nrf24_ptx.o (.rodata.str1.18158066330371006656.1)
+                  000083ed    0000000b     diag_console.o (.rodata.str1.11858721499567804342.1)
+                  000083f8    0000000b     req002.o (.rodata.str1.14519661726848775581.1)
+                  00008403    0000000b     diag_console.o (.rodata.str1.15625074855538008002.1)
+                  0000840e    0000000b     diag_console.o (.rodata.str1.17197432830885351810.1)
+                  00008419    0000000b     diag_console.o (.rodata.str1.2437401455240083982.1)
+                  00008424    0000000b     diag_console.o (.rodata.str1.5926118724489890093.1)
+                  0000842f    0000000b     diag_console.o (.rodata.str1.9798642557863000284.1)
+                  0000843a    0000000a     ti_msp_dl_config.o (.rodata.gDIAG_UARTConfig)
+                  00008444    0000000a     ti_msp_dl_config.o (.rodata.gRADIO_SPI_config)
+                  0000844e    0000000a     diag_console.o (.rodata.str1.15804963083468125269.1)
+                  00008458    0000000a     diag_console.o (.rodata.str1.8341931057821991107.1)
+                  00008462    00000009     diag_console.o (.rodata.str1.10021391958218067169.1)
+                  0000846b    00000009     req002.o (.rodata.str1.12553014538444358850.1)
+                  00008474    00000009     nrf24_ptx.o (.rodata.str1.1466761408321915565.1)
+                  0000847d    00000009     diag_console.o (.rodata.str1.15191501805510545095.1)
+                  00008486    00000009     diag_console.o (.rodata.str1.16718133499535619421.1)
+                  0000848f    00000009     nrf24_ptx.o (.rodata.str1.3287502044353476605.1)
+                  00008498    00000009     req002.o (.rodata.str1.4498054223093770164.1)
+                  000084a1    00000009     req002.o (.rodata.str1.9783865751474204056.1)
+                  000084aa    00000008     diag_console.o (.rodata.str1.1116829374954328495.1)
+                  000084b2    00000007     diag_console.o (.rodata.str1.18237275900639492659.1)
+                  000084b9    00000007     diag_console.o (.rodata.str1.7767364581813029062.1)
+                  000084c0    00000006     req002.o (.rodata.str1.1330840565073376.1)
+                  000084c6    00000006     nrf24_ptx.o (.rodata.str1.17809926154172099862.1)
+                  000084cc    00000006     req002.o (.rodata.str1.404665452499805758.1)
+                  000084d2    00000006     diag_console.o (.rodata.str1.475083551094971178.1)
+                  000084d8    00000005     diag_console.o (.rodata.str1.11767802008270839024.1)
+                  000084dd    00000005     req002.o (.rodata.str1.11884172484412477609.1)
+                  000084e2    00000005     nrf24_ptx.o (.rodata.str1.1246111486341945488.1)
+                  000084e7    00000005     diag_console.o (.rodata.str1.13160629704296733059.1)
+                  000084ec    00000005     diag_console.o (.rodata.str1.16469263393576567306.1)
+                  000084f1    00000005     diag_console.o (.rodata.str1.3251375336230076641.1)
+                  000084f6    00000005     req002.o (.rodata.str1.4278235483893593186.1)
+                  000084fb    00000005     diag_console.o (.rodata.str1.8182549175682356078.1)
+                  00008500    00000005     diag_console.o (.rodata.str1.8521603489394202036.1)
+                  00008505    00000005     diag_console.o (.rodata.str1.8535165006884115289.1)
+                  0000850a    00000005     diag_console.o (.rodata.str1.9239603917100908406.1)
+                  0000850f    00000004     diag_console.o (.rodata.str1.17103627226480421635.1)
+                  00008513    00000003     diag_console.o (.rodata.str1.15004393915158247055.1)
+                  00008516    00000002     ti_msp_dl_config.o (.rodata.gDIAG_UARTClockConfig)
+                  00008518    00000002     ti_msp_dl_config.o (.rodata.gMPU_I2CClockConfig)
+                  0000851a    00000002     ti_msp_dl_config.o (.rodata.gOLED_I2CClockConfig)
+                  0000851c    00000002     ti_msp_dl_config.o (.rodata.gRADIO_SPI_clockConfig)
+                  0000851e    00000002     --HOLE-- [fill = 0]
 
 .init_array 
 *          0    00000000    00000000     UNINITIALIZED
 
 .binit     0    00000000    00000000     
 
-.bss       0    20200000    00000277     UNINITIALIZED
-                  20200000    000000bc     (.common:gLEFT_CAPTUREBackup)
-                  202000bc    000000a0     (.common:gRIGHT_QEIBackup)
-                  2020015c    00000080     empty.o (.bss.gRxBuffer)
-                  202001dc    00000050     empty.o (.bss.gCommand)
-                  2020022c    00000028     (.common:gRADIO_SPIBackup)
-                  20200254    00000004     empty.o (.bss.gLeftEncoderCount)
-                  20200258    00000004     empty.o (.bss.gLeftInvalidTransitions)
-                  2020025c    00000004     empty.o (.bss.gMilliseconds)
-                  20200260    00000004     empty.o (.bss.gRadioStats.0)
-                  20200264    00000004     empty.o (.bss.gRadioStats.5)
-                  20200268    00000004     empty.o (.bss.gRxOverflow)
-                  2020026c    00000002     empty.o (.bss.gDiagLineLength)
-                  2020026e    00000002     empty.o (.bss.gRxHead)
-                  20200270    00000002     empty.o (.bss.gRxTail)
-                  20200272    00000001     empty.o (.bss.gCaptureEnabled)
-                  20200273    00000001     empty.o (.bss.gCommandLength)
-                  20200274    00000001     empty.o (.bss.gDiagLineOverflow)
-                  20200275    00000001     empty.o (.bss.gDiscardLine)
-                  20200276    00000001     empty.o (.bss.gLeftState)
-
-.data      0    20200277    00000001     UNINITIALIZED
-                  20200277    00000001     empty.o (.data.gRadioState)
+.bss       0    20200000    000005bf     UNINITIALIZED
+                  20200000    00000240     nrf24_ptx.o (.bss.gQueue)
+                  20200240    000000c0     nrf24_ptx.o (.bss.gDiagLine)
+                  20200300    000000bc     (.common:gLEFT_CAPTUREBackup)
+                  202003bc    000000a0     (.common:gRIGHT_QEIBackup)
+                  2020045c    00000080     diag_console.o (.bss.gRxBuffer)
+                  202004dc    00000050     diag_console.o (.bss.gCommand)
+                  2020052c    00000028     (.common:gRADIO_SPIBackup)
+                  20200554    00000020     req002.o (.bss.gStatus)
+                  20200574    0000001c     nrf24_ptx.o (.bss.gStats)
+                  20200590    00000008     app.o (.bss.gStartButton)
+                  20200598    00000004     nrf24_ptx.o (.bss.gDeadline)
+                  2020059c    00000004     encoders.o (.bss.gLeftCount)
+                  202005a0    00000004     encoders.o (.bss.gLeftInvalidTransitions)
+                  202005a4    00000004     timebase.o (.bss.gMilliseconds)
+                  202005a8    00000004     diag_console.o (.bss.gRxOverflow)
+                  202005ac    00000002     nrf24_ptx.o (.bss.gDiagLineLength)
+                  202005ae    00000002     nrf24_ptx.o (.bss.gNextMessageId)
+                  202005b0    00000002     diag_console.o (.bss.gRxHead)
+                  202005b2    00000002     diag_console.o (.bss.gRxTail)
+                  202005b4    00000001     nrf24_ptx.o (.bss.gArmed)
+                  202005b5    00000001     diag_console.o (.bss.gCaptureEnabled)
+                  202005b6    00000001     diag_console.o (.bss.gCommandLength)
+                  202005b7    00000001     nrf24_ptx.o (.bss.gDiagLineOverflow)
+                  202005b8    00000001     diag_console.o (.bss.gDiscardLine)
+                  202005b9    00000001     encoders.o (.bss.gLeftState)
+                  202005ba    00000001     nrf24_ptx.o (.bss.gOneShotQueued)
+                  202005bb    00000001     nrf24_ptx.o (.bss.gQueueCount)
+                  202005bc    00000001     nrf24_ptx.o (.bss.gQueueHead)
+                  202005bd    00000001     nrf24_ptx.o (.bss.gQueueTail)
+                  202005be    00000001     nrf24_ptx.o (.bss.gState)
 
 .stack     0    20207e00    00000200     UNINITIALIZED
                   20207e00    00000004     libc.a : boot_cortex_m.c.obj (.stack)
@@ -238,11 +291,33 @@ MODULE SUMMARY
        Module                         code    ro data   rw data
        ------                         ----    -------   -------
     .\
-       empty.o                        20400   1402      244    
-       ti_msp_dl_config.o             1092    34        388    
+       ti_msp_dl_config.o             1104    34        388    
        startup_mspm0g350x_ticlang.o   6       192       0      
+       empty.o                        46      0         0      
     +--+------------------------------+-------+---------+---------+
-       Total:                         21498   1628      632    
+       Total:                         1156    226       388    
+                                                               
+    .\app\
+       req002.o                       212     255       32     
+       app.o                          112     0         8      
+    +--+------------------------------+-------+---------+---------+
+       Total:                         324     255       40     
+                                                               
+    .\bsp\
+       board_safety.o                 160     50        0      
+       timebase.o                     84      0         4      
+    +--+------------------------------+-------+---------+---------+
+       Total:                         244     50        4      
+                                                               
+    .\drivers\
+       diag_console.o                 25204   1270      219    
+       nrf24_ptx.o                    2656    133       811    
+       i2c_diag.o                     812     0         0      
+       encoders.o                     324     16        9      
+       start_button.o                 118     0         0      
+       line_sensors.o                 60      0         0      
+    +--+------------------------------+-------+---------+---------+
+       Total:                         29174   1419      1039   
                                                                
     D:/AAADiansai/CCS/mspm0_sdk_2_11_00_07/source/ti/driverlib/lib/ticlang/m0p/mspm0g1x0x_g3x0x/driverlib.a
        dl_i2c.o                       240     0         0      
@@ -255,16 +330,15 @@ MODULE SUMMARY
                                                                
     D:\AAADiansai\CCS\ccs\tools\compiler\ti-cgt-armllvm_5.1.1.LTS\lib\armv6m-ti-none-eabi/c/libc.a
        memcpy16.S.obj                 154     0         0      
-       copy_decompress_lzss.c.obj     124     0         0      
+       memset16.S.obj                 98      0         0      
        autoinit.c.obj                 60      0         0      
        boot_cortex_m.c.obj            40      0         0      
        memcmp.c.obj                   32      0         0      
-       copy_zero_init.c.obj           22      0         0      
-       copy_decompress_none.c.obj     18      0         0      
+       copy_zero_init.c.obj           16      0         0      
        exit.c.obj                     6       0         0      
        pre_init.c.obj                 4       0         0      
     +--+------------------------------+-------+---------+---------+
-       Total:                         460     0         0      
+       Total:                         410     0         0      
                                                                
     D:\AAADiansai\CCS\ccs\tools\compiler\ti-cgt-armllvm_5.1.1.LTS\lib\armv6m-ti-none-eabi/c/libsysbm.a
        hostexit.c.obj                 4       0         0      
@@ -273,95 +347,129 @@ MODULE SUMMARY
                                                                
     D:\AAADiansai\CCS\ccs\tools\compiler\ti-cgt-armllvm_5.1.1.LTS\lib\armv6m-ti-none-eabi/libclang_rt.builtins.a
        aeabi_uidivmod.S.obj           64      0         0      
+       aeabi_memset.S.obj             26      0         0      
        aeabi_memcpy.S.obj             8       0         0      
        aeabi_div0.c.obj               2       0         0      
     +--+------------------------------+-------+---------+---------+
-       Total:                         74      0         0      
+       Total:                         100     0         0      
                                                                
        Stack:                         0       0         512    
-       Linker Generated:              0       41        0      
+       Linker Generated:              0       20        0      
     +--+------------------------------+-------+---------+---------+
-       Grand Total:                   22744   1669      1144   
+       Grand Total:                   32120   1970      1983   
 
 
 LINKER GENERATED COPY TABLES
 
-__TI_cinit_table @ 00005f5c records: 2, size/record: 8, table size: 16
-	.bss: load addr=00005f4c, load size=00000008 bytes, run addr=20200000, run size=00000277 bytes, compression=zero_init
-	.data: load addr=00005f54, load size=00000005 bytes, run addr=20200277, run size=00000001 bytes, compression=lzss
+__TI_cinit_table @ 0000852c records: 1, size/record: 8, table size: 8
+	.bss: load addr=00008520, load size=00000008 bytes, run addr=20200000, run size=000005bf bytes, compression=zero_init
 
 
 LINKER GENERATED HANDLER TABLE
 
-__TI_handler_table @ 00005f40 records: 3, size/record: 4, table size: 12
-	index: 0, handler: __TI_decompress_lzss
-	index: 1, handler: __TI_decompress_none
-	index: 2, handler: __TI_zero_init
+__TI_handler_table @ 00008528 records: 1, size/record: 4, table size: 4
+	index: 0, handler: __TI_zero_init
 
 
 GLOBAL SYMBOLS: SORTED ALPHABETICALLY BY Name 
 
 address   name                           
 -------   ----                           
-0000519b  ADC0_IRQHandler                
-0000519b  ADC1_IRQHandler                
-0000519b  AES_IRQHandler                 
-00005992  C$$EXIT                        
-0000519b  CANFD0_IRQHandler              
-0000519b  DAC0_IRQHandler                
-00005979  DL_Common_delayCycles          
-00005399  DL_I2C_fillControllerTXFIFO    
-00005785  DL_I2C_flushControllerRXFIFO   
-0000570d  DL_I2C_flushControllerTXFIFO   
-00005865  DL_I2C_setClockConfig          
-000054b1  DL_SPI_drainRXFIFO8            
-00005689  DL_SPI_init                    
-000058ad  DL_SPI_receiveDataCheck8       
-00005931  DL_SPI_setClockConfig          
-000058c9  DL_SPI_transmitDataCheck8      
-00005815  DL_Timer_setCaptureCompareCtl  
-00005901  DL_Timer_setCaptureCompareInput
-000058e5  DL_Timer_setClockConfig        
-000055f9  DL_UART_init                   
-00005943  DL_UART_setClockConfig         
-000057b5  DL_UART_transmitDataBlocking   
-0000519b  DMA_IRQHandler                 
-0000519b  Default_Handler                
-0000519b  GROUP0_IRQHandler              
-0000519b  GROUP1_IRQHandler              
-00005993  HOSTexit                       
-0000519b  HardFault_Handler              
-0000519b  I2C0_IRQHandler                
-0000519b  I2C1_IRQHandler                
-0000519b  NMI_Handler                    
-0000519b  PendSV_Handler                 
-0000519b  RTC_IRQHandler                 
-00005997  Reset_Handler                  
-0000519b  SPI0_IRQHandler                
-0000519b  SPI1_IRQHandler                
-0000519b  SVC_Handler                    
-0000519d  SYSCFG_DL_DIAG_UART_init       
-00004f81  SYSCFG_DL_GPIO_init            
-00005051  SYSCFG_DL_LEFT_CAPTURE_init    
-00005505  SYSCFG_DL_MPU_I2C_init         
-00005559  SYSCFG_DL_OLED_I2C_init        
-000055ad  SYSCFG_DL_RADIO_SPI_init       
-000053f9  SYSCFG_DL_RIGHT_QEI_init       
-000057e5  SYSCFG_DL_SYSCTL_init          
-00005641  SYSCFG_DL_init                 
-00005329  SYSCFG_DL_initPower            
-00005969  SysTick_Handler                
-0000519b  TIMA0_IRQHandler               
-00005229  TIMA1_IRQHandler               
-0000519b  TIMG0_IRQHandler               
-0000519b  TIMG12_IRQHandler              
-0000519b  TIMG6_IRQHandler               
-0000519b  TIMG7_IRQHandler               
-0000519b  TIMG8_IRQHandler               
-00005455  UART0_IRQHandler               
-0000519b  UART1_IRQHandler               
-0000519b  UART2_IRQHandler               
-0000519b  UART3_IRQHandler               
+00006f0b  ADC0_IRQHandler                
+00006f0b  ADC1_IRQHandler                
+00006f0b  AES_IRQHandler                 
+00007a75  App_init                       
+00007911  App_service                    
+00007df5  BoardSafety_buzzerPolicy       
+00007b69  BoardSafety_init               
+00007725  BoardSafety_outputsLocked      
+00007b91  BoardSafety_service            
+00007e32  C$$EXIT                        
+00006f0b  CANFD0_IRQHandler              
+00006f0b  DAC0_IRQHandler                
+00007de1  DL_Common_delayCycles          
+00007327  DL_I2C_fillControllerTXFIFO    
+00007aa9  DL_I2C_flushControllerRXFIFO   
+0000794d  DL_I2C_flushControllerTXFIFO   
+00007c31  DL_I2C_setClockConfig          
+00007499  DL_SPI_drainRXFIFO8            
+0000788d  DL_SPI_init                    
+00007cbd  DL_SPI_receiveDataCheck8       
+00007d8f  DL_SPI_setClockConfig          
+00007cd9  DL_SPI_transmitDataCheck8      
+00007bb9  DL_Timer_setCaptureCompareCtl  
+00007d11  DL_Timer_setCaptureCompareInput
+00007cf5  DL_Timer_setClockConfig        
+0000776d  DL_UART_init                   
+00007da1  DL_UART_setClockConfig         
+00007ad9  DL_UART_transmitDataBlocking   
+00006f0b  DMA_IRQHandler                 
+00006f0b  Default_Handler                
+000077b5  DiagConsole_init               
+00007385  DiagConsole_onUartInterrupt    
+000064e1  DiagConsole_reportBoot         
+000000c1  DiagConsole_service            
+000071fd  Encoders_init                  
+00006f99  Encoders_onLeftCaptureInterrupt
+000073e1  Encoders_snapshot              
+00006f0b  GROUP0_IRQHandler              
+00006f0b  GROUP1_IRQHandler              
+00007e33  HOSTexit                       
+00006f0b  HardFault_Handler              
+00006f0b  I2C0_IRQHandler                
+00006f0b  I2C1_IRQHandler                
+0000633d  I2cDiag_readMpuWhoAmI          
+0000667d  I2cDiag_scan                   
+00007989  LineSensors_readRawBits        
+00006f0b  NMI_Handler                    
+0000763d  Nrf24Ptx_arm                   
+00006add  Nrf24Ptx_captureDiagnosticChar 
+000079c5  Nrf24Ptx_disarm                
+000074ed  Nrf24Ptx_getStatus             
+0000701d  Nrf24Ptx_init                  
+00007541  Nrf24Ptx_readCoreRegisters     
+00007c59  Nrf24Ptx_safeWhenDisarmed      
+000058bd  Nrf24Ptx_service               
+00006f0b  PendSV_Handler                 
+00006f0b  RTC_IRQHandler                 
+00007d49  Req002_blockReasonName         
+00007dfd  Req002_getStatus               
+00007be1  Req002_init                    
+00007119  Req002_service                 
+00007d61  Req002_stateName               
+00007e37  Reset_Handler                  
+00006f0b  SPI0_IRQHandler                
+00006f0b  SPI1_IRQHandler                
+00006f0b  SVC_Handler                    
+00006f0d  SYSCFG_DL_DIAG_UART_init       
+00006ce5  SYSCFG_DL_GPIO_init            
+00006dc1  SYSCFG_DL_LEFT_CAPTURE_init    
+00007595  SYSCFG_DL_MPU_I2C_init         
+000075e9  SYSCFG_DL_OLED_I2C_init        
+0000768d  SYSCFG_DL_RADIO_SPI_init       
+0000743d  SYSCFG_DL_RIGHT_QEI_init       
+00007b09  SYSCFG_DL_SYSCTL_init          
+000077fd  SYSCFG_DL_init                 
+0000718d  SYSCFG_DL_initPower            
+00007c7d  StartButton_init               
+000076d9  StartButton_poll               
+00007deb  StartButton_takePress          
+00007e05  SysTick_Handler                
+00006f0b  TIMA0_IRQHandler               
+00007e0d  TIMA1_IRQHandler               
+00006f0b  TIMG0_IRQHandler               
+00006f0b  TIMG12_IRQHandler              
+00006f0b  TIMG6_IRQHandler               
+00006f0b  TIMG7_IRQHandler               
+00006f0b  TIMG8_IRQHandler               
+00007b39  Timebase_init                  
+00007dd5  Timebase_nowMs                 
+00007db5  Timebase_onSysTick             
+00007e15  Timebase_reached               
+00007e1d  UART0_IRQHandler               
+00006f0b  UART1_IRQHandler               
+00006f0b  UART2_IRQHandler               
+00006f0b  UART3_IRQHandler               
 20208000  __STACK_END                    
 00000200  __STACK_SIZE                   
 00000000  __TI_ATRegion0_region_sz       
@@ -373,25 +481,29 @@ address   name
 00000000  __TI_ATRegion2_region_sz       
 00000000  __TI_ATRegion2_src_addr        
 00000000  __TI_ATRegion2_trg_addr        
-00005f5c  __TI_CINIT_Base                
-00005f6c  __TI_CINIT_Limit               
-00005f6c  __TI_CINIT_Warm                
-00005f40  __TI_Handler_Table_Base        
-00005f4c  __TI_Handler_Table_Limit       
-00005749  __TI_auto_init_nobinit_nopinit 
-000052ad  __TI_decompress_lzss           
-00005955  __TI_decompress_none           
+0000852c  __TI_CINIT_Base                
+00008534  __TI_CINIT_Limit               
+00008534  __TI_CINIT_Warm                
+00008528  __TI_Handler_Table_Base        
+0000852c  __TI_Handler_Table_Limit       
+00007a01  __TI_auto_init_nobinit_nopinit 
 ffffffff  __TI_pprof_out_hndl            
 ffffffff  __TI_prof_data_size            
 ffffffff  __TI_prof_data_start           
 00000000  __TI_static_base__             
-0000591b  __TI_zero_init_nomemset        
-000053f7  __aeabi_idiv0                  
-00005985  __aeabi_memcpy                 
-00005985  __aeabi_memcpy4                
-00005985  __aeabi_memcpy8                
-000056cd  __aeabi_uidiv                  
-000056cd  __aeabi_uidivmod               
+00007dc5  __TI_zero_init                 
+00007c57  __aeabi_idiv0                  
+00007d3b  __aeabi_memclr                 
+00007d3b  __aeabi_memclr4                
+00007d3b  __aeabi_memclr8                
+00007e25  __aeabi_memcpy                 
+00007e25  __aeabi_memcpy4                
+00007e25  __aeabi_memcpy8                
+00007d2d  __aeabi_memset                 
+00007d2d  __aeabi_memset4                
+00007d2d  __aeabi_memset8                
+000078d1  __aeabi_uidiv                  
+000078d1  __aeabi_uidivmod               
 ffffffff  __binit__                      
 UNDEFED   __mpu_init                     
 20207e00  __stack                        
@@ -399,18 +511,19 @@ UNDEFED   __mpu_init
 20200000  __start___llvm_prf_cnts        
 20200000  __stop___llvm_prf_bits         
 20200000  __stop___llvm_prf_cnts         
-0000583d  _c_int00_noargs                
+00007c09  _c_int00_noargs                
 UNDEFED   _system_post_cinit             
-0000599b  _system_pre_init               
-0000598d  abort                          
+00007e3b  _system_pre_init               
+00007e2d  abort                          
 ffffffff  binit                          
-20200000  gLEFT_CAPTUREBackup            
-2020022c  gRADIO_SPIBackup               
-202000bc  gRIGHT_QEIBackup               
+20200300  gLEFT_CAPTUREBackup            
+2020052c  gRADIO_SPIBackup               
+202003bc  gRIGHT_QEIBackup               
 00000000  interruptVectors               
-000000c1  main                           
-0000588b  memcmp                         
-00005101  memcpy                         
+00007d79  main                           
+00007c9d  memcmp                         
+00006e71  memcpy                         
+000072c5  memset                         
 
 
 GLOBAL SYMBOLS: SORTED BY Symbol Address 
@@ -428,94 +541,135 @@ address   name
 00000000  __TI_ATRegion2_trg_addr        
 00000000  __TI_static_base__             
 00000000  interruptVectors               
-000000c1  main                           
+000000c1  DiagConsole_service            
 00000200  __STACK_SIZE                   
-00004f81  SYSCFG_DL_GPIO_init            
-00005051  SYSCFG_DL_LEFT_CAPTURE_init    
-00005101  memcpy                         
-0000519b  ADC0_IRQHandler                
-0000519b  ADC1_IRQHandler                
-0000519b  AES_IRQHandler                 
-0000519b  CANFD0_IRQHandler              
-0000519b  DAC0_IRQHandler                
-0000519b  DMA_IRQHandler                 
-0000519b  Default_Handler                
-0000519b  GROUP0_IRQHandler              
-0000519b  GROUP1_IRQHandler              
-0000519b  HardFault_Handler              
-0000519b  I2C0_IRQHandler                
-0000519b  I2C1_IRQHandler                
-0000519b  NMI_Handler                    
-0000519b  PendSV_Handler                 
-0000519b  RTC_IRQHandler                 
-0000519b  SPI0_IRQHandler                
-0000519b  SPI1_IRQHandler                
-0000519b  SVC_Handler                    
-0000519b  TIMA0_IRQHandler               
-0000519b  TIMG0_IRQHandler               
-0000519b  TIMG12_IRQHandler              
-0000519b  TIMG6_IRQHandler               
-0000519b  TIMG7_IRQHandler               
-0000519b  TIMG8_IRQHandler               
-0000519b  UART1_IRQHandler               
-0000519b  UART2_IRQHandler               
-0000519b  UART3_IRQHandler               
-0000519d  SYSCFG_DL_DIAG_UART_init       
-00005229  TIMA1_IRQHandler               
-000052ad  __TI_decompress_lzss           
-00005329  SYSCFG_DL_initPower            
-00005399  DL_I2C_fillControllerTXFIFO    
-000053f7  __aeabi_idiv0                  
-000053f9  SYSCFG_DL_RIGHT_QEI_init       
-00005455  UART0_IRQHandler               
-000054b1  DL_SPI_drainRXFIFO8            
-00005505  SYSCFG_DL_MPU_I2C_init         
-00005559  SYSCFG_DL_OLED_I2C_init        
-000055ad  SYSCFG_DL_RADIO_SPI_init       
-000055f9  DL_UART_init                   
-00005641  SYSCFG_DL_init                 
-00005689  DL_SPI_init                    
-000056cd  __aeabi_uidiv                  
-000056cd  __aeabi_uidivmod               
-0000570d  DL_I2C_flushControllerTXFIFO   
-00005749  __TI_auto_init_nobinit_nopinit 
-00005785  DL_I2C_flushControllerRXFIFO   
-000057b5  DL_UART_transmitDataBlocking   
-000057e5  SYSCFG_DL_SYSCTL_init          
-00005815  DL_Timer_setCaptureCompareCtl  
-0000583d  _c_int00_noargs                
-00005865  DL_I2C_setClockConfig          
-0000588b  memcmp                         
-000058ad  DL_SPI_receiveDataCheck8       
-000058c9  DL_SPI_transmitDataCheck8      
-000058e5  DL_Timer_setClockConfig        
-00005901  DL_Timer_setCaptureCompareInput
-0000591b  __TI_zero_init_nomemset        
-00005931  DL_SPI_setClockConfig          
-00005943  DL_UART_setClockConfig         
-00005955  __TI_decompress_none           
-00005969  SysTick_Handler                
-00005979  DL_Common_delayCycles          
-00005985  __aeabi_memcpy                 
-00005985  __aeabi_memcpy4                
-00005985  __aeabi_memcpy8                
-0000598d  abort                          
-00005992  C$$EXIT                        
-00005993  HOSTexit                       
-00005997  Reset_Handler                  
-0000599b  _system_pre_init               
-00005f40  __TI_Handler_Table_Base        
-00005f4c  __TI_Handler_Table_Limit       
-00005f5c  __TI_CINIT_Base                
-00005f6c  __TI_CINIT_Limit               
-00005f6c  __TI_CINIT_Warm                
+000058bd  Nrf24Ptx_service               
+0000633d  I2cDiag_readMpuWhoAmI          
+000064e1  DiagConsole_reportBoot         
+0000667d  I2cDiag_scan                   
+00006add  Nrf24Ptx_captureDiagnosticChar 
+00006ce5  SYSCFG_DL_GPIO_init            
+00006dc1  SYSCFG_DL_LEFT_CAPTURE_init    
+00006e71  memcpy                         
+00006f0b  ADC0_IRQHandler                
+00006f0b  ADC1_IRQHandler                
+00006f0b  AES_IRQHandler                 
+00006f0b  CANFD0_IRQHandler              
+00006f0b  DAC0_IRQHandler                
+00006f0b  DMA_IRQHandler                 
+00006f0b  Default_Handler                
+00006f0b  GROUP0_IRQHandler              
+00006f0b  GROUP1_IRQHandler              
+00006f0b  HardFault_Handler              
+00006f0b  I2C0_IRQHandler                
+00006f0b  I2C1_IRQHandler                
+00006f0b  NMI_Handler                    
+00006f0b  PendSV_Handler                 
+00006f0b  RTC_IRQHandler                 
+00006f0b  SPI0_IRQHandler                
+00006f0b  SPI1_IRQHandler                
+00006f0b  SVC_Handler                    
+00006f0b  TIMA0_IRQHandler               
+00006f0b  TIMG0_IRQHandler               
+00006f0b  TIMG12_IRQHandler              
+00006f0b  TIMG6_IRQHandler               
+00006f0b  TIMG7_IRQHandler               
+00006f0b  TIMG8_IRQHandler               
+00006f0b  UART1_IRQHandler               
+00006f0b  UART2_IRQHandler               
+00006f0b  UART3_IRQHandler               
+00006f0d  SYSCFG_DL_DIAG_UART_init       
+00006f99  Encoders_onLeftCaptureInterrupt
+0000701d  Nrf24Ptx_init                  
+00007119  Req002_service                 
+0000718d  SYSCFG_DL_initPower            
+000071fd  Encoders_init                  
+000072c5  memset                         
+00007327  DL_I2C_fillControllerTXFIFO    
+00007385  DiagConsole_onUartInterrupt    
+000073e1  Encoders_snapshot              
+0000743d  SYSCFG_DL_RIGHT_QEI_init       
+00007499  DL_SPI_drainRXFIFO8            
+000074ed  Nrf24Ptx_getStatus             
+00007541  Nrf24Ptx_readCoreRegisters     
+00007595  SYSCFG_DL_MPU_I2C_init         
+000075e9  SYSCFG_DL_OLED_I2C_init        
+0000763d  Nrf24Ptx_arm                   
+0000768d  SYSCFG_DL_RADIO_SPI_init       
+000076d9  StartButton_poll               
+00007725  BoardSafety_outputsLocked      
+0000776d  DL_UART_init                   
+000077b5  DiagConsole_init               
+000077fd  SYSCFG_DL_init                 
+0000788d  DL_SPI_init                    
+000078d1  __aeabi_uidiv                  
+000078d1  __aeabi_uidivmod               
+00007911  App_service                    
+0000794d  DL_I2C_flushControllerTXFIFO   
+00007989  LineSensors_readRawBits        
+000079c5  Nrf24Ptx_disarm                
+00007a01  __TI_auto_init_nobinit_nopinit 
+00007a75  App_init                       
+00007aa9  DL_I2C_flushControllerRXFIFO   
+00007ad9  DL_UART_transmitDataBlocking   
+00007b09  SYSCFG_DL_SYSCTL_init          
+00007b39  Timebase_init                  
+00007b69  BoardSafety_init               
+00007b91  BoardSafety_service            
+00007bb9  DL_Timer_setCaptureCompareCtl  
+00007be1  Req002_init                    
+00007c09  _c_int00_noargs                
+00007c31  DL_I2C_setClockConfig          
+00007c57  __aeabi_idiv0                  
+00007c59  Nrf24Ptx_safeWhenDisarmed      
+00007c7d  StartButton_init               
+00007c9d  memcmp                         
+00007cbd  DL_SPI_receiveDataCheck8       
+00007cd9  DL_SPI_transmitDataCheck8      
+00007cf5  DL_Timer_setClockConfig        
+00007d11  DL_Timer_setCaptureCompareInput
+00007d2d  __aeabi_memset                 
+00007d2d  __aeabi_memset4                
+00007d2d  __aeabi_memset8                
+00007d3b  __aeabi_memclr                 
+00007d3b  __aeabi_memclr4                
+00007d3b  __aeabi_memclr8                
+00007d49  Req002_blockReasonName         
+00007d61  Req002_stateName               
+00007d79  main                           
+00007d8f  DL_SPI_setClockConfig          
+00007da1  DL_UART_setClockConfig         
+00007db5  Timebase_onSysTick             
+00007dc5  __TI_zero_init                 
+00007dd5  Timebase_nowMs                 
+00007de1  DL_Common_delayCycles          
+00007deb  StartButton_takePress          
+00007df5  BoardSafety_buzzerPolicy       
+00007dfd  Req002_getStatus               
+00007e05  SysTick_Handler                
+00007e0d  TIMA1_IRQHandler               
+00007e15  Timebase_reached               
+00007e1d  UART0_IRQHandler               
+00007e25  __aeabi_memcpy                 
+00007e25  __aeabi_memcpy4                
+00007e25  __aeabi_memcpy8                
+00007e2d  abort                          
+00007e32  C$$EXIT                        
+00007e33  HOSTexit                       
+00007e37  Reset_Handler                  
+00007e3b  _system_pre_init               
+00008528  __TI_Handler_Table_Base        
+0000852c  __TI_CINIT_Base                
+0000852c  __TI_Handler_Table_Limit       
+00008534  __TI_CINIT_Limit               
+00008534  __TI_CINIT_Warm                
 20200000  __start___llvm_prf_bits        
 20200000  __start___llvm_prf_cnts        
 20200000  __stop___llvm_prf_bits         
 20200000  __stop___llvm_prf_cnts         
-20200000  gLEFT_CAPTUREBackup            
-202000bc  gRIGHT_QEIBackup               
-2020022c  gRADIO_SPIBackup               
+20200300  gLEFT_CAPTUREBackup            
+202003bc  gRIGHT_QEIBackup               
+2020052c  gRADIO_SPIBackup               
 20207e00  __stack                        
 20208000  __STACK_END                    
 ffffffff  __TI_pprof_out_hndl            
@@ -526,4 +680,4 @@ ffffffff  binit
 UNDEFED   __mpu_init                     
 UNDEFED   _system_post_cinit             
 
-[108 symbols]
+[149 symbols]

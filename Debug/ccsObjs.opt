@@ -1,6 +1,17 @@
 "./empty.o"
 "./ti_msp_dl_config.o"
 "./startup_mspm0g350x_ticlang.o"
+"./algorithm/pid.o"
+"./app/app.o"
+"./app/req002.o"
+"./bsp/board_safety.o"
+"./bsp/timebase.o"
+"./drivers/diag_console.o"
+"./drivers/encoders.o"
+"./drivers/i2c_diag.o"
+"./drivers/line_sensors.o"
+"./drivers/nrf24_ptx.o"
+"./drivers/start_button.o"
 -l"./device_linker.cmd"
 -ldevice.cmd.genlibs
 -llibc.a

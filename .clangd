@@ -1,8 +1,13 @@
-# This is an auto-generated file - do not add it to source-control
+# CCS generates Debug/.clangd/compile_commands.json without the MSPM0 target
+# flags from device.opt. Add them here so clangd parses the same device family
+# and ARM architecture as the TI clang target build.
 
 CompileFlags:
    CompilationDatabase: Debug/.clangd
-
-Diagnostics:
-   Suppress: '*'
+   Add:
+      - -D__MSPM0G3507__
+      - -D__USE_SYSCONFIG__
+      - --target=arm-none-eabi
+      - -mcpu=cortex-m0plus
+      - -mthumb
 

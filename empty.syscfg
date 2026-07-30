@@ -65,9 +65,11 @@ GPIO1.associatedPins[10].pin.$assign   = "PB25";
 GPIO1.associatedPins[11].$name         = "RADIO_IRQ";
 GPIO1.associatedPins[11].direction     = "INPUT";
 GPIO1.associatedPins[11].pin.$assign   = "PB16";
-GPIO1.associatedPins[12].$name         = "BUZZER";
-GPIO1.associatedPins[12].initialValue  = "CLEARED";
-GPIO1.associatedPins[12].pin.$assign   = "PB27";
+/* PB21 board key is the local, low-active REQ-002 start input. */
+GPIO1.associatedPins[12].$name            = "START_BUTTON";
+GPIO1.associatedPins[12].direction        = "INPUT";
+GPIO1.associatedPins[12].internalResistor = "PULL_UP";
+GPIO1.associatedPins[12].pin.$assign      = "PB21";
 GPIO1.associatedPins[13].$name         = "D36A_EN_SAFE";
 GPIO1.associatedPins[13].initialValue  = "CLEARED";
 GPIO1.associatedPins[13].pin.$assign   = "PB0";

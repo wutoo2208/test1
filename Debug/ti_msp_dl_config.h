@@ -233,10 +233,10 @@ extern "C" {
 #define DIAG_GPIO_RADIO_IRQ_PORT                                         (GPIOB)
 #define DIAG_GPIO_RADIO_IRQ_PIN                                 (DL_GPIO_PIN_16)
 #define DIAG_GPIO_RADIO_IRQ_IOMUX                                (IOMUX_PINCM33)
-/* Defines for BUZZER: GPIOB.27 with pinCMx 58 on package pin 29 */
-#define DIAG_GPIO_BUZZER_PORT                                            (GPIOB)
-#define DIAG_GPIO_BUZZER_PIN                                    (DL_GPIO_PIN_27)
-#define DIAG_GPIO_BUZZER_IOMUX                                   (IOMUX_PINCM58)
+/* Defines for START_BUTTON: GPIOB.21 with pinCMx 49 on package pin 20 */
+#define DIAG_GPIO_START_BUTTON_PORT                                      (GPIOB)
+#define DIAG_GPIO_START_BUTTON_PIN                              (DL_GPIO_PIN_21)
+#define DIAG_GPIO_START_BUTTON_IOMUX                             (IOMUX_PINCM49)
 /* Defines for D36A_EN_SAFE: GPIOB.0 with pinCMx 12 on package pin 47 */
 #define DIAG_GPIO_D36A_EN_SAFE_PORT                                      (GPIOB)
 #define DIAG_GPIO_D36A_EN_SAFE_PIN                               (DL_GPIO_PIN_0)

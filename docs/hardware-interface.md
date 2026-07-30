@@ -127,11 +127,11 @@ Reviewed by:
 |---|---|---|---|
 | nRF24L01+ | `docs/hardware/modules/nrf24l01p.md` | 3.3 V SPI 无线 IC/模块候选，最高 2 Mbps 空口速率。 | 实物模块排针、用途、图传能力。 |
 | 八路灰度循迹 | `docs/hardware/modules/line-sensor-8ch.md` | 5 V 供电、AD0-AD2 选通、OUT 数字量；教程候选 PA14-PA17。 | OUT 电平、发光颜色、实测高度。 |
-| MPU6000A/MPU6050 | `docs/hardware/modules/mpu6000a.md` | I2C 地址候选 0x68/0x69、INT、采样率/量程寄存器。 | 实物型号、上拉电压、安装方向。 |
+| MPU6000A/MPU6050 | `docs/hardware/modules/mpu6000a.md` | PB2/PB3 I2C1 端点保持；模块从摆杆移到车体，只作为循迹扰动/角速度/加速度辅助候选。 | 实物型号、上拉电压、车体安装轴向、振动与收益对照。 |
 | DRV8870 双路 | `docs/hardware/modules/drv8870-dual.md` | 双电机控制、四路编码器输入、VIN/电流/接口资料。 | 实物板版本、电机参数、电池与电平。 |
 | 天猛星拓展板 V2.0 | `docs/hardware/modules/tianmengxing-expansion-board-v2.md` | EPRO 静态资料与实物正面装配照片均已归档；可见双稳压、TB6612、OLED、按键等区域。 | 背面照片、板号、排针线序、电平与实际供电路径。 |
 | MP1584EN 可调降压 | `docs/hardware/modules/mp1584en-adjustable-step-down.md` | 用户称 MP1584EN；参数图称 4.5–28 V 输入、0.8–20 V 可调输出、最大 3 A。 | 实物板型、输出设定/测量、负载、保护、热与接线。 |
-| K230 目标跟踪 | docs/hardware/modules/k230-target-tracking.md | 教程给出 K230 IO9/IO10 UART 与目标框 x/y/w/h；教程 MSPM0 端仅写 A22/A21。 | K230 板型/电平、A21/A22 对应关系、帧/速率、供电与完整视频图传链路。 |
+| K230 目标跟踪 | docs/hardware/modules/k230-target-tracking.md | PA8/PA9 UART1 端点保持；K230 目标框经球心、杆轴投影和像素到毫米标定后，作为钢球位置外环的唯一测量。 | 板型/电平、完整帧、捕获时间、帧率/延迟、标定精度、异常帧策略及完整视频图传链路。 |
 | MS42CG 编码器 | `docs/hardware/modules/ms42cg-encoder.md` | 3.3–5 V 供电，输出 A/B/PWM/Z；手册示例 A/B 1000 线、四倍频 4000 计数/圈。 | 实物线束、3.3 V 供电、A/B/PWM/Z 取线、MCU 捕获资源和最高边沿频率。 |
 | D36A 双路步进驱动 | `docs/hardware/modules/d36a-dual-stepper-driver.md` | 两路 STEP/DIR/EN，外部 12 V 示例、4 线两相步进输出，细分/电流拨码共用。 | 实际步进电机型号/相电流、控制电平时序、供电保护、热与物理连接。 |
 
@@ -194,3 +194,15 @@ Reviewed by:
 | `IF-V1.2-MS42` | MS42CG A/B/PWM/Z | PA29/PA30/PA13/PB23 | H4 pin17/H2 pin7/H4 pin15/H3 pin16 | Timer 捕获隔离验证、边沿频率、PWM 周期与线束 |
 
 `PB18` 按用户现场陈述标记为 `KEY3 / FORBIDDEN-FOR-RADIO`。v1.2 冻结只确认设计资源，不授权修改 `.syscfg`、接线、供电、构建、烧录或硬件测试。
+
+## 13. 传感器与执行器职责变更（2026-07-30，未改变接线）
+
+| 链路 | 当前职责 | 明确不承担 | 状态/门槛 |
+|---|---|---|---|
+| K230 → UART1 PA8/PA9 | 目标框经过标定后输出钢球相对 O 点的有符号位置，作为球位置外环唯一测量。 | 不直接证明杆角、执行器位置或视频图传已合规。 | 完整协议、时间戳、帧率/延迟、毫米标定和异常帧策略待验证。 |
+| MS42CG → PA29/PA30/PA13/PB23 | D36A 步进执行器的位置/角度内层反馈、回零/丢步监测候选。 | 不测钢球位置。 | 零位、方向、计数、PWM/Z 语义、几何映射与失步策略待验证。 |
+| D36A → PA26/PA24/PB0 | 控制步进电机改变摆杆右端高度，从而实现定轴转动。 | 不提供编码器反馈，也不能保证没有失步。 | 步频、加速度、限位、失能、相电流与温升待验证。 |
+| MPU6050 → I2C1 PB2/PB3 | 安装在车体，作为循迹扰动、角速度、加速度、倾斜或前馈候选。 | 不装摆杆、不测杆角、不替代 TCRT5000。 | 默认仅记录；安装轴向、零偏、振动和收益对照通过后才可加入控制。 |
+| TCRT5000 五路 | 小车循迹主反馈。 | 不测钢球位置。 | 电平、极性、车体左右顺序和赛道标定仍需关闭。 |
+
+本节只改变系统职责，不改变 `docs/pin-plan/mspm0g3507-pin-plan-frozen-v1.2.md` 或 `docs/pin-plan/mspm0g3507-adapter-harness-v1.2.md` 的端点，不授权修改 `.syscfg`、接线、上电、构建、烧录或运动测试。
