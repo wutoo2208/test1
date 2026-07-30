@@ -1,6 +1,6 @@
 # 项目当前状态（轻量上下文）
 
-> **更新时间**：2026-07-30。
+> **更新时间**：2026-07-30（诊断固件首版已构建）。
 > **用途**：供新的 Claude Code / Codex 短会话快速了解当前项目；它不是正式题面、决策或测试记录的替代品。发生冲突时，按 `AGENTS.md` 的证据优先级处理。
 
 ## 1. 当前阶段与授权
@@ -18,6 +18,11 @@
 - 正式、完整要求和评分以 `docs/requirements.md` 为准。
 
 ## 3. 已确认的项目事实
+
+- 用户于 2026-07-30 明确陈述：DRV8870、两台车轮电机、两路编码器、五路 TCRT 循迹、nRF24L01、OLED 和 MPU6050 已完成实物接线。该陈述更新“是否已接线”的现场状态，但不自动证明端点、电平、极性、Pin 1、供电或连续性正确。
+- `empty.syscfg` 与 `empty.c` 已进入首版 bring-up：UART0/CH340 为 `115200 8N1` 诊断口；电机与 D36A 仅配置软件低电平安全锁；已加入 TCRT 原始输入、右轮 TIMG8 QEI、左轮 TIMA1 Capture/软件正交、I2C0 OLED 探测、I2C1 MPU `WHO_AM_I` 和 SPI0 nRF 寄存器只读诊断命令。
+- SysConfig 1.26.2 隔离生成及 TI clang 5.1.1 LTS clean build/link 已通过，生成 `Debug/test1.out`；Flash 使用 `0x2e00/0x20000`，SRAM 使用 `0x467/0x8000`。这仅是构建证据，尚未烧录或实测任何模块。
+- 当前诊断命令：`help`、`status`、`pins`、`line`、`enc`、`i2c`、`mpu`、`radio`、`stop`、`selftest`。没有电机运动、PWM、步进脉冲、无线发射或任意寄存器写命令。
 
 - 主控开发板：立创天猛星 `MSPM0G3507`；MCU/Timer/接口资源已按 `docs/pin-plan/mspm0g3507-pin-plan-frozen-v1.2.md` 冻结为当前唯一设计基线，配套线束见 `docs/pin-plan/mspm0g3507-adapter-harness-v1.2.md`；`empty.syscfg` 尚未修改，硬件尚未接线/上电。
 - 驱动电机：额定 12 V、堵转电流 3.2 A（每个）、减速比 1:28；编码器输入/输出均为 3.3 V（用户陈述）。

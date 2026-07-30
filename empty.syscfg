@@ -1,35 +1,145 @@
 /**
- * These arguments were used when this file was generated. They will be automatically applied on subsequent loads
- * via the GUI or CLI. Run CLI with '--help' for additional information on how to override these arguments.
  * @cliArgs --device "MSPM0G350X" --part "Default" --package "LQFP-64(PM)" --product "mspm0_sdk@2.11.00.07"
  * @v2CliArgs --device "MSPM0G3507" --package "LQFP-64(PM)" --product "mspm0_sdk@2.11.00.07"
  * @versions {"tool":"1.26.2+4477"}
  */
 
-/**
- * Import the modules used in this configuration.
- */
-const GPIO   = scripting.addModule("/ti/driverlib/GPIO", {}, false);
-const GPIO1  = GPIO.addInstance();
-const SYSCTL = scripting.addModule("/ti/driverlib/SYSCTL");
+const GPIO    = scripting.addModule("/ti/driverlib/GPIO", {}, false);
+const UART    = scripting.addModule("/ti/driverlib/UART", {}, false);
+const I2C     = scripting.addModule("/ti/driverlib/I2C", {}, false);
+const SPI     = scripting.addModule("/ti/driverlib/SPI", {}, false);
+const QEI     = scripting.addModule("/ti/driverlib/QEI", {}, false);
+const CAPTURE = scripting.addModule("/ti/driverlib/CAPTURE", {}, false);
+const SYSCTL  = scripting.addModule("/ti/driverlib/SYSCTL");
 
-/**
- * Write custom configuration values to the imported modules.
+const GPIO1   = GPIO.addInstance();
+const UART1   = UART.addInstance();
+const I2C1    = I2C.addInstance();
+const I2C2    = I2C.addInstance();
+const SPI1    = SPI.addInstance();
+const QEI1    = QEI.addInstance();
+const CAPTURE1 = CAPTURE.addInstance();
+
+/*
+ * GPIO-only bring-up deliberately keeps both DRV8870 channels locked at 00.
+ * PB14/PA7 move to TIMA0 PWM only after a separate motor-test authorization.
  */
-GPIO1.$name                         = "LED";
-GPIO1.associatedPins[0].$name       = "LED0";
-GPIO1.associatedPins[0].pin.$assign = "PB22";
+GPIO1.$name = "DIAG_GPIO";
+GPIO1.associatedPins.create(15);
+
+GPIO1.associatedPins[0].$name        = "MOTOR_AIN1_SAFE";
+GPIO1.associatedPins[0].initialValue = "CLEARED";
+GPIO1.associatedPins[0].pin.$assign  = "PB14";
+GPIO1.associatedPins[1].$name        = "MOTOR_AIN2_SAFE";
+GPIO1.associatedPins[1].initialValue = "CLEARED";
+GPIO1.associatedPins[1].pin.$assign  = "PB12";
+GPIO1.associatedPins[2].$name        = "MOTOR_BIN1_SAFE";
+GPIO1.associatedPins[2].initialValue = "CLEARED";
+GPIO1.associatedPins[2].pin.$assign  = "PA7";
+GPIO1.associatedPins[3].$name        = "MOTOR_BIN2_SAFE";
+GPIO1.associatedPins[3].initialValue = "CLEARED";
+GPIO1.associatedPins[3].pin.$assign  = "PB24";
+
+GPIO1.associatedPins[4].$name       = "TCRT_OUT1";
+GPIO1.associatedPins[4].direction   = "INPUT";
+GPIO1.associatedPins[4].pin.$assign = "PA25";
+GPIO1.associatedPins[5].$name       = "TCRT_OUT2";
+GPIO1.associatedPins[5].direction   = "INPUT";
+GPIO1.associatedPins[5].pin.$assign = "PA27";
+GPIO1.associatedPins[6].$name       = "TCRT_OUT3";
+GPIO1.associatedPins[6].direction   = "INPUT";
+GPIO1.associatedPins[6].pin.$assign = "PA16";
+GPIO1.associatedPins[7].$name       = "TCRT_OUT4";
+GPIO1.associatedPins[7].direction   = "INPUT";
+GPIO1.associatedPins[7].pin.$assign = "PA14";
+GPIO1.associatedPins[8].$name       = "TCRT_OUT5";
+GPIO1.associatedPins[8].direction   = "INPUT";
+GPIO1.associatedPins[8].pin.$assign = "PB20";
+
+GPIO1.associatedPins[9].$name         = "RADIO_CE";
+GPIO1.associatedPins[9].initialValue  = "CLEARED";
+GPIO1.associatedPins[9].pin.$assign   = "PB1";
+GPIO1.associatedPins[10].$name         = "RADIO_IRQ";
+GPIO1.associatedPins[10].direction     = "INPUT";
+GPIO1.associatedPins[10].pin.$assign   = "PB16";
+GPIO1.associatedPins[11].$name         = "BUZZER";
+GPIO1.associatedPins[11].initialValue  = "CLEARED";
+GPIO1.associatedPins[11].pin.$assign   = "PB27";
+GPIO1.associatedPins[12].$name         = "D36A_EN_SAFE";
+GPIO1.associatedPins[12].initialValue  = "CLEARED";
+GPIO1.associatedPins[12].pin.$assign   = "PB0";
+GPIO1.associatedPins[13].$name         = "D36A_DIR_SAFE";
+GPIO1.associatedPins[13].initialValue  = "CLEARED";
+GPIO1.associatedPins[13].pin.$assign   = "PA24";
+GPIO1.associatedPins[14].$name         = "D36A_STEP_SAFE";
+GPIO1.associatedPins[14].initialValue  = "CLEARED";
+GPIO1.associatedPins[14].pin.$assign   = "PA26";
+
+UART1.$name                    = "DIAG_UART";
+UART1.enableFIFO               = true;
+UART1.enableDMARX              = false;
+UART1.enableDMATX              = false;
+UART1.targetBaudRate           = 115200;
+UART1.rxFifoThreshold          = "DL_UART_RX_FIFO_LEVEL_ONE_ENTRY";
+UART1.enabledInterrupts        = ["RX"];
+UART1.peripheral.$assign       = "UART0";
+UART1.peripheral.rxPin.$assign = "PA11";
+UART1.peripheral.txPin.$assign = "PA10";
+
+I2C1.$name                     = "OLED_I2C";
+I2C1.basicEnableController     = true;
+I2C1.basicControllerBusSpeed   = 100000;
+I2C1.advAnalogGlitchFilter     = "DISABLED";
+I2C1.peripheral.$assign        = "I2C0";
+I2C1.peripheral.sdaPin.$assign = "PA0";
+I2C1.peripheral.sclPin.$assign = "PA1";
+
+I2C2.$name                     = "MPU_I2C";
+I2C2.basicEnableController     = true;
+I2C2.basicControllerBusSpeed   = 100000;
+I2C2.advAnalogGlitchFilter     = "DISABLED";
+I2C2.peripheral.$assign        = "I2C1";
+I2C2.peripheral.sdaPin.$assign = "PB3";
+I2C2.peripheral.sclPin.$assign = "PB2";
+
+/* SPI is initialized but no transaction is automatic; CE remains low. */
+SPI1.$name                      = "RADIO_SPI";
+SPI1.targetBitRate              = 500000;
+SPI1.chipSelect                 = ["0"];
+SPI1.peripheral.$assign         = "SPI0";
+SPI1.peripheral.sclkPin.$assign = "PA12";
+SPI1.peripheral.mosiPin.$assign = "PB17";
+SPI1.peripheral.misoPin.$assign = "PB19";
+SPI1.peripheral.cs0Pin.$assign  = "PB25";
+SPI1.cs0PinConfig.enableConfig     = true;
+SPI1.cs0PinConfig.internalResistor = "PULL_UP";
+
+QEI1.$name                      = "RIGHT_QEI";
+QEI1.interrupts                 = ["DC_EVENT"];
+QEI1.timerStartTimer            = false;
+QEI1.peripheral.$assign         = "TIMG8";
+QEI1.peripheral.ccp0Pin.$assign = "PB10";
+QEI1.peripheral.ccp1Pin.$assign = "PB11";
+
+CAPTURE1.$name                            = "LEFT_CAPTURE";
+CAPTURE1.captureInputMode                 = "multi";
+CAPTURE1.ccIndexMulti                     = [0,1];
+CAPTURE1.multi_countMode                  = "DL_TIMER_COUNT_MODE_UP";
+CAPTURE1.multi_countRep                   = "DL_TIMER_REPEAT_MODE_ENABLED";
+CAPTURE1.multi_cvae                       = "DL_TIMER_COUNT_AFTER_EN_ZERO";
+CAPTURE1.multi_ch_zero                    = 1;
+CAPTURE1.multi_ch0_input_mode             = "DL_TIMER_CC_IN_SEL_CCPX";
+CAPTURE1.multi_ch1_input_mode             = "DL_TIMER_CC_IN_SEL_CCPX";
+CAPTURE1.multi_ch0_input_filter           = false;
+CAPTURE1.multi_ch1_input_filter           = false;
+CAPTURE1.multi_ch0_captEdgeDetection      = "DL_TIMER_CC_CCOND_TRIG_EDGE";
+CAPTURE1.multi_ch1_captEdgeDetection      = "DL_TIMER_CC_CCOND_TRIG_EDGE";
+CAPTURE1.interrupts                       = ["CC0_UP","CC1_UP","LOAD"];
+CAPTURE1.timerStartTimer                  = false;
+CAPTURE1.peripheral.$assign               = "TIMA1";
+CAPTURE1.peripheral.ccp0Pin.$assign       = "PB4";
+CAPTURE1.peripheral.ccp1Pin.$assign       = "PB5";
 
 const Board = scripting.addModule("/ti/driverlib/Board", {}, false);
-
 SYSCTL.forceDefaultClkConfig = true;
-
-/**
- * Pinmux solution for unlocked pins/peripherals. This ensures that minor changes to the automatic solver in a future
- * version of the tool will not impact the pinmux you originally saw.  These lines can be completely deleted in order to
- * re-solve from scratch.
- */
-Board.peripheral.$suggestSolution          = "DEBUGSS";
-Board.peripheral.swclkPin.$suggestSolution = "PA20";
-Board.peripheral.swdioPin.$suggestSolution = "PA19";
-SYSCTL.peripheral.$suggestSolution         = "SYSCTL";
+SYSCTL.clockTreeEn           = true;
