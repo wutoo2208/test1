@@ -182,10 +182,6 @@ extern "C" {
 #define GPIO_RADIO_SPI_SCLK_PIN                                  DL_GPIO_PIN_12
 #define GPIO_RADIO_SPI_IOMUX_SCLK                               (IOMUX_PINCM34)
 #define GPIO_RADIO_SPI_IOMUX_SCLK_FUNC               IOMUX_PINCM34_PF_SPI0_SCLK
-#define GPIO_RADIO_SPI_CS0_PORT                                           GPIOB
-#define GPIO_RADIO_SPI_CS0_PIN                                   DL_GPIO_PIN_25
-#define GPIO_RADIO_SPI_IOMUX_CS0                                (IOMUX_PINCM56)
-#define GPIO_RADIO_SPI_IOMUX_CS0_FUNC                 IOMUX_PINCM56_PF_SPI0_CS0
 
 
 
@@ -229,6 +225,10 @@ extern "C" {
 #define DIAG_GPIO_RADIO_CE_PORT                                          (GPIOB)
 #define DIAG_GPIO_RADIO_CE_PIN                                   (DL_GPIO_PIN_1)
 #define DIAG_GPIO_RADIO_CE_IOMUX                                 (IOMUX_PINCM13)
+/* Defines for RADIO_CSN: GPIOB.25 with pinCMx 56 on package pin 27 */
+#define DIAG_GPIO_RADIO_CSN_PORT                                         (GPIOB)
+#define DIAG_GPIO_RADIO_CSN_PIN                                 (DL_GPIO_PIN_25)
+#define DIAG_GPIO_RADIO_CSN_IOMUX                                (IOMUX_PINCM56)
 /* Defines for RADIO_IRQ: GPIOB.16 with pinCMx 33 on package pin 4 */
 #define DIAG_GPIO_RADIO_IRQ_PORT                                         (GPIOB)
 #define DIAG_GPIO_RADIO_IRQ_PIN                                 (DL_GPIO_PIN_16)

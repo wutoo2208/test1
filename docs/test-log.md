@@ -95,7 +95,18 @@
 
 构建后资源：Flash `0x2e00 / 0x20000`，SRAM `0x467 / 0x8000`。当前 `Debug/**` 是构建生成物，不得手工修改。
 
-## 10. 测试记录模板
+## 10. 2026-07-30 无线传输框架记录
+
+| ID | 类型 | 检查/动作 | 结果 | 证据与局限 |
+|---|---|---|---|---|
+| `TEST-014` | 用户澄清 | COM7 是独立 `CH340 + 控制器 + nRF24` USB 无线接收适配器，不是开发板 PA10/PA11 UART。 | RECORDED | 未收到接收器型号、手册、购买链接或 RF 配置。 |
+| `TEST-015` | SysConfig 隔离验证 | PB25 改为初始高 GPIO 软件 CSN；SPI0 保留 PA12/PB17/PB19、MOTO3 mode0、500 kHz。 | PASS | 0 error；STOP/STANDBY retention 为 info，当前固件不进入这些模式。 |
+| `TEST-016` | 构建验证 | nRF PTX 框架经 TI clang `5.1.1 LTS` clean build/link。 | PASS | 生成 `Debug/test1.out`；Flash `0x5f70/0x20000`，SRAM `0x478/0x8000`。 |
+| `TEST-017` | 静态安全核验 | `RADIO_ALLOW_TX=0`、`RADIO_PROFILE_VALID=0`、`RADIO_AUTO_ARM=0`；唯一 CE-high 只能经成功 profile validation 和 arm 到达。 | PASS | 当前构建不会发 RF；不证明复位高阻期间 CE 安全，仍需外部下拉。 |
+| `TEST-018` | 功能静态核验 | 已实现软件 CSN、有界 SPI、初始化/读回、队列/分片、SysTick 状态机、`TX_DS/MAX_RT/timeout` 和统计。 | PASS | 尚未填入接收器 profile；dynamic-payload `ACTIVATE` 与 CRC/power profile 扩展仅在需要时补充。 |
+| `TEST-019` | 无线端到端 | 车载 nRF 配置、发包、COM7 接收和透明串口重组。 | BLOCKED | 缺 RF channel、地址/字节序、速率、CRC、payload 模式/宽度、ACK/重试及 COM7 输出格式。 |
+
+## 11. 测试记录模板
 
 ```text
 Test ID: TEST-NNN

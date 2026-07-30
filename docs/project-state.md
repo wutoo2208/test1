@@ -1,6 +1,6 @@
 # 项目当前状态（轻量上下文）
 
-> **更新时间**：2026-07-30（诊断固件首版已构建）。
+> **更新时间**：2026-07-30（无线传输框架已构建，RF 默认锁止）。
 > **用途**：供新的 Claude Code / Codex 短会话快速了解当前项目；它不是正式题面、决策或测试记录的替代品。发生冲突时，按 `AGENTS.md` 的证据优先级处理。
 
 ## 1. 当前阶段与授权
@@ -20,17 +20,19 @@
 ## 3. 已确认的项目事实
 
 - 用户于 2026-07-30 明确陈述：DRV8870、两台车轮电机、两路编码器、五路 TCRT 循迹、nRF24L01、OLED 和 MPU6050 已完成实物接线。该陈述更新“是否已接线”的现场状态，但不自动证明端点、电平、极性、Pin 1、供电或连续性正确。
-- `empty.syscfg` 与 `empty.c` 已进入首版 bring-up：UART0/CH340 为 `115200 8N1` 诊断口；电机与 D36A 仅配置软件低电平安全锁；已加入 TCRT 原始输入、右轮 TIMG8 QEI、左轮 TIMA1 Capture/软件正交、I2C0 OLED 探测、I2C1 MPU `WHO_AM_I` 和 SPI0 nRF 寄存器只读诊断命令。
-- SysConfig 1.26.2 隔离生成及 TI clang 5.1.1 LTS clean build/link 已通过，生成 `Debug/test1.out`；Flash 使用 `0x2e00/0x20000`，SRAM 使用 `0x467/0x8000`。这仅是构建证据，尚未烧录或实测任何模块。
-- 当前诊断命令：`help`、`status`、`pins`、`line`、`enc`、`i2c`、`mpu`、`radio`、`stop`、`selftest`。没有电机运动、PWM、步进脉冲、无线发射或任意寄存器写命令。
+- `empty.syscfg` 与 `empty.c` 已实现 bring-up：UART0 为 `115200 8N1` 本地诊断；电机与 D36A 保持软件低电平安全锁；具备 TCRT 原始输入、右轮 TIMG8 QEI、左轮 TIMA1 Capture/软件正交、OLED/MPU I2C 诊断，以及完整但默认锁止的 nRF24 PTX 传输框架。
+- 无线框架已包含：PB25 软件 CSN、SPI0 有界事务、寄存器初始化与读回、32-byte 分片、16-frame 队列、SysTick 时限、CE 短脉冲、`TX_DS/MAX_RT/timeout` 处理、统计与 `radio arm/disarm/status/test` 命令。
+- 由于 COM7 接收适配器的 RF channel、地址、air rate、CRC、payload mode/width 和 ACK 策略未知，当前 `RADIO_ALLOW_TX=0`、`RADIO_PROFILE_VALID=0`、`RADIO_AUTO_ARM=0`；正常执行无法进入唯一 CE-high 路径，不会发射 RF。
+- SysConfig 1.26.2 隔离生成及 TI clang 5.1.1 LTS clean build/link 已通过，生成 `Debug/test1.out`；Flash 使用 `0x5f70/0x20000`，SRAM 使用 `0x478/0x8000`。这仅是构建证据，当前无线版尚未烧录或发射。
+- 当前诊断命令：`help`、`status`、`pins`、`line`、`enc`、`i2c`、`mpu`、`radio_regs`、`radio_status`、`radio_arm`、`radio_disarm`、`radio_test`、`stop`、`selftest`。`radio_arm` 在未知 profile 下返回 `BLOCKED`。
 
-- 主控开发板：立创天猛星 `MSPM0G3507`；MCU/Timer/接口资源已按 `docs/pin-plan/mspm0g3507-pin-plan-frozen-v1.2.md` 冻结为当前唯一设计基线，配套线束见 `docs/pin-plan/mspm0g3507-adapter-harness-v1.2.md`；`empty.syscfg` 尚未修改，硬件尚未接线/上电。
+- 主控开发板：立创天猛星 `MSPM0G3507`；MCU/Timer/接口资源以 `docs/pin-plan/mspm0g3507-pin-plan-frozen-v1.2.md` 为引脚 Owner 基线。固件将 PB25 从 SPI0 硬件 CS0 改为同一物理网络上的 GPIO 软件 CSN，以保证完整 nRF 命令帧持续选中；其余 v1.2 端点不变。
 - 驱动电机：额定 12 V、堵转电流 3.2 A（每个）、减速比 1:28；编码器输入/输出均为 3.3 V（用户陈述）。
 - 电池：3S 锂电池组；电池标签标称 11.1 V、充电限制 12.6 V、额定容量 2800 mAh。BMS 与持续/峰值放电能力未确认。
 - 电机驱动：库存为 DRV8870 双路模块；长期堵转热、电流、模块版本和保护方案仍需核实。
 - 原八路蓝光灰度模块已排除，不作为 H 题最终循迹方案。
 - 主循迹已确定为五路一体 TCRT5000；v1.2 最新端点为 OUT1/OUT2→H10 pin7/pin8→PA25/PA27，OUT3/OUT4/OUT5→H10 pin3/pin4/pin5→PA16/PA14/PB20，必须使用交叉线束。输出电平、结构、极性和车体左右顺序仍待台架关闭。
-- MPU6050 规划为 PB2/PB3 的 I2C1；K230 规划为 PA8/PA9 的 UART1；UART0 留 CH340。无线 SPI0 v1.1 因 `PB18=KEY3` 已否决；v1.2 已获批准并冻结，使用 PB17/PA12/PB19/PB25 + PB1 CE + PB16 IRQ，PB18 标记为 `KEY3 / FORBIDDEN-FOR-RADIO`。该设计尚未接线，无线 pin1/pin2、供电、IRQ 输出结构和 SPI 参数仍阻塞；低速无线不能替代题面视频图传。
+- MPU6050 规划为 PB2/PB3 的 I2C1；K230 规划为 PA8/PA9 的 UART1；UART0 留给开发板 PA10/PA11 路径。用户已澄清当前电脑 `COM7` 是独立 CH340+nRF24 USB 无线接收适配器，不是开发板板载 CH340。无线使用 PB17/PA12/PB19/PB25 + PB1 CE + PB16 IRQ；实物已接线是用户陈述，但接收端 RF profile 与模块电气仍未形成资料/实测证据。低速无线不能替代题面视频图传。
 - 天猛星拓展板 V2.0 的正面装配照片已归档；背面、实际供电路径和排针线序仍未确认。用户称有 MP1584EN 可调降压模块；参数图宣称 4.5–28 V 输入、0.8–20 V 可调输出、最大 3 A，但实际板型、5 V 设定和带载能力未测。
 - 摆杆执行器路线已确定为 D36A 通道1 + MS42CG V2，取代 RC 舵机；使用 ST1/DIR1/EN1 和 A/B/PWM/Z，MS42CG 固定 3.3 V 逻辑域。实际绕组、相电流、细分、输入时序、机械限位和散热仍待验证。
 - DRV8870 车轮控制采用 U2 三隔离、三桥接、一保留；车轮功率绕过拓展板直连 DRV。U6/U16 只接编码器四线；U3/U12/H8 不使用，PB18 因板载 KEY3 占用而禁止用于无线。
@@ -44,7 +46,7 @@
 5. 左右轮编码器 PPR/CPR、相位、最高边沿频率和正方向标定。
 6. D36A 输入门限/STEP 时序、EN/ST 复位偏置、步进绕组/相电流/细分、MS42CG 六针观察面、PWM/Z 时序、机械限位和散热。
 7. OLED/MPU6050 的供电、地址和 I2C 上拉电压；H13 蜂鸣器有源/无源与输入电流。
-8. 无线模块 pin1/pin2、供电、IRQ 输出结构、SPI mode/频率/协议和线束；TCRT 改线后的电平、极性、物理顺序及交叉线束连续性；MS42 PWM 捕获仍需未来 SysConfig 隔离验证。
+8. 无线：车载模块 VCC/GND/去耦和 CE 复位外部下拉；COM7 USB 接收适配器的 channel、地址、air rate、CRC、payload width/mode、ACK/重试和串口输出格式。建议通过购买链接/手册或被动抓取接收适配器上电时 nRF SPI 配置获得；未知前 RF 保持锁止。
 
 ## 5. 建议的新会话读取顺序
 
