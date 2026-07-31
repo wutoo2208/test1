@@ -147,11 +147,11 @@ EXE_OUTPUTS__QUOTED += \
 
 
 # All Target
-all: $(OBJS) $(GEN_CMDS)
+all: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
 	@$(MAKE) --no-print-directory -Onone "test1.out"
 
 # Tool invocations
-test1.out: $(OBJS) $(GEN_CMDS)
+test1.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
 	@echo 'Arm Linker - building target: "$@"'
 	"D:/AAADiansai/CCS/ccs/tools/compiler/ti-cgt-armllvm_5.1.1.LTS/bin/tiarmclang.exe" @"device.opt"  -march=thumbv6m -mcpu=cortex-m0plus -mfloat-abi=soft -mlittle-endian -mthumb -O2 -g -Wall -Wl,-m"test1.map" -Wl,-i"D:/AAADiansai/CCS/mspm0_sdk_2_11_00_07/source" -Wl,-i"C:/Users/Administrator/workspace_ccstheia/test1" -Wl,-i"C:/Users/Administrator/workspace_ccstheia/test1/Debug/syscfg" -Wl,-i"D:/AAADiansai/CCS/ccs/tools/compiler/ti-cgt-armllvm_5.1.1.LTS/lib" -Wl,--diag_wrap=off -Wl,--display_error_number -Wl,--warn_sections -Wl,--xml_link_info="test1_linkInfo.xml" -Wl,--rom_model -o "test1.out" $(ORDERED_OBJS)
 	@echo 'Finished building target: "$@"'

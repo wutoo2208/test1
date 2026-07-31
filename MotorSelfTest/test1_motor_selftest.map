@@ -1,7 +1,7 @@
 ******************************************************************************
             TI ARM Clang Linker PC v5.1.1                      
 ******************************************************************************
->> Linked Fri Jul 31 23:23:47 2026
+>> Linked Sat Aug  1 00:33:23 2026
 
 OUTPUT FILE NAME:   <test1_motor_selftest.out>
 ENTRY POINT SYMBOL: "_c_int00_noargs"  address: 0000be31

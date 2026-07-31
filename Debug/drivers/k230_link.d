@@ -1,5 +1,0 @@
-# FIXED
-
-drivers/k230_link.o: ../drivers/k230_link.c \
- C:/Users/Administrator/workspace_ccstheia/test1/drivers/k230_link.h
-C:/Users/Administrator/workspace_ccstheia/test1/drivers/k230_link.h:

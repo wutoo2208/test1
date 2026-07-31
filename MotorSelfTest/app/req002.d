@@ -1,9 +1,0 @@
-# FIXED
-
-app/req002.o: ../app/req002.c \
- C:/Users/Administrator/workspace_ccstheia/test1/app/req002.h \
- C:/Users/Administrator/workspace_ccstheia/test1/bsp/timebase.h \
- C:/Users/Administrator/workspace_ccstheia/test1/config/firmware_config.h
-C:/Users/Administrator/workspace_ccstheia/test1/app/req002.h:
-C:/Users/Administrator/workspace_ccstheia/test1/bsp/timebase.h:
-C:/Users/Administrator/workspace_ccstheia/test1/config/firmware_config.h:
