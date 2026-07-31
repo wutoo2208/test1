@@ -14,6 +14,17 @@
 static LineSensorSample gSample;
 static uint32_t gNextPollMs;
 
+static bool recordFailure(
+    LineSensorFailureStage stage, uint8_t reg, uint8_t received)
+{
+    gSample.lastFailureStage = (uint8_t) stage;
+    gSample.lastRegister = reg;
+    gSample.lastReceivedBytes = received;
+    gSample.lastControllerStatus =
+        DL_I2C_getControllerStatus(LINE_I2C_INST);
+    return false;
+}
+
 static void resetTransfer(void)
 {
     DL_I2C_resetControllerTransfer(LINE_I2C_INST);
@@ -29,27 +40,34 @@ static void recoverController(void)
     SYSCFG_DL_LINE_I2C_init();
 }
 
+static bool controllerHasError(uint32_t status)
+{
+    return (status & (DL_I2C_CONTROLLER_STATUS_ERROR |
+        DL_I2C_CONTROLLER_STATUS_ARBITRATION_LOST)) != 0U;
+}
+
 static bool waitForBusIdle(void)
 {
     uint32_t timeout = I2C_DIAG_TIMEOUT_LOOPS;
 
     while (timeout-- != 0U) {
         uint32_t status = DL_I2C_getControllerStatus(LINE_I2C_INST);
-        if ((status & DL_I2C_CONTROLLER_STATUS_ERROR) != 0U) return false;
+        if (controllerHasError(status)) return false;
         if ((status & (DL_I2C_CONTROLLER_STATUS_BUSY |
                        DL_I2C_CONTROLLER_STATUS_BUSY_BUS)) == 0U) return true;
     }
     return false;
 }
 
-static bool waitForTransferComplete(void)
+static bool waitForTxDone(void)
 {
     uint32_t timeout = I2C_DIAG_TIMEOUT_LOOPS;
 
     while (timeout-- != 0U) {
         uint32_t status = DL_I2C_getControllerStatus(LINE_I2C_INST);
-        if ((status & DL_I2C_CONTROLLER_STATUS_ERROR) != 0U) return false;
-        if ((status & DL_I2C_CONTROLLER_STATUS_BUSY) == 0U) return true;
+        if (controllerHasError(status)) return false;
+        if (DL_I2C_getRawInterruptStatus(LINE_I2C_INST,
+                DL_I2C_INTERRUPT_CONTROLLER_TX_DONE) != 0U) return true;
     }
     return false;
 }
@@ -59,11 +77,15 @@ static bool readRegisterBlock(uint8_t reg, uint8_t *data, uint8_t length)
     uint32_t timeout;
     uint8_t received = 0U;
 
-    if (!waitForBusIdle()) return false;
+    if (!waitForBusIdle()) {
+        return recordFailure(LINE_SENSOR_FAILURE_BUS_IDLE, reg, 0U);
+    }
     resetTransfer();
+    DL_I2C_clearInterruptStatus(LINE_I2C_INST,
+        DL_I2C_INTERRUPT_CONTROLLER_TX_DONE);
     if (DL_I2C_fillControllerTXFIFO(LINE_I2C_INST, &reg, 1U) != 1U) {
         resetTransfer();
-        return false;
+        return recordFailure(LINE_SENSOR_FAILURE_TX_FIFO, reg, 0U);
     }
 
     DL_I2C_startControllerTransferAdvanced(LINE_I2C_INST,
@@ -71,11 +93,16 @@ static bool readRegisterBlock(uint8_t reg, uint8_t *data, uint8_t length)
         DL_I2C_CONTROLLER_START_ENABLE, DL_I2C_CONTROLLER_STOP_DISABLE,
         DL_I2C_CONTROLLER_ACK_DISABLE);
     delay_cycles(12U);
-    if (!waitForTransferComplete()) {
+    if (!waitForTxDone()) {
+        recordFailure(LINE_SENSOR_FAILURE_TX_DONE, reg, 0U);
         resetTransfer();
         return false;
     }
+    DL_I2C_clearInterruptStatus(LINE_I2C_INST,
+        DL_I2C_INTERRUPT_CONTROLLER_TX_DONE);
 
+    DL_I2C_clearInterruptStatus(LINE_I2C_INST,
+        DL_I2C_INTERRUPT_CONTROLLER_RX_DONE);
     DL_I2C_startControllerTransferAdvanced(LINE_I2C_INST,
         LINE_SENSOR_I2C_ADDRESS, DL_I2C_CONTROLLER_DIRECTION_RX, length,
         DL_I2C_CONTROLLER_START_ENABLE, DL_I2C_CONTROLLER_STOP_ENABLE,
@@ -86,12 +113,13 @@ static bool readRegisterBlock(uint8_t reg, uint8_t *data, uint8_t length)
     while (timeout-- != 0U) {
         uint32_t status = DL_I2C_getControllerStatus(LINE_I2C_INST);
 
-        if ((status & DL_I2C_CONTROLLER_STATUS_ERROR) != 0U) break;
+        if (controllerHasError(status)) break;
         while (!DL_I2C_isControllerRXFIFOEmpty(LINE_I2C_INST)) {
             uint8_t value = DL_I2C_receiveControllerData(LINE_I2C_INST);
             if (received < length) data[received++] = value;
         }
-        if ((status & DL_I2C_CONTROLLER_STATUS_BUSY) == 0U) break;
+        if (DL_I2C_getRawInterruptStatus(LINE_I2C_INST,
+                DL_I2C_INTERRUPT_CONTROLLER_RX_DONE) != 0U) break;
     }
 
     while (!DL_I2C_isControllerRXFIFOEmpty(LINE_I2C_INST)) {
@@ -99,7 +127,15 @@ static bool readRegisterBlock(uint8_t reg, uint8_t *data, uint8_t length)
         if (received < length) data[received++] = value;
     }
 
-    if ((received != length) || !waitForBusIdle()) {
+    DL_I2C_clearInterruptStatus(LINE_I2C_INST,
+        DL_I2C_INTERRUPT_CONTROLLER_RX_DONE);
+    if (received != length) {
+        recordFailure(LINE_SENSOR_FAILURE_RX_DATA, reg, received);
+        resetTransfer();
+        return false;
+    }
+    if (!waitForBusIdle()) {
+        recordFailure(LINE_SENSOR_FAILURE_BUS_RELEASE, reg, received);
         resetTransfer();
         return false;
     }

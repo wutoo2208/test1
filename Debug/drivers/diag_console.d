@@ -3,12 +3,13 @@
 drivers/diag_console.o: ../drivers/diag_console.c \
  C:/Users/Administrator/workspace_ccstheia/test1/drivers/diag_console.h \
  C:/Users/Administrator/workspace_ccstheia/test1/app/req002.h \
+ C:/Users/Administrator/workspace_ccstheia/test1/algorithm/line_tracking.h \
+ C:/Users/Administrator/workspace_ccstheia/test1/drivers/line_sensors.h \
  C:/Users/Administrator/workspace_ccstheia/test1/bsp/board_safety.h \
  C:/Users/Administrator/workspace_ccstheia/test1/bsp/timebase.h \
  C:/Users/Administrator/workspace_ccstheia/test1/config/firmware_config.h \
  C:/Users/Administrator/workspace_ccstheia/test1/drivers/encoders.h \
  C:/Users/Administrator/workspace_ccstheia/test1/drivers/i2c_diag.h \
- C:/Users/Administrator/workspace_ccstheia/test1/drivers/line_sensors.h \
  C:/Users/Administrator/workspace_ccstheia/test1/drivers/nrf24_ptx.h \
  C:/Users/Administrator/workspace_ccstheia/test1/drivers/oled_ssd1306.h \
  C:/Users/Administrator/workspace_ccstheia/test1/drivers/start_button.h \
@@ -97,12 +98,13 @@ drivers/diag_console.o: ../drivers/diag_console.c \
  D:/AAADiansai/CCS/mspm0_sdk_2_11_00_07/source/ti/driverlib/m0p/dl_systick.h
 C:/Users/Administrator/workspace_ccstheia/test1/drivers/diag_console.h:
 C:/Users/Administrator/workspace_ccstheia/test1/app/req002.h:
+C:/Users/Administrator/workspace_ccstheia/test1/algorithm/line_tracking.h:
+C:/Users/Administrator/workspace_ccstheia/test1/drivers/line_sensors.h:
 C:/Users/Administrator/workspace_ccstheia/test1/bsp/board_safety.h:
 C:/Users/Administrator/workspace_ccstheia/test1/bsp/timebase.h:
 C:/Users/Administrator/workspace_ccstheia/test1/config/firmware_config.h:
 C:/Users/Administrator/workspace_ccstheia/test1/drivers/encoders.h:
 C:/Users/Administrator/workspace_ccstheia/test1/drivers/i2c_diag.h:
-C:/Users/Administrator/workspace_ccstheia/test1/drivers/line_sensors.h:
 C:/Users/Administrator/workspace_ccstheia/test1/drivers/nrf24_ptx.h:
 C:/Users/Administrator/workspace_ccstheia/test1/drivers/oled_ssd1306.h:
 C:/Users/Administrator/workspace_ccstheia/test1/drivers/start_button.h:

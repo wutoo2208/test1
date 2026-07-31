@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include "app/req002.h"
+#include "algorithm/line_tracking.h"
 #include "bsp/board_safety.h"
 #include "bsp/timebase.h"
 #include "config/firmware_config.h"
@@ -67,6 +68,13 @@ static void writeI32(int32_t value)
     writeU32(magnitude);
 }
 
+static void writeMilliFloat(float value)
+{
+    int32_t scaled = (int32_t) (value * 1000.0f);
+
+    writeI32(scaled);
+}
+
 static void writeHex8(uint8_t value)
 {
     static const char hex[] = "0123456789ABCDEF";
@@ -97,7 +105,31 @@ static void reportLine(void)
     writeText(" sequence="); writeU32(sample.sequence);
     writeText(" last_success_ms="); writeU32(sample.lastSuccessMs);
     writeText(" errors="); writeU32(sample.errorCount);
-    writeText(" polarity=UNKNOWN order=CH1..CH6_UNVERIFIED");
+    writeText(" fail_stage="); writeU32(sample.lastFailureStage);
+    writeText(" fail_reg=0x"); writeHex8(sample.lastRegister);
+    writeText(" received="); writeU32(sample.lastReceivedBytes);
+    writeText(" i2c_status="); writeU32(sample.lastControllerStatus);
+    writeText(" black_digital=1 analog_black_higher=1 order=CH1..CH6_LEFT_TO_RIGHT");
+    newLine();
+}
+
+static void reportLineTracking(void)
+{
+    const LineTrackingStatus *status = LineTracking_getStatus();
+    uint8_t index;
+
+    writeText("@TRACK valid="); writeU32(status->valid ? 1U : 0U);
+    writeText(" lost="); writeU32(status->lineLost ? 1U : 0U);
+    writeText(" norm_milli=");
+    for (index = 0U; index < LINE_SENSOR_COUNT; index++) {
+        if (index != 0U) putChar(',');
+        writeMilliFloat(status->normalized[index]);
+    }
+    writeText(" position_milli="); writeMilliFloat(status->position);
+    writeText(" error_milli="); writeMilliFloat(status->centeredError);
+    writeText(" confidence_milli="); writeMilliFloat(status->confidence);
+    writeText(" shadow_milli="); writeMilliFloat(status->shadowCorrection);
+    writeText(" actuator_lock=1");
     newLine();
 }
 
@@ -248,7 +280,7 @@ static void reportStatus(void)
 
 static void reportHelp(void)
 {
-    writeText("@HELP commands=help,status,pins,line,enc,button,i2c,oled_test,oled_all_on,oled_sh1106_on,oled_clear,radio_regs,radio_status,radio_arm,radio_disarm,radio_test,req002,req002_status,stop,selftest");
+    writeText("@HELP commands=help,status,pins,line,track,enc,button,i2c,oled_test,oled_all_on,oled_sh1106_on,oled_clear,radio_regs,radio_status,radio_arm,radio_disarm,radio_test,req002,req002_status,stop,selftest");
     newLine();
 }
 
@@ -277,6 +309,10 @@ static void processCommand(const char *command)
     } else if ((strcmp(command, "line") == 0) ||
                (strcmp(command, "line raw") == 0)) {
         reportLine();
+    } else if ((strcmp(command, "track") == 0) ||
+               (strcmp(command, "line track") == 0) ||
+               (strcmp(command, "line_track") == 0)) {
+        reportLineTracking();
     } else if ((strcmp(command, "button") == 0) ||
                (strcmp(command, "button raw") == 0)) {
         reportButton();

@@ -146,12 +146,26 @@ class FirmwareSafetyTests(unittest.TestCase):
         self.assertIn("LINE_SENSOR_I2C_ADDRESS       (0x5CU)", source)
         self.assertIn("LINE_SENSOR_DIGITAL_REGISTER  (0x05U)", source)
         self.assertIn("LINE_SENSOR_ANALOG_REGISTER   (0x06U)", source)
+        self.assertIn("DL_I2C_INTERRUPT_CONTROLLER_TX_DONE", source)
+        self.assertIn("DL_I2C_INTERRUPT_CONTROLLER_RX_DONE", source)
+        self.assertIn("waitForTxDone", source)
+        self.assertNotIn("waitForTransferComplete", source)
         self.assertIn("LineSensors_init(nowMs);", app)
         self.assertIn("LineSensors_service(nowMs);", app)
         self.assertNotIn("DL_GPIO_readPins", source)
         self.assertIn("line_5c", console)
-        self.assertIn("CH1..CH6_UNVERIFIED", console)
+        self.assertIn("CH1..CH6_LEFT_TO_RIGHT", console)
         self.assertNotIn('strcmp(command, "mpu")', console)
+
+        tracking = text("algorithm/line_tracking.c")
+        tracking_header = text("algorithm/line_tracking.h")
+        self.assertIn("1921U, 1514U, 1830U, 1604U, 1850U, 1607U", tracking)
+        self.assertIn("3038U, 2797U, 3242U, 2400U, 2899U, 2336U", tracking)
+        self.assertIn("LINE_TRACKING_CENTER_OFFSET", tracking)
+        self.assertIn("Pid_step", tracking)
+        self.assertIn("shadowCorrection", tracking_header)
+        self.assertIn("LineTracking_service(nowMs);", app)
+        self.assertIn("actuator_lock=1", console)
 
 
 if __name__ == "__main__":
