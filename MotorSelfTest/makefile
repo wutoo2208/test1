@@ -153,7 +153,7 @@ all: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
 # Tool invocations
 test1_motor_selftest.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
 	@echo 'Arm Linker - building target: "$@"'
-	"D:/AAADiansai/CCS/ccs/tools/compiler/ti-cgt-armllvm_5.1.1.LTS/bin/tiarmclang.exe" @"device.opt"  -march=thumbv6m -mcpu=cortex-m0plus -mfloat-abi=soft -mlittle-endian -mthumb -O2 -DMOTOR_SELFTEST_BUILD=1 -g -Wall -Wl,-m"test1_motor_selftest.map" -Wl,-i"D:/AAADiansai/CCS/mspm0_sdk_2_11_00_07/source" -Wl,-i"C:/Users/Administrator/workspace_ccstheia/test1" -Wl,-i"C:/Users/Administrator/workspace_ccstheia/test1/MotorSelfTest/syscfg" -Wl,-i"D:/AAADiansai/CCS/ccs/tools/compiler/ti-cgt-armllvm_5.1.1.LTS/lib" -Wl,--diag_wrap=off -Wl,--display_error_number -Wl,--warn_sections -Wl,--xml_link_info="test1_motor_selftest_linkInfo.xml" -Wl,--rom_model -o "test1_motor_selftest.out" $(ORDERED_OBJS)
+	"D:/AAADiansai/CCS/ccs/tools/compiler/ti-cgt-armllvm_5.1.1.LTS/bin/tiarmclang.exe" @"device.opt"  -march=thumbv6m -mcpu=cortex-m0plus -mfloat-abi=soft -mlittle-endian -mthumb -O2 -DMOTOR_SELFTEST_BUILD=1 -g -Wall -Wl,-m"test1_motor_selftest.map" -Wl,-i"D:/AAADiansai/CCS/mspm0_sdk_2_11_00_07/source" -Wl,-i"C:/Users/Administrator/workspace_ccstheia/test1_2.2_recovered" -Wl,-i"C:/Users/Administrator/workspace_ccstheia/test1_2.2_recovered/MotorSelfTest/syscfg" -Wl,-i"D:/AAADiansai/CCS/ccs/tools/compiler/ti-cgt-armllvm_5.1.1.LTS/lib" -Wl,--diag_wrap=off -Wl,--display_error_number -Wl,--warn_sections -Wl,--xml_link_info="test1_motor_selftest_linkInfo.xml" -Wl,--rom_model -o "test1_motor_selftest.out" $(ORDERED_OBJS)
 	@echo 'Finished building target: "$@"'
 	@echo ' '
 

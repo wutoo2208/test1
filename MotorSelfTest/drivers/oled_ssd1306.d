@@ -1,8 +1,8 @@
 # FIXED
 
 drivers/oled_ssd1306.o: ../drivers/oled_ssd1306.c \
- C:/Users/Administrator/workspace_ccstheia/test1/drivers/oled_ssd1306.h \
- C:/Users/Administrator/workspace_ccstheia/test1/config/firmware_config.h \
+ C:/Users/Administrator/workspace_ccstheia/test1_2.2_recovered/drivers/oled_ssd1306.h \
+ C:/Users/Administrator/workspace_ccstheia/test1_2.2_recovered/config/firmware_config.h \
  ti_msp_dl_config.h \
  D:/AAADiansai/CCS/mspm0_sdk_2_11_00_07/source/ti/devices/msp/msp.h \
  D:/AAADiansai/CCS/mspm0_sdk_2_11_00_07/source/ti/devices/DeviceFamily.h \
@@ -86,8 +86,8 @@ drivers/oled_ssd1306.o: ../drivers/oled_ssd1306.c \
  D:/AAADiansai/CCS/mspm0_sdk_2_11_00_07/source/ti/driverlib/dl_wwdt.h \
  D:/AAADiansai/CCS/mspm0_sdk_2_11_00_07/source/ti/driverlib/m0p/dl_interrupt.h \
  D:/AAADiansai/CCS/mspm0_sdk_2_11_00_07/source/ti/driverlib/m0p/dl_systick.h
-C:/Users/Administrator/workspace_ccstheia/test1/drivers/oled_ssd1306.h:
-C:/Users/Administrator/workspace_ccstheia/test1/config/firmware_config.h:
+C:/Users/Administrator/workspace_ccstheia/test1_2.2_recovered/drivers/oled_ssd1306.h:
+C:/Users/Administrator/workspace_ccstheia/test1_2.2_recovered/config/firmware_config.h:
 ti_msp_dl_config.h:
 D:/AAADiansai/CCS/mspm0_sdk_2_11_00_07/source/ti/devices/msp/msp.h:
 D:/AAADiansai/CCS/mspm0_sdk_2_11_00_07/source/ti/devices/DeviceFamily.h:

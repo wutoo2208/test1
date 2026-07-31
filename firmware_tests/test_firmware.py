@@ -93,7 +93,8 @@ class FirmwareSafetyTests(unittest.TestCase):
             "DIAG_GPIO_MOTOR_BIN2_SAFE",
         )
         for path in ROOT.rglob("*.c"):
-            if "Debug" in path.parts or "firmware_tests" in path.parts:
+            if ("Debug" in path.parts or "MotorSelfTest" in path.parts or
+                    "firmware_tests" in path.parts):
                 continue
             source = path.read_text(encoding="utf-8")
             if any(token in source for token in output_tokens):
@@ -116,6 +117,85 @@ class FirmwareSafetyTests(unittest.TestCase):
         self.assertNotIn("req002 start", console.lower())
         self.assertNotIn("Req002_service", console)
         self.assertIn("req002_status", console)
+
+    def test_req002_observes_tracking_and_remains_actuator_locked(self) -> None:
+        config = text("config/firmware_config.h")
+        header = text("app/req002.h")
+        req002 = text("app/req002.c")
+        app = text("app/app.c")
+
+        for gate in (
+            "REQ002_CALIBRATION_VALID",
+            "REQ002_ACTUATION_GATE_VALID",
+            "REQ002_PHYSICAL_PARAMETERS_VALID",
+            "REQ002_ACTUATOR_ADAPTER_ENABLED",
+            "REQ002_PID_ENABLED",
+        ):
+            self.assertRegex(config, rf"#define\s+{gate}\s+\(0U\)")
+
+        for token in (
+            "Req002TrackingInput",
+            "Req002ControlDecision",
+            "REQ002_TRACKING_VALID_OBSERVATION",
+            "REQ002_TRACKING_I2C_FAILURE",
+            "REQ002_TRACKING_TIMEOUT",
+            "REQ002_TRACKING_SIGNAL_INSUFFICIENT",
+            "REQ002_TRACKING_LINE_LOST",
+            "sampleAgeMs",
+            "centeredError",
+            "analog[REQ002_LINE_SENSOR_COUNT]",
+            "i2cFailureStage",
+            "motionAuthorized",
+            "actuatorLocked",
+        ):
+            self.assertIn(token, header)
+
+        self.assertIn("LineSensors_snapshot()", app)
+        self.assertIn("LineTracking_getStatus()", app)
+        self.assertIn("req002Tracking.analog", app)
+        self.assertIn("&req002Tracking", app)
+        self.assertNotIn("LineSensors_readRawBits()", app)
+        self.assertLess(app.index("LineTracking_service(nowMs);"),
+                        app.index("Req002_service(nowMs"))
+
+        self.assertIn("Req002_evaluateTracking", req002)
+        self.assertIn("LINE_SENSOR_POLL_PERIOD_MS", req002)
+        self.assertIn("LINE_SENSOR_RETRY_PERIOD_MS", req002)
+        self.assertIn("input->sensorErrorCount", req002)
+        self.assertIn("input->lastSuccessMs", req002)
+        self.assertIn("input->signalSum < LINE_TRACKING_MIN_SIGNAL_SUM", req002)
+        self.assertIn("decision.snapshot = *input;", req002)
+        self.assertNotIn("MotorDriver_drive", app)
+        self.assertNotIn("MotorDriver_", text("algorithm/line_tracking.c"))
+        self.assertNotIn("motor_driver.h", text("algorithm/line_tracking.c"))
+        self.assertGreaterEqual(req002.count("motionAuthorized = false;"), 2)
+        self.assertGreaterEqual(req002.count("actuatorLocked = true;"), 3)
+        self.assertGreaterEqual(req002.count("steeringRequest = 0.0f;"), 2)
+
+        for forbidden in (
+            "MotorDriver_",
+            "motor_driver.h",
+            "DL_",
+            "K230",
+            "Oled",
+            "Nrf24",
+            "D36A",
+            "rolling_ball",
+        ):
+            self.assertNotIn(forbidden, req002)
+
+        evaluator_start = req002.index(
+            "Req002ControlDecision Req002_evaluateTracking")
+        evaluator_end = req002.index("void Req002_init", evaluator_start)
+        evaluator = req002[evaluator_start:evaluator_end]
+        for forbidden in (
+            "gStatus",
+            "Timebase_",
+            "LineSensors_",
+            "LineTracking_",
+            "MotorDriver_",
+        ):
+            self.assertNotIn(forbidden, evaluator)
 
     def test_pid_contains_limits_freeze_filter_and_anti_windup(self) -> None:
         header = text("algorithm/pid.h")

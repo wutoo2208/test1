@@ -1,11 +1,11 @@
 # FIXED
 
 app/motor_test.o: ../app/motor_test.c \
- C:/Users/Administrator/workspace_ccstheia/test1/app/motor_test.h \
- C:/Users/Administrator/workspace_ccstheia/test1/drivers/motor_driver.h \
- C:/Users/Administrator/workspace_ccstheia/test1/bsp/board_safety.h \
- C:/Users/Administrator/workspace_ccstheia/test1/bsp/timebase.h \
- C:/Users/Administrator/workspace_ccstheia/test1/config/firmware_config.h \
+ C:/Users/Administrator/workspace_ccstheia/test1_2.2_recovered/app/motor_test.h \
+ C:/Users/Administrator/workspace_ccstheia/test1_2.2_recovered/drivers/motor_driver.h \
+ C:/Users/Administrator/workspace_ccstheia/test1_2.2_recovered/bsp/board_safety.h \
+ C:/Users/Administrator/workspace_ccstheia/test1_2.2_recovered/bsp/timebase.h \
+ C:/Users/Administrator/workspace_ccstheia/test1_2.2_recovered/config/firmware_config.h \
  D:/AAADiansai/CCS/mspm0_sdk_2_11_00_07/source/ti/devices/msp/m0p/mspm0g350x.h \
  D:/AAADiansai/CCS/mspm0_sdk_2_11_00_07/source/third_party/CMSIS/Core/Include/core_cm0plus.h \
  D:/AAADiansai/CCS/mspm0_sdk_2_11_00_07/source/ti/devices/msp/peripherals/hw_adc12.h \
@@ -35,11 +35,11 @@ app/motor_test.o: ../app/motor_test.c \
  D:/AAADiansai/CCS/mspm0_sdk_2_11_00_07/source/ti/devices/msp/peripherals/m0p/hw_sysctl.h \
  D:/AAADiansai/CCS/mspm0_sdk_2_11_00_07/source/ti/devices/DeviceFamily.h \
  D:/AAADiansai/CCS/mspm0_sdk_2_11_00_07/source/ti/devices/msp/peripherals/m0p/sysctl/hw_sysctl_mspm0g1x0x_g3x0x.h
-C:/Users/Administrator/workspace_ccstheia/test1/app/motor_test.h:
-C:/Users/Administrator/workspace_ccstheia/test1/drivers/motor_driver.h:
-C:/Users/Administrator/workspace_ccstheia/test1/bsp/board_safety.h:
-C:/Users/Administrator/workspace_ccstheia/test1/bsp/timebase.h:
-C:/Users/Administrator/workspace_ccstheia/test1/config/firmware_config.h:
+C:/Users/Administrator/workspace_ccstheia/test1_2.2_recovered/app/motor_test.h:
+C:/Users/Administrator/workspace_ccstheia/test1_2.2_recovered/drivers/motor_driver.h:
+C:/Users/Administrator/workspace_ccstheia/test1_2.2_recovered/bsp/board_safety.h:
+C:/Users/Administrator/workspace_ccstheia/test1_2.2_recovered/bsp/timebase.h:
+C:/Users/Administrator/workspace_ccstheia/test1_2.2_recovered/config/firmware_config.h:
 D:/AAADiansai/CCS/mspm0_sdk_2_11_00_07/source/ti/devices/msp/m0p/mspm0g350x.h:
 D:/AAADiansai/CCS/mspm0_sdk_2_11_00_07/source/third_party/CMSIS/Core/Include/core_cm0plus.h:
 D:/AAADiansai/CCS/mspm0_sdk_2_11_00_07/source/ti/devices/msp/peripherals/hw_adc12.h:

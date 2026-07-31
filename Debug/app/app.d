@@ -1,27 +1,27 @@
 # FIXED
 
 app/app.o: ../app/app.c \
- C:/Users/Administrator/workspace_ccstheia/test1/app/app.h \
- C:/Users/Administrator/workspace_ccstheia/test1/app/req002.h \
- C:/Users/Administrator/workspace_ccstheia/test1/app/motor_test.h \
- C:/Users/Administrator/workspace_ccstheia/test1/drivers/motor_driver.h \
- C:/Users/Administrator/workspace_ccstheia/test1/algorithm/line_tracking.h \
- C:/Users/Administrator/workspace_ccstheia/test1/drivers/line_sensors.h \
- C:/Users/Administrator/workspace_ccstheia/test1/bsp/board_safety.h \
- C:/Users/Administrator/workspace_ccstheia/test1/bsp/timebase.h \
- C:/Users/Administrator/workspace_ccstheia/test1/drivers/diag_console.h \
- C:/Users/Administrator/workspace_ccstheia/test1/drivers/encoders.h \
- C:/Users/Administrator/workspace_ccstheia/test1/drivers/nrf24_ptx.h \
- C:/Users/Administrator/workspace_ccstheia/test1/drivers/start_button.h
-C:/Users/Administrator/workspace_ccstheia/test1/app/app.h:
-C:/Users/Administrator/workspace_ccstheia/test1/app/req002.h:
-C:/Users/Administrator/workspace_ccstheia/test1/app/motor_test.h:
-C:/Users/Administrator/workspace_ccstheia/test1/drivers/motor_driver.h:
-C:/Users/Administrator/workspace_ccstheia/test1/algorithm/line_tracking.h:
-C:/Users/Administrator/workspace_ccstheia/test1/drivers/line_sensors.h:
-C:/Users/Administrator/workspace_ccstheia/test1/bsp/board_safety.h:
-C:/Users/Administrator/workspace_ccstheia/test1/bsp/timebase.h:
-C:/Users/Administrator/workspace_ccstheia/test1/drivers/diag_console.h:
-C:/Users/Administrator/workspace_ccstheia/test1/drivers/encoders.h:
-C:/Users/Administrator/workspace_ccstheia/test1/drivers/nrf24_ptx.h:
-C:/Users/Administrator/workspace_ccstheia/test1/drivers/start_button.h:
+ C:/Users/Administrator/workspace_ccstheia/test1_2.2_recovered/app/app.h \
+ C:/Users/Administrator/workspace_ccstheia/test1_2.2_recovered/app/req002.h \
+ C:/Users/Administrator/workspace_ccstheia/test1_2.2_recovered/app/motor_test.h \
+ C:/Users/Administrator/workspace_ccstheia/test1_2.2_recovered/drivers/motor_driver.h \
+ C:/Users/Administrator/workspace_ccstheia/test1_2.2_recovered/algorithm/line_tracking.h \
+ C:/Users/Administrator/workspace_ccstheia/test1_2.2_recovered/drivers/line_sensors.h \
+ C:/Users/Administrator/workspace_ccstheia/test1_2.2_recovered/bsp/board_safety.h \
+ C:/Users/Administrator/workspace_ccstheia/test1_2.2_recovered/bsp/timebase.h \
+ C:/Users/Administrator/workspace_ccstheia/test1_2.2_recovered/drivers/diag_console.h \
+ C:/Users/Administrator/workspace_ccstheia/test1_2.2_recovered/drivers/encoders.h \
+ C:/Users/Administrator/workspace_ccstheia/test1_2.2_recovered/drivers/nrf24_ptx.h \
+ C:/Users/Administrator/workspace_ccstheia/test1_2.2_recovered/drivers/start_button.h
+C:/Users/Administrator/workspace_ccstheia/test1_2.2_recovered/app/app.h:
+C:/Users/Administrator/workspace_ccstheia/test1_2.2_recovered/app/req002.h:
+C:/Users/Administrator/workspace_ccstheia/test1_2.2_recovered/app/motor_test.h:
+C:/Users/Administrator/workspace_ccstheia/test1_2.2_recovered/drivers/motor_driver.h:
+C:/Users/Administrator/workspace_ccstheia/test1_2.2_recovered/algorithm/line_tracking.h:
+C:/Users/Administrator/workspace_ccstheia/test1_2.2_recovered/drivers/line_sensors.h:
+C:/Users/Administrator/workspace_ccstheia/test1_2.2_recovered/bsp/board_safety.h:
+C:/Users/Administrator/workspace_ccstheia/test1_2.2_recovered/bsp/timebase.h:
+C:/Users/Administrator/workspace_ccstheia/test1_2.2_recovered/drivers/diag_console.h:
+C:/Users/Administrator/workspace_ccstheia/test1_2.2_recovered/drivers/encoders.h:
+C:/Users/Administrator/workspace_ccstheia/test1_2.2_recovered/drivers/nrf24_ptx.h:
+C:/Users/Administrator/workspace_ccstheia/test1_2.2_recovered/drivers/start_button.h:
