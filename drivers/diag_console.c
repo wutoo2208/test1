@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include "app/req002.h"
+#include "app/motor_test.h"
 #include "algorithm/line_tracking.h"
 #include "bsp/board_safety.h"
 #include "bsp/timebase.h"
@@ -15,6 +16,12 @@
 #include "drivers/oled_ssd1306.h"
 #include "drivers/start_button.h"
 #include "ti_msp_dl_config.h"
+
+#if MOTOR_SELFTEST_BUILD
+#define MOTOR_TEST_HELP_COMMANDS ",motor_status,motor_test_left,motor_test_right"
+#else
+#define MOTOR_TEST_HELP_COMMANDS ""
+#endif
 
 static volatile uint8_t gRxBuffer[DIAG_UART_RX_BUFFER_SIZE];
 static volatile uint16_t gRxHead;
@@ -150,6 +157,22 @@ static void reportEncoders(void)
     newLine();
 }
 
+#if MOTOR_SELFTEST_BUILD
+static void reportMotorTest(void)
+{
+    MotorTestStatus status = MotorTest_snapshot();
+
+    writeText("@MOTOR_TEST state="); writeText(MotorTest_stateName(status.state));
+    writeText(" wheel=");
+    writeText(status.wheel == MOTOR_WHEEL_LEFT ? "LEFT" : "RIGHT");
+    writeText(" active="); writeU32(status.outputsActive ? 1U : 0U);
+    writeText(" duty_permille="); writeU32(status.dutyPermille);
+    writeText(" started_ms="); writeU32(status.startedMs);
+    writeText(" deadline_ms="); writeU32(status.deadlineMs);
+    newLine();
+}
+#endif
+
 static void reportI2c(void)
 {
     I2cDiagScan scan = I2cDiag_scan();
@@ -267,9 +290,11 @@ static void reportStatus(void)
 {
     Nrf24PtxStatus radio = Nrf24Ptx_getStatus();
     const Req002Status *req002 = Req002_getStatus();
+    bool motorSafe = BoardSafety_outputsSafe();
 
     writeText("@STATUS fw=" FW_VERSION " pinmap=" PIN_PLAN_VERSION);
-    writeText(" safe=SOFTWARE_LOCKED_RESET_BIAS_UNVERIFIED motor=00/00");
+    writeText(motorSafe ? " safe=SOFTWARE_LOCKED_RESET_BIAS_UNVERIFIED motor=00/00" :
+        " safe=MOTION_ACTIVE_SOFTWARE_ONLY motor=ACTIVE");
     writeText(" d36a=DISABLED buzzer=");
     writeText(BoardSafety_buzzerPolicy());
     writeText(" radio="); writeText(radio.stateName);
@@ -280,7 +305,9 @@ static void reportStatus(void)
 
 static void reportHelp(void)
 {
-    writeText("@HELP commands=help,status,pins,line,track,enc,button,i2c,oled_test,oled_all_on,oled_sh1106_on,oled_clear,radio_regs,radio_status,radio_arm,radio_disarm,radio_test,req002,req002_status,stop,selftest");
+    writeText("@HELP commands=help,status,pins,line,track,enc,button,i2c"
+        MOTOR_TEST_HELP_COMMANDS
+        ",oled_test,oled_all_on,oled_sh1106_on,oled_clear,radio_regs,radio_status,radio_arm,radio_disarm,radio_test,req002,req002_status,stop,selftest");
     newLine();
 }
 
@@ -288,8 +315,10 @@ static void runSelfTest(void)
 {
     bool safe;
 
-    BoardSafety_service();
-    safe = BoardSafety_outputsLocked() && Nrf24Ptx_safeWhenDisarmed();
+    MotorTest_abort();
+    BoardSafety_stop(BOARD_SAFETY_STOP_SELFTEST);
+    Nrf24Ptx_disarm();
+    safe = BoardSafety_outputsSafe() && Nrf24Ptx_safeWhenDisarmed();
     writeText("@SELFTEST safe_outputs="); writeText(safe ? "PASS" : "FAIL");
     writeText(" reset_bias=UNVERIFIED buzzer=NOT_TESTED_DNC result=");
     writeText(safe ? "PASS_SOFTWARE_ONLY" : "FAIL");
@@ -319,6 +348,27 @@ static void processCommand(const char *command)
     } else if ((strcmp(command, "i2c") == 0) ||
                (strcmp(command, "i2c scan") == 0)) {
         reportI2c();
+#if MOTOR_SELFTEST_BUILD
+    } else if ((strcmp(command, "motor status") == 0) ||
+               (strcmp(command, "motor_status") == 0)) {
+        reportMotorTest();
+    } else if ((strcmp(command, "motor test left") == 0) ||
+               (strcmp(command, "motor_test_left") == 0)) {
+        if (MotorTest_start(MOTOR_WHEEL_LEFT, Timebase_nowMs()) ==
+            MOTOR_TEST_START_OK) {
+            writeText("@OK cmd=motor_test_left "); reportMotorTest();
+        } else {
+            writeText("@BLOCKED cmd=motor_test_left reason=DISABLED_BUSY_OR_FAULT\r\n");
+        }
+    } else if ((strcmp(command, "motor test right") == 0) ||
+               (strcmp(command, "motor_test_right") == 0)) {
+        if (MotorTest_start(MOTOR_WHEEL_RIGHT, Timebase_nowMs()) ==
+            MOTOR_TEST_START_OK) {
+            writeText("@OK cmd=motor_test_right "); reportMotorTest();
+        } else {
+            writeText("@BLOCKED cmd=motor_test_right reason=DISABLED_BUSY_OR_FAULT\r\n");
+        }
+#endif
     } else if ((strcmp(command, "oled test") == 0) ||
                (strcmp(command, "oled_test") == 0)) {
         runOledTest();
@@ -358,8 +408,17 @@ static void processCommand(const char *command)
         reportReq002();
     } else if ((strcmp(command, "stop") == 0) ||
                (strcmp(command, "motor stop") == 0)) {
-        BoardSafety_service(); Nrf24Ptx_disarm();
-        writeText("@OK cmd=stop safe=LOCKED motor=00/00 radio=DISABLED\r\n");
+        bool motorSafe;
+        bool radioSafe;
+        MotorTest_abort();
+        BoardSafety_stop(BOARD_SAFETY_STOP_OPERATOR);
+        Nrf24Ptx_disarm();
+        motorSafe = BoardSafety_outputsSafe();
+        radioSafe = Nrf24Ptx_safeWhenDisarmed();
+        writeText((motorSafe && radioSafe) ? "@OK" : "@FAIL");
+        writeText(" cmd=stop motor_safe="); writeU32(motorSafe ? 1U : 0U);
+        writeText(" radio_safe="); writeU32(radioSafe ? 1U : 0U);
+        newLine();
     } else if (strcmp(command, "selftest") == 0) {
         runSelfTest();
     } else if (command[0] != '\0') {

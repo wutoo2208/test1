@@ -1,17 +1,12 @@
 #include "bsp/board_safety.h"
 
+#include "drivers/motor_driver.h"
 #include "ti_msp_dl_config.h"
 
-static void forceLockedOutputs(void)
+static BoardSafetyStatus gStatus;
+
+static void disableD36a(void)
 {
-    DL_GPIO_clearPins(DIAG_GPIO_MOTOR_AIN1_SAFE_PORT,
-        DIAG_GPIO_MOTOR_AIN1_SAFE_PIN);
-    DL_GPIO_clearPins(DIAG_GPIO_MOTOR_AIN2_SAFE_PORT,
-        DIAG_GPIO_MOTOR_AIN2_SAFE_PIN);
-    DL_GPIO_clearPins(DIAG_GPIO_MOTOR_BIN1_SAFE_PORT,
-        DIAG_GPIO_MOTOR_BIN1_SAFE_PIN);
-    DL_GPIO_clearPins(DIAG_GPIO_MOTOR_BIN2_SAFE_PORT,
-        DIAG_GPIO_MOTOR_BIN2_SAFE_PIN);
     DL_GPIO_clearPins(DIAG_GPIO_D36A_EN_SAFE_PORT,
         DIAG_GPIO_D36A_EN_SAFE_PIN);
     DL_GPIO_clearPins(DIAG_GPIO_D36A_DIR_SAFE_PORT,
@@ -20,35 +15,60 @@ static void forceLockedOutputs(void)
         DIAG_GPIO_D36A_STEP_SAFE_PIN);
 }
 
+static bool d36aDisabled(void)
+{
+    return (DL_GPIO_readPins(DIAG_GPIO_D36A_EN_SAFE_PORT,
+                DIAG_GPIO_D36A_EN_SAFE_PIN) == 0U) &&
+        (DL_GPIO_readPins(DIAG_GPIO_D36A_DIR_SAFE_PORT,
+             DIAG_GPIO_D36A_DIR_SAFE_PIN) == 0U) &&
+        (DL_GPIO_readPins(DIAG_GPIO_D36A_STEP_SAFE_PORT,
+             DIAG_GPIO_D36A_STEP_SAFE_PIN) == 0U);
+}
+
 void BoardSafety_init(void)
 {
-    forceLockedOutputs();
+    gStatus.faultLatched = false;
+    BoardSafety_stop(BOARD_SAFETY_STOP_BOOT);
 }
 
 void BoardSafety_service(void)
 {
-    forceLockedOutputs();
+    gStatus.motorStopped = MotorDriver_outputsStopped();
+    gStatus.d36aDisabled = d36aDisabled();
+    if (!gStatus.d36aDisabled) {
+        gStatus.faultLatched = true;
+        BoardSafety_stop(BOARD_SAFETY_STOP_FAULT);
+    }
 }
 
-bool BoardSafety_outputsLocked(void)
+void BoardSafety_stop(BoardSafetyStopReason reason)
 {
-    bool safe = true;
+    MotorDriver_stopAll();
+    disableD36a();
+    gStatus.lastStopReason = reason;
+    gStatus.motorStopped = MotorDriver_outputsStopped();
+    gStatus.d36aDisabled = d36aDisabled();
+    if (reason == BOARD_SAFETY_STOP_FAULT) {
+        gStatus.faultLatched = true;
+    }
+}
 
-    safe &= (DL_GPIO_readPins(DIAG_GPIO_MOTOR_AIN1_SAFE_PORT,
-                 DIAG_GPIO_MOTOR_AIN1_SAFE_PIN) == 0U);
-    safe &= (DL_GPIO_readPins(DIAG_GPIO_MOTOR_AIN2_SAFE_PORT,
-                 DIAG_GPIO_MOTOR_AIN2_SAFE_PIN) == 0U);
-    safe &= (DL_GPIO_readPins(DIAG_GPIO_MOTOR_BIN1_SAFE_PORT,
-                 DIAG_GPIO_MOTOR_BIN1_SAFE_PIN) == 0U);
-    safe &= (DL_GPIO_readPins(DIAG_GPIO_MOTOR_BIN2_SAFE_PORT,
-                 DIAG_GPIO_MOTOR_BIN2_SAFE_PIN) == 0U);
-    safe &= (DL_GPIO_readPins(DIAG_GPIO_D36A_EN_SAFE_PORT,
-                 DIAG_GPIO_D36A_EN_SAFE_PIN) == 0U);
-    safe &= (DL_GPIO_readPins(DIAG_GPIO_D36A_DIR_SAFE_PORT,
-                 DIAG_GPIO_D36A_DIR_SAFE_PIN) == 0U);
-    safe &= (DL_GPIO_readPins(DIAG_GPIO_D36A_STEP_SAFE_PORT,
-                 DIAG_GPIO_D36A_STEP_SAFE_PIN) == 0U);
-    return safe;
+bool BoardSafety_outputsSafe(void)
+{
+    return MotorDriver_outputsStopped() && d36aDisabled();
+}
+
+BoardSafetyStatus BoardSafety_snapshot(void)
+{
+    BoardSafetyStatus status = gStatus;
+    status.motorStopped = MotorDriver_outputsStopped();
+    status.d36aDisabled = d36aDisabled();
+    return status;
+}
+
+bool BoardSafety_faultLatched(void)
+{
+    return gStatus.faultLatched;
 }
 
 const char *BoardSafety_buzzerPolicy(void)

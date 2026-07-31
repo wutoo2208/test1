@@ -566,7 +566,7 @@ Nrf24PtxRegisters Nrf24Ptx_readCoreRegisters(void)
 
 bool Nrf24Ptx_safeWhenDisarmed(void)
 {
-    if (gArmed) return true;
+    if (gArmed || (gQueueCount != 0U)) return false;
     return DL_GPIO_readPins(DIAG_GPIO_RADIO_CE_PORT,
                DIAG_GPIO_RADIO_CE_PIN) == 0U;
 }

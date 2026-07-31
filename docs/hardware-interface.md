@@ -1,4 +1,4 @@
-﻿# 硬件接口与接线登记
+# 硬件接口与接线登记
 
 > 初始化日期：2026-07-28  
 > 本文档区分“板级已复核事实”“候选接口”和“最终接线”。当前没有已确认的外接模块接线。
@@ -133,7 +133,7 @@ Reviewed by:
 | DRV8870 双路 | `docs/hardware/modules/drv8870-dual.md` | 双电机控制、四路编码器输入、VIN/电流/接口资料。 | 实物板版本、电机参数、电池与电平。 |
 | 天猛星拓展板 V2.0 | `docs/hardware/modules/tianmengxing-expansion-board-v2.md` | EPRO 静态资料与实物正面装配照片均已归档；可见双稳压、TB6612、OLED、按键等区域。 | 背面照片、板号、排针线序、电平与实际供电路径。 |
 | MP1584EN 可调降压 | `docs/hardware/modules/mp1584en-adjustable-step-down.md` | 用户称 MP1584EN；参数图称 4.5–28 V 输入、0.8–20 V 可调输出、最大 3 A。 | 实物板型、输出设定/测量、负载、保护、热与接线。 |
-| K230 目标跟踪 | docs/hardware/modules/k230-target-tracking.md | PA8/PA9 UART1 端点保持；K230 目标框经球心、杆轴投影和像素到毫米标定后，作为钢球位置外环的唯一测量。 | 板型/电平、完整帧、捕获时间、帧率/延迟、标定精度、异常帧策略及完整视频图传链路。 |
+| K230 目标跟踪 | docs/hardware/modules/k230-target-tracking.md | PA9/UART1_RX单向接收K230 IO9/TXD；用户批准115200 8N1、固定14字节位置帧和CRC-8/ATM。PA8保留但当前DNC。 | 尚未写入SysConfig/源码；电源、波形、帧率/延迟、标定精度及完整视频图传链路待验证。 |
 | MS42CG 编码器 | `docs/hardware/modules/ms42cg-encoder.md` | 3.3–5 V 供电，输出 A/B/PWM/Z；手册示例 A/B 1000 线、四倍频 4000 计数/圈。 | 实物线束、3.3 V 供电、A/B/PWM/Z 取线、MCU 捕获资源和最高边沿频率。 |
 | D36A 双路步进驱动 | `docs/hardware/modules/d36a-dual-stepper-driver.md` | 两路 STEP/DIR/EN，外部 12 V 示例、4 线两相步进输出，细分/电流拨码共用。 | 实际步进电机型号/相电流、控制电平时序、供电保护、热与物理连接。 |
 
@@ -201,7 +201,7 @@ Reviewed by:
 
 | 链路 | 当前职责 | 明确不承担 | 状态/门槛 |
 |---|---|---|---|
-| K230 → UART1 PA8/PA9 | 目标框经过标定后输出钢球相对 O 点的有符号位置，作为球位置外环唯一测量。 | 不直接证明杆角、执行器位置或视频图传已合规。 | 完整协议、时间戳、帧率/延迟、毫米标定和异常帧策略待验证。 |
+| K230 IO9/TXD → UART1 PA9/RX | 按协议v1单向输出钢球相对O点的POS、VEL、置信度、像素坐标与状态，作为球位置外环唯一测量。 | PA8/TX当前不接；不直接证明杆角、执行器位置或视频图传已合规。 | 115200 8N1及14字节格式已由用户批准；SysConfig/源码/波形/帧率/延迟/毫米标定仍待验证。 |
 | MS42CG → PA29/PA30/PA13/PB23 | D36A 步进执行器的位置/角度内层反馈、回零/丢步监测候选。 | 不测钢球位置。 | 零位、方向、计数、PWM/Z 语义、几何映射与失步策略待验证。 |
 | D36A → PA26/PA24/PB0 | 控制步进电机改变摆杆右端高度，从而实现定轴转动。 | 不提供编码器反馈，也不能保证没有失步。 | 步频、加速度、限位、失能、相电流与温升待验证。 |
 | LineFollower_6CH → I2C0 PA28/PA31 | 小车红外循迹主反馈；读取 0x05 数字状态和 0x06 六路模拟值候选。 | 不测钢球位置；不使用原 TCRT 五根 GPIO。 | frozen v1.5设计已批准；通道顺序、极性、总线速率、200 Hz调度和异常恢复待验证。 |
@@ -221,3 +221,15 @@ Reviewed by:
 | `IF-V1.5-U8-DNC` | 旧 OLED U8 | PA0/PA1 释放为 DNC | U8 pad1～4 不接 | FROZEN-DNC；板载上拉网络仍存在 |
 
 H10 pin1/PB19、pin2/PB17、pin6/PB25 的无线 SPI0 Owner 不变。当前权威文件是 `docs/pin-plan/mspm0g3507-pin-plan-frozen-v1.5.md` 与 `docs/pin-plan/mspm0g3507-adapter-harness-v1.5.md`。
+
+
+## 15. K230单向UART协议v1登记
+
+| Interface ID | 发送端 | 接收端 | 参数 | 状态/门槛 |
+|---|---|---|---|---|
+| `IF-K230-UART-RX-V1` | K230 `TXD(IO9)`，3.3 V TTL | `USART1 pin1 / PA9 / UART1_RX` | 115200、8N1、固定14字节、CRC-8/ATM | USER-APPROVED DESIGN；未改SysConfig/源码，未构建、烧录或实测 |
+| `IF-K230-GND-V1` | K230 GND | `USART1 pin3 / GND` | 共地 | 线束与回流路径待验证 |
+| `IF-K230-TX-DNC-V1` | K230 `RXD(IO10)` | `USART1 pin2 / PA8 / UART1_TX` | 本协议不使用 | PA8保留给K230接口但当前DNC，不自动释放 |
+| `IF-K230-POWER-V1` | K230 `5V`供电输入 | 独立稳定5 V | 供电与逻辑严格分离 | USART1 pin4/5V保持DNC；电流、纹波和上电时序待验证 |
+
+协议权威定义见 `docs/protocols/k230-ball-position-uart-v1.md`。固定帧不包含长度字段；长度检查按14字节执行。协议v1没有K230采集时间戳，实际端到端延迟和抖动仍必须台架测量。

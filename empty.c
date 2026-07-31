@@ -34,6 +34,7 @@
 #include "ti_msp_dl_config.h"
 
 #include "app/app.h"
+#include "app/motor_test.h"
 #include "bsp/timebase.h"
 #include "drivers/diag_console.h"
 #include "drivers/encoders.h"
@@ -51,6 +52,7 @@ int main(void)
 void SysTick_Handler(void)
 {
     Timebase_onSysTick();
+    MotorTest_onTimebaseTick(Timebase_nowMs());
 }
 
 void DIAG_UART_INST_IRQHandler(void)

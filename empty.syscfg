@@ -10,6 +10,7 @@ const I2C     = scripting.addModule("/ti/driverlib/I2C", {}, false);
 const SPI     = scripting.addModule("/ti/driverlib/SPI", {}, false);
 const QEI     = scripting.addModule("/ti/driverlib/QEI", {}, false);
 const CAPTURE = scripting.addModule("/ti/driverlib/CAPTURE", {}, false);
+const PWM     = scripting.addModule("/ti/driverlib/PWM", {}, false);
 const SYSCTL  = scripting.addModule("/ti/driverlib/SYSCTL");
 
 const GPIO1   = GPIO.addInstance();
@@ -19,50 +20,42 @@ const I2C2    = I2C.addInstance();
 const SPI1    = SPI.addInstance();
 const QEI1    = QEI.addInstance();
 const CAPTURE1 = CAPTURE.addInstance();
+const PWM1    = PWM.addInstance();
 
-/*
- * GPIO-only bring-up deliberately keeps both DRV8870 channels locked at 00.
- * PB14/PA7 move to TIMA0 PWM only after a separate motor-test authorization.
- */
+/* MotorDriver exclusively owns both DRV8870 PWM and direction outputs. */
 GPIO1.$name = "DIAG_GPIO";
-GPIO1.associatedPins.create(11);
+GPIO1.associatedPins.create(9);
 
-GPIO1.associatedPins[0].$name        = "MOTOR_AIN1_SAFE";
+GPIO1.associatedPins[0].$name        = "MOTOR_AIN2_SAFE";
 GPIO1.associatedPins[0].initialValue = "CLEARED";
-GPIO1.associatedPins[0].pin.$assign  = "PB14";
-GPIO1.associatedPins[1].$name        = "MOTOR_AIN2_SAFE";
+GPIO1.associatedPins[0].pin.$assign  = "PB12";
+GPIO1.associatedPins[1].$name        = "MOTOR_BIN2_SAFE";
 GPIO1.associatedPins[1].initialValue = "CLEARED";
-GPIO1.associatedPins[1].pin.$assign  = "PB12";
-GPIO1.associatedPins[2].$name        = "MOTOR_BIN1_SAFE";
-GPIO1.associatedPins[2].initialValue = "CLEARED";
-GPIO1.associatedPins[2].pin.$assign  = "PA7";
-GPIO1.associatedPins[3].$name        = "MOTOR_BIN2_SAFE";
-GPIO1.associatedPins[3].initialValue = "CLEARED";
-GPIO1.associatedPins[3].pin.$assign  = "PB24";
+GPIO1.associatedPins[1].pin.$assign  = "PB24";
 
-GPIO1.associatedPins[4].$name         = "RADIO_CE";
-GPIO1.associatedPins[4].initialValue  = "CLEARED";
-GPIO1.associatedPins[4].pin.$assign   = "PB1";
-GPIO1.associatedPins[5].$name         = "RADIO_CSN";
-GPIO1.associatedPins[5].initialValue  = "SET";
-GPIO1.associatedPins[5].pin.$assign   = "PB25";
-GPIO1.associatedPins[6].$name         = "RADIO_IRQ";
-GPIO1.associatedPins[6].direction     = "INPUT";
-GPIO1.associatedPins[6].pin.$assign   = "PB16";
+GPIO1.associatedPins[2].$name         = "RADIO_CE";
+GPIO1.associatedPins[2].initialValue  = "CLEARED";
+GPIO1.associatedPins[2].pin.$assign   = "PB1";
+GPIO1.associatedPins[3].$name         = "RADIO_CSN";
+GPIO1.associatedPins[3].initialValue  = "SET";
+GPIO1.associatedPins[3].pin.$assign   = "PB25";
+GPIO1.associatedPins[4].$name         = "RADIO_IRQ";
+GPIO1.associatedPins[4].direction     = "INPUT";
+GPIO1.associatedPins[4].pin.$assign   = "PB16";
 /* User-verified expansion-board KEY2 is PA21; PB21 is unconnected. */
-GPIO1.associatedPins[7].$name            = "START_BUTTON";
-GPIO1.associatedPins[7].direction        = "INPUT";
-GPIO1.associatedPins[7].internalResistor = "PULL_UP";
-GPIO1.associatedPins[7].pin.$assign      = "PA21";
-GPIO1.associatedPins[8].$name         = "D36A_EN_SAFE";
+GPIO1.associatedPins[5].$name            = "START_BUTTON";
+GPIO1.associatedPins[5].direction        = "INPUT";
+GPIO1.associatedPins[5].internalResistor = "PULL_UP";
+GPIO1.associatedPins[5].pin.$assign      = "PA21";
+GPIO1.associatedPins[6].$name         = "D36A_EN_SAFE";
+GPIO1.associatedPins[6].initialValue  = "CLEARED";
+GPIO1.associatedPins[6].pin.$assign   = "PB0";
+GPIO1.associatedPins[7].$name         = "D36A_DIR_SAFE";
+GPIO1.associatedPins[7].initialValue  = "CLEARED";
+GPIO1.associatedPins[7].pin.$assign   = "PA24";
+GPIO1.associatedPins[8].$name         = "D36A_STEP_SAFE";
 GPIO1.associatedPins[8].initialValue  = "CLEARED";
-GPIO1.associatedPins[8].pin.$assign   = "PB0";
-GPIO1.associatedPins[9].$name         = "D36A_DIR_SAFE";
-GPIO1.associatedPins[9].initialValue  = "CLEARED";
-GPIO1.associatedPins[9].pin.$assign   = "PA24";
-GPIO1.associatedPins[10].$name         = "D36A_STEP_SAFE";
-GPIO1.associatedPins[10].initialValue  = "CLEARED";
-GPIO1.associatedPins[10].pin.$assign   = "PA26";
+GPIO1.associatedPins[8].pin.$assign   = "PA26";
 
 UART1.$name                    = "DIAG_UART";
 UART1.enableFIFO               = true;
@@ -126,6 +119,19 @@ CAPTURE1.timerStartTimer                  = false;
 CAPTURE1.peripheral.$assign               = "TIMA1";
 CAPTURE1.peripheral.ccp0Pin.$assign       = "PB4";
 CAPTURE1.peripheral.ccp1Pin.$assign       = "PB5";
+
+/* 20 kHz edge-aligned PWM on the frozen TIMA0 motor channels. */
+PWM1.$name                         = "MOTOR_PWM";
+PWM1.timerStartTimer               = false;
+PWM1.timerCount                    = 1600;
+PWM1.ccIndex                       = [0,2];
+PWM1.peripheral.$assign            = "TIMA0";
+PWM1.peripheral.ccp0Pin.$assign    = "PB14";
+PWM1.peripheral.ccp2Pin.$assign    = "PA7";
+PWM1.PWM_CHANNEL_0.$name           = "ti_driverlib_pwm_PWMTimerCC0";
+PWM1.PWM_CHANNEL_0.dutyCycle       = 0;
+PWM1.PWM_CHANNEL_2.$name           = "ti_driverlib_pwm_PWMTimerCC6";
+PWM1.PWM_CHANNEL_2.dutyCycle       = 0;
 
 const Board = scripting.addModule("/ti/driverlib/Board", {}, false);
 SYSCTL.forceDefaultClkConfig = true;

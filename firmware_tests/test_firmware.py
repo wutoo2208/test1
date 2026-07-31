@@ -15,7 +15,7 @@ def text(relative: str) -> str:
 
 
 class FirmwareSafetyTests(unittest.TestCase):
-    def test_working_copy_one_shot_profile_is_preserved(self) -> None:
+    def test_working_copy_one_shot_profile_and_truthful_selftest(self) -> None:
         config = text("config/firmware_config.h")
         radio = text("drivers/nrf24_ptx.c")
         for gate in (
@@ -44,6 +44,62 @@ class FirmwareSafetyTests(unittest.TestCase):
         self.assertIn("gArmed = false;", fault_body)
         self.assertIn("queueReset();", fault_body)
         self.assertIn("forceSafe();", fault_body)
+
+        safety_body = radio[radio.index("bool Nrf24Ptx_safeWhenDisarmed(void)"):]
+        self.assertRegex(safety_body, r"gArmed\s*\|\|\s*\(gQueueCount != 0U\)")
+        self.assertIn("return false;", safety_body)
+        self.assertIn("DIAG_GPIO_RADIO_CE_PIN", safety_body)
+
+    def test_motor_output_ownership_and_test_isolation(self) -> None:
+        config = text("config/firmware_config.h")
+        syscfg = text("empty.syscfg")
+        safety = text("bsp/board_safety.c") + text("bsp/board_safety.h")
+        driver = text("drivers/motor_driver.c")
+        motor_test = text("app/motor_test.c") + text("app/motor_test.h")
+        console = text("drivers/diag_console.c")
+
+        self.assertRegex(config, r"#define\s+MOTOR_SELFTEST_BUILD\s+\(0U\)")
+        for token in (
+            'PWM1.$name                         = "MOTOR_PWM"',
+            "PWM1.timerCount                    = 1600",
+            'PWM1.peripheral.$assign            = "TIMA0"',
+            'PWM1.peripheral.ccp0Pin.$assign    = "PB14"',
+            'PWM1.peripheral.ccp2Pin.$assign    = "PA7"',
+            "PWM1.PWM_CHANNEL_0.dutyCycle       = 0",
+            "PWM1.PWM_CHANNEL_2.dutyCycle       = 0",
+        ):
+            self.assertIn(token, syscfg)
+
+        for forbidden in (
+            "MotorTestState",
+            "MOTOR_TEST_DUTY_PERMILLE",
+            "MOTOR_TEST_DURATION_MS",
+            "MOTOR_PWM_INST",
+            "DL_TimerA_setCaptureCompareValue",
+            "DIAG_GPIO_MOTOR_AIN2_SAFE",
+            "DIAG_GPIO_MOTOR_BIN2_SAFE",
+        ):
+            self.assertNotIn(forbidden, safety)
+        self.assertIn("MotorDriver_stopAll", safety)
+        self.assertNotIn("ti_msp_dl_config.h", motor_test)
+        self.assertNotIn("DL_TimerA_", motor_test + console)
+        self.assertIn("MotorTest_start", console)
+        self.assertIn("#if MOTOR_SELFTEST_BUILD", console)
+        self.assertIn("MotorTest_onTimebaseTick", text("empty.c"))
+
+        output_tokens = (
+            "MOTOR_PWM_INST",
+            "DIAG_GPIO_MOTOR_AIN2_SAFE",
+            "DIAG_GPIO_MOTOR_BIN2_SAFE",
+        )
+        for path in ROOT.rglob("*.c"):
+            if "Debug" in path.parts or "firmware_tests" in path.parts:
+                continue
+            source = path.read_text(encoding="utf-8")
+            if any(token in source for token in output_tokens):
+                self.assertEqual(path.relative_to(ROOT).as_posix(),
+                                 "drivers/motor_driver.c")
+        self.assertIn("DL_TimerA_setCaptureCompareValue", driver)
 
     def test_req002_gates_are_false_and_uart_has_status_only(self) -> None:
         config = text("config/firmware_config.h")

@@ -16,13 +16,16 @@ ORDERED_OBJS += \
 "./algorithm/line_tracking.o" \
 "./algorithm/pid.o" \
 "./app/app.o" \
+"./app/motor_test.o" \
 "./app/req002.o" \
 "./bsp/board_safety.o" \
 "./bsp/timebase.o" \
 "./drivers/diag_console.o" \
 "./drivers/encoders.o" \
 "./drivers/i2c_diag.o" \
+"./drivers/k230_link.o" \
 "./drivers/line_sensors.o" \
+"./drivers/motor_driver.o" \
 "./drivers/nrf24_ptx.o" \
 "./drivers/oled_ssd1306.o" \
 "./drivers/start_button.o" \
@@ -157,8 +160,8 @@ test1.out: $(OBJS) $(GEN_CMDS)
 # Other Targets
 clean:
 	-$(RM) $(GEN_MISC_FILES__QUOTED)$(GEN_FILES__QUOTED)$(EXE_OUTPUTS__QUOTED)
-	-$(RM) "empty.o" "ti_msp_dl_config.o" "startup_mspm0g350x_ticlang.o" "algorithm\line_tracking.o" "algorithm\pid.o" "app\app.o" "app\req002.o" "bsp\board_safety.o" "bsp\timebase.o" "drivers\diag_console.o" "drivers\encoders.o" "drivers\i2c_diag.o" "drivers\line_sensors.o" "drivers\nrf24_ptx.o" "drivers\oled_ssd1306.o" "drivers\start_button.o" 
-	-$(RM) "empty.d" "ti_msp_dl_config.d" "startup_mspm0g350x_ticlang.d" "algorithm\line_tracking.d" "algorithm\pid.d" "app\app.d" "app\req002.d" "bsp\board_safety.d" "bsp\timebase.d" "drivers\diag_console.d" "drivers\encoders.d" "drivers\i2c_diag.d" "drivers\line_sensors.d" "drivers\nrf24_ptx.d" "drivers\oled_ssd1306.d" "drivers\start_button.d" 
+	-$(RM) "empty.o" "ti_msp_dl_config.o" "startup_mspm0g350x_ticlang.o" "algorithm\line_tracking.o" "algorithm\pid.o" "app\app.o" "app\motor_test.o" "app\req002.o" "bsp\board_safety.o" "bsp\timebase.o" "drivers\diag_console.o" "drivers\encoders.o" "drivers\i2c_diag.o" "drivers\k230_link.o" "drivers\line_sensors.o" "drivers\motor_driver.o" "drivers\nrf24_ptx.o" "drivers\oled_ssd1306.o" "drivers\start_button.o" 
+	-$(RM) "empty.d" "ti_msp_dl_config.d" "startup_mspm0g350x_ticlang.d" "algorithm\line_tracking.d" "algorithm\pid.d" "app\app.d" "app\motor_test.d" "app\req002.d" "bsp\board_safety.d" "bsp\timebase.d" "drivers\diag_console.d" "drivers\encoders.d" "drivers\i2c_diag.d" "drivers\k230_link.d" "drivers\line_sensors.d" "drivers\motor_driver.d" "drivers\nrf24_ptx.d" "drivers\oled_ssd1306.d" "drivers\start_button.d" 
 	-@echo ' '
 
 .PHONY: all clean dependents

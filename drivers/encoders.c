@@ -52,6 +52,11 @@ void Encoders_init(void)
     gLeftInvalidTransitions = 0U;
     gLeftState = readLeftState();
 
+    DL_GPIO_setDigitalInternalResistor(GPIO_LEFT_CAPTURE_C0_IOMUX,
+        DL_GPIO_RESISTOR_PULL_UP);
+    DL_GPIO_setDigitalInternalResistor(GPIO_LEFT_CAPTURE_C1_IOMUX,
+        DL_GPIO_RESISTOR_PULL_UP);
+
     DL_TimerG_setTimerCount(RIGHT_QEI_INST, 0U);
     DL_TimerG_startCounter(RIGHT_QEI_INST);
     DL_TimerA_startCounter(LEFT_CAPTURE_INST);

@@ -82,6 +82,7 @@
 | `DEC-015` | 2026-07-30 | superseded-in-part | MPU6050 不再安装于摆杆，也不作为摆杆角度反馈；K230 派生的“钢球相对原点 O 的有符号位置”作为钢球位置外环的唯一测量，D36A+MS42CG 构成摆杆执行器位置/角度内层；MPU6050 改装在小车上，仅作为循迹扰动、车体角速度/加速度或前馈候选。 | `[已确认设计方向|用户确认]` 用户因现有 MPU6050 精度不足主动调整方案；题面本身要求钢球位置必须由摄像头检测。 | 不改变 frozen v1.2 的 MCU 端点，但改变传感器职责和机械安装。K230 原始 `x/y/w/h` 必须经球心、杆轴投影、像素到毫米标定、时间戳和有效性检查后才能成为控制量；不得把步进电机当作无反馈开环角度源，MS42CG 零点/方向/丢步与连杆几何必须闭合。 |
 | `DEC-016` | 2026-07-31 | superseded | 主循迹模块改为 HiWonder/AiBlock LineFollower_6CH V1.0，替代原五路 TCRT5000；模块通过 I2C1 与 MPU6050 共享 PB2/PB3，H10 仅能通过分离线束或隔离/桥接作为物理入口。 | `[选型已确认|用户决定 + 资料复核 + IOMUX静态核验]` 模块为 5 V、85 mA、I²C 0x5C，H10 原始网络无完整硬件 I²C 对。 | 创建 v1.5 candidate，不修改 Claude Code 的 v1.4、不修改 SysConfig。推荐无切线方案 A；H10 单插头方案 B 需再次批准。原 TCRT GPIO 候选释放，但在 frozen v1.5 批准前不得用于其他功能。 |
 | `DEC-017` | 2026-07-31 | accepted | 冻结 Pin Plan v1.5：LineFollower_6CH 经 U12 独占 I2C0（PA28 SDA、PA31 SCL）；OLED 经原 MPU6050/GY 接口独占 I2C1（PB3 SDA、PB2 SCL）；MPU6050 暂时移除。OLED 实物 `VDD` 按正电源、`SCK` 按 I²C `SCL` 使用，线束必须按信号重排。 | `[已确认设计|用户批准 + 资料复核 + EPRO/照片静态核验]` 双总线消除共享负载并简化系统；OLED照片清楚显示 `GND/VDD/SCK/SDA`，模块资料确认该四针产品为 I²C。 | 发布 frozen v1.5 和 v1.5 harness；supersedes DEC-016、DEC-015 中的车体 MPU 职责及 DEC-014 中被 v1.5 覆盖的线束条目。只冻结设计，不授权 SysConfig、源码、线束制作、接线、上电、构建、烧录或实测。 |
+| `DEC-018` | 2026-07-31 | accepted | K230采用单向UART位置协议v1：IO9/TXD→PA9/UART1_RX、共地、115200 8N1、固定14字节、CRC-8/ATM；PA8保留但当前DNC；K230 5V只供电且USART1 pin4/5V保持DNC。 | `[已确认设计|用户明确给定]` 用户提供字段、单位、CRC和异常规则，并要求引脚以当前Pin Plan为准。 | 发布协议文档；不修改frozen Pin Plan、SysConfig或源码。协议没有采集时间戳；实际脚本、波形、帧率/延迟、标定和保护阈值仍需验证。 |
 
 ## 5. 待决策队列
 
@@ -123,3 +124,4 @@ Approved by:
 | 2026-07-30 | 调整滚球控制职责：K230 为钢球位置唯一测量，MS42CG 为执行器内层反馈，MPU6050 从摆杆移至车体并降为循迹/扰动辅助候选。 | Codex（用户确认后整理） |
 | 2026-07-31 | 主循迹改用 LineFollower_6CH；完成资料复核并建立共享 I2C1/H10 v1.5 候选，等待用户选择线束 A/B 后冻结。 | Codex（用户要求后整理） |
 | 2026-07-31 | 用户批准 frozen v1.5：LineFollower→U12/I2C0，OLED→原MPU接口/I2C1，MPU NOT FITTED；记录 OLED `VDD/SCK` 的设计别名和电气门槛。 | Codex（用户批准后整理） |
+| 2026-07-31 | 用户批准K230单向UART协议v1：PA9接收、115200 8N1、14字节位置帧、CRC-8/ATM和100 ms失效保护；仅整理文档。 | Codex（用户批准后整理） |

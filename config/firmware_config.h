@@ -32,6 +32,17 @@
 #define START_BUTTON_DEBOUNCE_MS            (30U)
 #define REQ002_TIMEOUT_MS                   (20000U)
 
+#ifndef MOTOR_SELFTEST_BUILD
+#define MOTOR_SELFTEST_BUILD                (0U)
+#endif
+
+#if MOTOR_SELFTEST_BUILD
+#define MOTOR_TEST_DUTY_PERMILLE            (120U)
+#define MOTOR_TEST_DURATION_MS              (1000U)
+#endif
+
+#define RIGHT_ENCODER_COUNTS_PER_REV         (1650U)
+
 /*
  * REQ-002 remains actuator-locked. These gates are deliberately false until
  * calibration evidence, physical parameters, and a separately approved motor

@@ -32,7 +32,7 @@
 - 电机驱动：库存为 DRV8870 双路模块；长期堵转热、电流、模块版本和保护方案仍需核实。
 - 原八路蓝光灰度模块和五路一体 TCRT5000 均退出后续主循迹方案；旧资料、旧接线和固件状态仅保留追溯。
 - 主循迹已选 HiWonder/AiBlock LineFollower_6CH V1.0：5 V、资料电流 85 mA、I²C 7 位地址 0x5C，可读六路数字状态和六路 16 位模拟值。frozen v1.5 指定经 U12 独占 I2C0：PA28 SDA、PA31 SCL；模块 `5V/GND/SDA/SCL` 与 U12 `5V/SCL/SDA/GND` 必须按信号交叉，尚未制作线束或实测。
-- MPU6050 当前 `NOT FITTED`；原 MPU6050/GY 接口改接 OLED 并独占 I2C1：PB3 SDA、PB2 SCL。OLED 实物丝印为 `GND/VDD/SCK/SDA`，其中 `VDD` 按正电源、`SCK` 按 I²C `SCL` 使用，必须重排线束，地址0x3C/0x3D和上拉待实测。K230 仍为 PA8/PA9 UART1，UART0 留给开发板 PA10/PA11。COM7 无线接收适配器和 nRF24 约束不变。
+- MPU6050 当前 `NOT FITTED`；原 MPU6050/GY 接口改接 OLED 并独占 I2C1：PB3 SDA、PB2 SCL。OLED 实物丝印为 `GND/VDD/SCK/SDA`，其中 `VDD` 按正电源、`SCK` 按 I²C `SCL` 使用，必须重排线束，地址0x3C/0x3D和上拉待实测。K230 单向UART协议v1已由用户批准：IO9/TXD→PA9/UART1_RX、115200 8N1、固定14字节、CRC-8/ATM；PA8保留但当前DNC。该协议尚未写入SysConfig/源码或实测。UART0仍留给开发板PA10/PA11；COM7无线接收适配器和nRF24约束不变。
 - 天猛星拓展板 V2.0 的正面装配照片已归档；背面、实际供电路径和排针线序仍未确认。用户称有 MP1584EN 可调降压模块；参数图宣称 4.5–28 V 输入、0.8–20 V 可调输出、最大 3 A，但实际板型、5 V 设定和带载能力未测。
 - 摆杆执行器路线已确定为 D36A 通道1 + MS42CG V2，取代 RC 舵机；使用 ST1/DIR1/EN1 和 A/B/PWM/Z，MS42CG 固定 3.3 V 逻辑域。实际绕组、相电流、细分、输入时序、机械限位和散热仍待验证。
 - DRV8870 车轮控制采用 U2 三隔离、三桥接、一保留；车轮功率绕过拓展板直连 DRV。U6/U16 只接编码器四线；U12 已由 frozen v1.5 分配给 LineFollower，U3/H8 不使用，PB18 因板载 KEY3 占用而禁止用于无线。
@@ -41,7 +41,7 @@
 
 1. LineFollower_6CH 实物版本/插头观察面、U12 Pin 1观察面、交叉线束连续性、5 V负载、SDA/SCL空闲电压与上升沿、I²C速率/超时、通道1～6左右顺序、数字极性、模拟范围和阈值寄存器冲突。
 2. U2 实际切线点、桥接点、DRV H3 Pin 1 和 U6/U16 观察面；PCB 修改后必须完成断电连续性表。
-3. K230 的精确板型、电平、波特率/帧格式、供电以及车载发送、场外接收、显示/录像完整链路。
+3. K230 的精确板型和供电能力；协议v1实际脚本、3.3 V/115200波形、帧率、延迟、抖动、坐标标定，以及车载发送、场外接收、显示/录像完整链路。
 4. 电池 BMS、持续/峰值能力、保险/急停；DRV8870 限流、散热及车轮功率线规格。
 5. 左右轮编码器 PPR/CPR、相位、最高边沿频率和正方向标定。
 6. D36A 输入门限/STEP 时序、EN/ST 复位偏置、步进绕组/相电流/细分、MS42CG 六针观察面、PWM/Z 时序、机械限位和散热。
@@ -67,4 +67,5 @@
 - 基础 MCU/Timer/PinMux 资源：`docs/pin-plan/mspm0g3507-pin-plan-frozen-v1.2.md`，再依次应用 v1.3/v1.4/v1.5
 - 当前模块逐线线束：`docs/pin-plan/mspm0g3507-adapter-harness-v1.5.md`
 - 当前 LineFollower/OLED/MPU/U12/I2C 修订：`docs/pin-plan/mspm0g3507-pin-plan-frozen-v1.5.md`（FROZEN-DESIGN / NOT SYSCONFIG-APPLIED）
+- K230单向UART协议：`docs/protocols/k230-ball-position-uart-v1.md`（`USER-APPROVED DESIGN / NOT IMPLEMENTED / NOT TESTED`）
 - Pin Plan 版本索引：`docs/pin-plan/README.md`
