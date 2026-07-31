@@ -4,7 +4,7 @@
 #include "config/firmware_config.h"
 #include "ti_msp_dl_config.h"
 
-static bool readPressed(void)
+bool StartButton_readHardwarePressed(void)
 {
     return DL_GPIO_readPins(DIAG_GPIO_START_BUTTON_PORT,
                DIAG_GPIO_START_BUTTON_PIN) == 0U;
@@ -12,7 +12,7 @@ static bool readPressed(void)
 
 void StartButton_init(StartButton *button, uint32_t nowMs)
 {
-    bool pressed = readPressed();
+    bool pressed = StartButton_readHardwarePressed();
     button->stablePressed = pressed;
     button->candidatePressed = pressed;
     button->pressPending = false;
@@ -21,7 +21,7 @@ void StartButton_init(StartButton *button, uint32_t nowMs)
 
 void StartButton_poll(StartButton *button, uint32_t nowMs)
 {
-    bool pressed = readPressed();
+    bool pressed = StartButton_readHardwarePressed();
 
     if (pressed != button->candidatePressed) {
         button->candidatePressed = pressed;

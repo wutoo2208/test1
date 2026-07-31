@@ -56,8 +56,8 @@ SYSCONFIG_WEAK void SYSCFG_DL_init(void)
     SYSCFG_DL_SYSCTL_init();
     SYSCFG_DL_RIGHT_QEI_init();
     SYSCFG_DL_LEFT_CAPTURE_init();
+    SYSCFG_DL_LINE_I2C_init();
     SYSCFG_DL_OLED_I2C_init();
-    SYSCFG_DL_MPU_I2C_init();
     SYSCFG_DL_DIAG_UART_init();
     SYSCFG_DL_RADIO_SPI_init();
     /* Ensure backup structures have no valid state */
@@ -100,8 +100,8 @@ SYSCONFIG_WEAK void SYSCFG_DL_initPower(void)
     DL_GPIO_reset(GPIOB);
     DL_TimerG_reset(RIGHT_QEI_INST);
     DL_TimerA_reset(LEFT_CAPTURE_INST);
+    DL_I2C_reset(LINE_I2C_INST);
     DL_I2C_reset(OLED_I2C_INST);
-    DL_I2C_reset(MPU_I2C_INST);
     DL_UART_Main_reset(DIAG_UART_INST);
     DL_SPI_reset(RADIO_SPI_INST);
 
@@ -109,8 +109,8 @@ SYSCONFIG_WEAK void SYSCFG_DL_initPower(void)
     DL_GPIO_enablePower(GPIOB);
     DL_TimerG_enablePower(RIGHT_QEI_INST);
     DL_TimerA_enablePower(LEFT_CAPTURE_INST);
+    DL_I2C_enablePower(LINE_I2C_INST);
     DL_I2C_enablePower(OLED_I2C_INST);
-    DL_I2C_enablePower(MPU_I2C_INST);
     DL_UART_Main_enablePower(DIAG_UART_INST);
     DL_SPI_enablePower(RADIO_SPI_INST);
     delay_cycles(POWER_STARTUP_DELAY);
@@ -125,6 +125,16 @@ SYSCONFIG_WEAK void SYSCFG_DL_GPIO_init(void)
     DL_GPIO_initPeripheralInputFunction(GPIO_LEFT_CAPTURE_C0_IOMUX,GPIO_LEFT_CAPTURE_C0_IOMUX_FUNC);
     DL_GPIO_initPeripheralInputFunction(GPIO_LEFT_CAPTURE_C1_IOMUX,GPIO_LEFT_CAPTURE_C1_IOMUX_FUNC);
 
+    DL_GPIO_initPeripheralInputFunctionFeatures(GPIO_LINE_I2C_IOMUX_SDA,
+        GPIO_LINE_I2C_IOMUX_SDA_FUNC, DL_GPIO_INVERSION_DISABLE,
+        DL_GPIO_RESISTOR_NONE, DL_GPIO_HYSTERESIS_DISABLE,
+        DL_GPIO_WAKEUP_DISABLE);
+    DL_GPIO_initPeripheralInputFunctionFeatures(GPIO_LINE_I2C_IOMUX_SCL,
+        GPIO_LINE_I2C_IOMUX_SCL_FUNC, DL_GPIO_INVERSION_DISABLE,
+        DL_GPIO_RESISTOR_NONE, DL_GPIO_HYSTERESIS_DISABLE,
+        DL_GPIO_WAKEUP_DISABLE);
+    DL_GPIO_enableHiZ(GPIO_LINE_I2C_IOMUX_SDA);
+    DL_GPIO_enableHiZ(GPIO_LINE_I2C_IOMUX_SCL);
     DL_GPIO_initPeripheralInputFunctionFeatures(GPIO_OLED_I2C_IOMUX_SDA,
         GPIO_OLED_I2C_IOMUX_SDA_FUNC, DL_GPIO_INVERSION_DISABLE,
         DL_GPIO_RESISTOR_NONE, DL_GPIO_HYSTERESIS_DISABLE,
@@ -135,16 +145,6 @@ SYSCONFIG_WEAK void SYSCFG_DL_GPIO_init(void)
         DL_GPIO_WAKEUP_DISABLE);
     DL_GPIO_enableHiZ(GPIO_OLED_I2C_IOMUX_SDA);
     DL_GPIO_enableHiZ(GPIO_OLED_I2C_IOMUX_SCL);
-    DL_GPIO_initPeripheralInputFunctionFeatures(GPIO_MPU_I2C_IOMUX_SDA,
-        GPIO_MPU_I2C_IOMUX_SDA_FUNC, DL_GPIO_INVERSION_DISABLE,
-        DL_GPIO_RESISTOR_NONE, DL_GPIO_HYSTERESIS_DISABLE,
-        DL_GPIO_WAKEUP_DISABLE);
-    DL_GPIO_initPeripheralInputFunctionFeatures(GPIO_MPU_I2C_IOMUX_SCL,
-        GPIO_MPU_I2C_IOMUX_SCL_FUNC, DL_GPIO_INVERSION_DISABLE,
-        DL_GPIO_RESISTOR_NONE, DL_GPIO_HYSTERESIS_DISABLE,
-        DL_GPIO_WAKEUP_DISABLE);
-    DL_GPIO_enableHiZ(GPIO_MPU_I2C_IOMUX_SDA);
-    DL_GPIO_enableHiZ(GPIO_MPU_I2C_IOMUX_SCL);
 
     DL_GPIO_initPeripheralOutputFunction(
         GPIO_DIAG_UART_IOMUX_TX, GPIO_DIAG_UART_IOMUX_TX_FUNC);
@@ -165,26 +165,6 @@ SYSCONFIG_WEAK void SYSCFG_DL_GPIO_init(void)
     DL_GPIO_initDigitalOutput(DIAG_GPIO_MOTOR_BIN1_SAFE_IOMUX);
 
     DL_GPIO_initDigitalOutput(DIAG_GPIO_MOTOR_BIN2_SAFE_IOMUX);
-
-    DL_GPIO_initDigitalInputFeatures(DIAG_GPIO_TCRT_OUT1_IOMUX,
-		 DL_GPIO_INVERSION_DISABLE, DL_GPIO_RESISTOR_NONE,
-		 DL_GPIO_HYSTERESIS_DISABLE, DL_GPIO_WAKEUP_DISABLE);
-
-    DL_GPIO_initDigitalInputFeatures(DIAG_GPIO_TCRT_OUT2_IOMUX,
-		 DL_GPIO_INVERSION_DISABLE, DL_GPIO_RESISTOR_NONE,
-		 DL_GPIO_HYSTERESIS_DISABLE, DL_GPIO_WAKEUP_DISABLE);
-
-    DL_GPIO_initDigitalInputFeatures(DIAG_GPIO_TCRT_OUT3_IOMUX,
-		 DL_GPIO_INVERSION_DISABLE, DL_GPIO_RESISTOR_NONE,
-		 DL_GPIO_HYSTERESIS_DISABLE, DL_GPIO_WAKEUP_DISABLE);
-
-    DL_GPIO_initDigitalInputFeatures(DIAG_GPIO_TCRT_OUT4_IOMUX,
-		 DL_GPIO_INVERSION_DISABLE, DL_GPIO_RESISTOR_NONE,
-		 DL_GPIO_HYSTERESIS_DISABLE, DL_GPIO_WAKEUP_DISABLE);
-
-    DL_GPIO_initDigitalInputFeatures(DIAG_GPIO_TCRT_OUT5_IOMUX,
-		 DL_GPIO_INVERSION_DISABLE, DL_GPIO_RESISTOR_NONE,
-		 DL_GPIO_HYSTERESIS_DISABLE, DL_GPIO_WAKEUP_DISABLE);
 
     DL_GPIO_initDigitalOutput(DIAG_GPIO_RADIO_CE_IOMUX);
 
@@ -324,6 +304,31 @@ SYSCONFIG_WEAK void SYSCFG_DL_LEFT_CAPTURE_init(void) {
 
 }
 
+static const DL_I2C_ClockConfig gLINE_I2CClockConfig = {
+    .clockSel = DL_I2C_CLOCK_BUSCLK,
+    .divideRatio = DL_I2C_CLOCK_DIVIDE_1,
+};
+
+SYSCONFIG_WEAK void SYSCFG_DL_LINE_I2C_init(void) {
+
+    DL_I2C_setClockConfig(LINE_I2C_INST,
+        (DL_I2C_ClockConfig *) &gLINE_I2CClockConfig);
+    DL_I2C_disableAnalogGlitchFilter(LINE_I2C_INST);
+
+    /* Configure Controller Mode */
+    DL_I2C_resetControllerTransfer(LINE_I2C_INST);
+    /* Set frequency to 100000 Hz*/
+    DL_I2C_setTimerPeriod(LINE_I2C_INST, 31);
+    DL_I2C_setControllerTXFIFOThreshold(LINE_I2C_INST, DL_I2C_TX_FIFO_LEVEL_EMPTY);
+    DL_I2C_setControllerRXFIFOThreshold(LINE_I2C_INST, DL_I2C_RX_FIFO_LEVEL_BYTES_1);
+    DL_I2C_enableControllerClockStretching(LINE_I2C_INST);
+
+
+    /* Enable module */
+    DL_I2C_enableController(LINE_I2C_INST);
+
+
+}
 static const DL_I2C_ClockConfig gOLED_I2CClockConfig = {
     .clockSel = DL_I2C_CLOCK_BUSCLK,
     .divideRatio = DL_I2C_CLOCK_DIVIDE_1,
@@ -346,31 +351,6 @@ SYSCONFIG_WEAK void SYSCFG_DL_OLED_I2C_init(void) {
 
     /* Enable module */
     DL_I2C_enableController(OLED_I2C_INST);
-
-
-}
-static const DL_I2C_ClockConfig gMPU_I2CClockConfig = {
-    .clockSel = DL_I2C_CLOCK_BUSCLK,
-    .divideRatio = DL_I2C_CLOCK_DIVIDE_1,
-};
-
-SYSCONFIG_WEAK void SYSCFG_DL_MPU_I2C_init(void) {
-
-    DL_I2C_setClockConfig(MPU_I2C_INST,
-        (DL_I2C_ClockConfig *) &gMPU_I2CClockConfig);
-    DL_I2C_disableAnalogGlitchFilter(MPU_I2C_INST);
-
-    /* Configure Controller Mode */
-    DL_I2C_resetControllerTransfer(MPU_I2C_INST);
-    /* Set frequency to 100000 Hz*/
-    DL_I2C_setTimerPeriod(MPU_I2C_INST, 31);
-    DL_I2C_setControllerTXFIFOThreshold(MPU_I2C_INST, DL_I2C_TX_FIFO_LEVEL_EMPTY);
-    DL_I2C_setControllerRXFIFOThreshold(MPU_I2C_INST, DL_I2C_RX_FIFO_LEVEL_BYTES_1);
-    DL_I2C_enableControllerClockStretching(MPU_I2C_INST);
-
-
-    /* Enable module */
-    DL_I2C_enableController(MPU_I2C_INST);
 
 
 }

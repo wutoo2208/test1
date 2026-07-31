@@ -1,14 +1,16 @@
 #ifndef CONFIG_FIRMWARE_CONFIG_H_
 #define CONFIG_FIRMWARE_CONFIG_H_
 
-#define FW_VERSION                         "req002-safe-0.3"
-#define PIN_PLAN_VERSION                   "1.3"
+#define FW_VERSION                         "req002-safe-0.5"
+#define PIN_PLAN_VERSION                   "1.5"
 
 #define DIAG_UART_RX_BUFFER_SIZE           (128U)
 #define DIAG_COMMAND_BUFFER_SIZE           (80U)
 #define DIAG_LINE_MIRROR_SIZE              (192U)
 
 #define I2C_DIAG_TIMEOUT_LOOPS             (200000U)
+#define LINE_SENSOR_POLL_PERIOD_MS         (5U)
+#define LINE_SENSOR_RETRY_PERIOD_MS        (50U)
 #define RADIO_SPI_TIMEOUT_LOOPS            (200000U)
 #define RADIO_TX_QUEUE_SLOTS               (16U)
 #define RADIO_MAX_PAYLOAD                  (32U)

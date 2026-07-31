@@ -11,6 +11,8 @@
 #include "drivers/i2c_diag.h"
 #include "drivers/line_sensors.h"
 #include "drivers/nrf24_ptx.h"
+#include "drivers/oled_ssd1306.h"
+#include "drivers/start_button.h"
 #include "ti_msp_dl_config.h"
 
 static volatile uint8_t gRxBuffer[DIAG_UART_RX_BUFFER_SIZE];
@@ -79,14 +81,23 @@ static void newLine(void)
 
 static void reportLine(void)
 {
-    uint8_t bits = LineSensors_readRawBits();
+    LineSensorSample sample = LineSensors_snapshot();
     uint8_t index;
 
-    writeText("@LINE raw=");
+    writeText("@LINE valid="); writeU32(sample.valid ? 1U : 0U);
+    writeText(" digital=");
     for (index = 0U; index < LINE_SENSOR_COUNT; index++) {
-        putChar(((bits & (1U << index)) != 0U) ? '1' : '0');
+        putChar(((sample.digitalBits & (1U << index)) != 0U) ? '1' : '0');
     }
-    writeText(" polarity=UNKNOWN order=OUT1..OUT5");
+    writeText(" analog=");
+    for (index = 0U; index < LINE_SENSOR_COUNT; index++) {
+        if (index != 0U) putChar(',');
+        writeU32(sample.analog[index]);
+    }
+    writeText(" sequence="); writeU32(sample.sequence);
+    writeText(" last_success_ms="); writeU32(sample.lastSuccessMs);
+    writeText(" errors="); writeU32(sample.errorCount);
+    writeText(" polarity=UNKNOWN order=CH1..CH6_UNVERIFIED");
     newLine();
 }
 
@@ -111,24 +122,40 @@ static void reportI2c(void)
 {
     I2cDiagScan scan = I2cDiag_scan();
 
-    writeText("@I2C oled_3c="); writeText(scan.oled3c ? "ACK" : "NACK");
+    writeText("@I2C line_5c="); writeText(scan.line5c ? "ACK" : "NACK");
+    writeText(" oled_3c="); writeText(scan.oled3c ? "ACK" : "NACK");
     writeText(" oled_3d="); writeText(scan.oled3d ? "ACK" : "NACK");
-    writeText(" mpu_68="); writeText(scan.mpu68 ? "ACK" : "NACK");
-    writeText(" mpu_69="); writeText(scan.mpu69 ? "ACK" : "NACK");
     newLine();
 }
 
-static void reportMpu(void)
+static void runOledTest(void)
 {
-    I2cDiagMpu result = I2cDiag_readMpuWhoAmI();
+    bool ok = OledSsd1306_showTestPattern();
+    writeText("@OLED address=0x3C controller=SSD1306_CANDIDATE test=");
+    writeText(ok ? "I2C_PASS_CHECK_SCREEN" : "I2C_FAIL");
+    newLine();
+}
 
-    if (!result.found) {
-        writeText("@MPU status=NO_RESPONSE addresses=68,69");
-    } else {
-        writeText("@MPU address=0x"); writeHex8(result.address);
-        writeText(" who_am_i=0x"); writeHex8(result.whoAmI);
-        writeText(" configured=NO");
-    }
+static void forceOledAllOn(void)
+{
+    bool ok = OledSsd1306_forceAllPixelsOn();
+    writeText("@OLED address=0x3C command=A5_ALL_ON test=");
+    writeText(ok ? "I2C_PASS_CHECK_SCREEN" : "I2C_FAIL");
+    newLine();
+}
+
+static void forceOledAllOnSh1106(void)
+{
+    bool ok = OledSsd1306_forceAllPixelsOnSh1106();
+    writeText("@OLED address=0x3C controller=SH1106_CANDIDATE command=AD8B_AF_A5 test=");
+    writeText(ok ? "I2C_PASS_CHECK_SCREEN" : "I2C_FAIL");
+    newLine();
+}
+
+static void clearOled(void)
+{
+    OledSsd1306_clear();
+    writeText("@OLED clear=REQUESTED display=OFF");
     newLine();
 }
 
@@ -169,6 +196,13 @@ static void reportRadioStatus(void)
     writeText(" drop_lines="); writeU32(status.droppedLines);
     newLine();
     gCaptureEnabled = capture;
+}
+
+static void reportButton(void)
+{
+    writeText("@BUTTON pin=PA21 key=KEY2 active_low=1 raw_pressed=");
+    writeU32(StartButton_readHardwarePressed() ? 1U : 0U);
+    newLine();
 }
 
 static void reportReq002(void)
@@ -214,7 +248,7 @@ static void reportStatus(void)
 
 static void reportHelp(void)
 {
-    writeText("@HELP commands=help,status,pins,line,enc,i2c,mpu,radio_regs,radio_status,radio_arm,radio_disarm,radio_test,req002,req002_status,stop,selftest");
+    writeText("@HELP commands=help,status,pins,line,enc,button,i2c,oled_test,oled_all_on,oled_sh1106_on,oled_clear,radio_regs,radio_status,radio_arm,radio_disarm,radio_test,req002,req002_status,stop,selftest");
     newLine();
 }
 
@@ -243,12 +277,24 @@ static void processCommand(const char *command)
     } else if ((strcmp(command, "line") == 0) ||
                (strcmp(command, "line raw") == 0)) {
         reportLine();
+    } else if ((strcmp(command, "button") == 0) ||
+               (strcmp(command, "button raw") == 0)) {
+        reportButton();
     } else if ((strcmp(command, "i2c") == 0) ||
                (strcmp(command, "i2c scan") == 0)) {
         reportI2c();
-    } else if ((strcmp(command, "mpu") == 0) ||
-               (strcmp(command, "mpu whoami") == 0)) {
-        reportMpu();
+    } else if ((strcmp(command, "oled test") == 0) ||
+               (strcmp(command, "oled_test") == 0)) {
+        runOledTest();
+    } else if ((strcmp(command, "oled all on") == 0) ||
+               (strcmp(command, "oled_all_on") == 0)) {
+        forceOledAllOn();
+    } else if ((strcmp(command, "oled sh1106 on") == 0) ||
+               (strcmp(command, "oled_sh1106_on") == 0)) {
+        forceOledAllOnSh1106();
+    } else if ((strcmp(command, "oled clear") == 0) ||
+               (strcmp(command, "oled_clear") == 0)) {
+        clearOled();
     } else if ((strcmp(command, "radio") == 0) ||
                (strcmp(command, "radio regs") == 0) ||
                (strcmp(command, "radio_regs") == 0)) {

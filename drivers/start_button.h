@@ -15,5 +15,6 @@ void StartButton_init(StartButton *button, uint32_t nowMs);
 void StartButton_poll(StartButton *button, uint32_t nowMs);
 bool StartButton_takePress(StartButton *button);
 bool StartButton_isPressed(const StartButton *button);
+bool StartButton_readHardwarePressed(void);
 
 #endif /* DRIVERS_START_BUTTON_H_ */

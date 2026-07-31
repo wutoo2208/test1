@@ -87,7 +87,8 @@ class FirmwareSafetyTests(unittest.TestCase):
         )
         self.assertNotIn('"BUZZER"', syscfg)
         self.assertNotIn("DIAG_GPIO_BUZZER", target_sources)
-        self.assertIn('pin.$assign      = "PB21"', syscfg)
+        self.assertIn('pin.$assign      = "PA21"', syscfg)
+        self.assertNotIn('pin.$assign      = "PB21"', syscfg)
         self.assertIn('internalResistor = "PULL_UP"', syscfg)
 
     def test_entrypoint_is_thin_and_tests_are_not_target_sources(self) -> None:
@@ -110,6 +111,47 @@ class FirmwareSafetyTests(unittest.TestCase):
             "-mthumb",
         ):
             self.assertIn(flag, clangd)
+
+    def test_pin_plan_v15_uses_six_line_i2c_and_removes_mpu(self) -> None:
+        syscfg = text("empty.syscfg")
+        header = text("drivers/line_sensors.h")
+        source = text("drivers/line_sensors.c")
+        app = text("app/app.c")
+        console = text("drivers/diag_console.c")
+        i2c_diag = text("drivers/i2c_diag.c")
+
+        for token in (
+            'I2C1.$name                     = "LINE_I2C"',
+            'I2C1.peripheral.$assign        = "I2C0"',
+            'I2C1.peripheral.sdaPin.$assign = "PA28"',
+            'I2C1.peripheral.sclPin.$assign = "PA31"',
+            'I2C2.$name                     = "OLED_I2C"',
+            'I2C2.peripheral.$assign        = "I2C1"',
+            'I2C2.peripheral.sdaPin.$assign = "PB3"',
+            'I2C2.peripheral.sclPin.$assign = "PB2"',
+        ):
+            self.assertIn(token, syscfg)
+        self.assertNotIn("MPU_I2C", syscfg + i2c_diag + console)
+        self.assertNotRegex(syscfg + source, r"TCRT_OUT[1-5]")
+
+        self.assertRegex(header, r"LINE_SENSOR_COUNT\s+\(6U\)")
+        for token in (
+            "LineSensors_init",
+            "LineSensors_service",
+            "LineSensors_snapshot",
+            "uint16_t analog[LINE_SENSOR_COUNT]",
+        ):
+            self.assertIn(token, header)
+        self.assertIn("LINE_I2C_INST", source)
+        self.assertIn("LINE_SENSOR_I2C_ADDRESS       (0x5CU)", source)
+        self.assertIn("LINE_SENSOR_DIGITAL_REGISTER  (0x05U)", source)
+        self.assertIn("LINE_SENSOR_ANALOG_REGISTER   (0x06U)", source)
+        self.assertIn("LineSensors_init(nowMs);", app)
+        self.assertIn("LineSensors_service(nowMs);", app)
+        self.assertNotIn("DL_GPIO_readPins", source)
+        self.assertIn("line_5c", console)
+        self.assertIn("CH1..CH6_UNVERIFIED", console)
+        self.assertNotIn('strcmp(command, "mpu")', console)
 
 
 if __name__ == "__main__":

@@ -116,33 +116,33 @@ extern "C" {
 
 
 
-/* Defines for OLED_I2C */
-#define OLED_I2C_INST                                                       I2C0
-#define OLED_I2C_INST_IRQHandler                                 I2C0_IRQHandler
-#define OLED_I2C_INST_INT_IRQN                                     I2C0_INT_IRQn
-#define OLED_I2C_BUS_SPEED_HZ                                             100000
-#define GPIO_OLED_I2C_SDA_PORT                                             GPIOA
-#define GPIO_OLED_I2C_SDA_PIN                                      DL_GPIO_PIN_0
-#define GPIO_OLED_I2C_IOMUX_SDA                                   (IOMUX_PINCM1)
-#define GPIO_OLED_I2C_IOMUX_SDA_FUNC                    IOMUX_PINCM1_PF_I2C0_SDA
-#define GPIO_OLED_I2C_SCL_PORT                                             GPIOA
-#define GPIO_OLED_I2C_SCL_PIN                                      DL_GPIO_PIN_1
-#define GPIO_OLED_I2C_IOMUX_SCL                                   (IOMUX_PINCM2)
-#define GPIO_OLED_I2C_IOMUX_SCL_FUNC                    IOMUX_PINCM2_PF_I2C0_SCL
+/* Defines for LINE_I2C */
+#define LINE_I2C_INST                                                       I2C0
+#define LINE_I2C_INST_IRQHandler                                 I2C0_IRQHandler
+#define LINE_I2C_INST_INT_IRQN                                     I2C0_INT_IRQn
+#define LINE_I2C_BUS_SPEED_HZ                                             100000
+#define GPIO_LINE_I2C_SDA_PORT                                             GPIOA
+#define GPIO_LINE_I2C_SDA_PIN                                     DL_GPIO_PIN_28
+#define GPIO_LINE_I2C_IOMUX_SDA                                   (IOMUX_PINCM3)
+#define GPIO_LINE_I2C_IOMUX_SDA_FUNC                    IOMUX_PINCM3_PF_I2C0_SDA
+#define GPIO_LINE_I2C_SCL_PORT                                             GPIOA
+#define GPIO_LINE_I2C_SCL_PIN                                     DL_GPIO_PIN_31
+#define GPIO_LINE_I2C_IOMUX_SCL                                   (IOMUX_PINCM6)
+#define GPIO_LINE_I2C_IOMUX_SCL_FUNC                    IOMUX_PINCM6_PF_I2C0_SCL
 
-/* Defines for MPU_I2C */
-#define MPU_I2C_INST                                                        I2C1
-#define MPU_I2C_INST_IRQHandler                                  I2C1_IRQHandler
-#define MPU_I2C_INST_INT_IRQN                                      I2C1_INT_IRQn
-#define MPU_I2C_BUS_SPEED_HZ                                              100000
-#define GPIO_MPU_I2C_SDA_PORT                                              GPIOB
-#define GPIO_MPU_I2C_SDA_PIN                                       DL_GPIO_PIN_3
-#define GPIO_MPU_I2C_IOMUX_SDA                                   (IOMUX_PINCM16)
-#define GPIO_MPU_I2C_IOMUX_SDA_FUNC                    IOMUX_PINCM16_PF_I2C1_SDA
-#define GPIO_MPU_I2C_SCL_PORT                                              GPIOB
-#define GPIO_MPU_I2C_SCL_PIN                                       DL_GPIO_PIN_2
-#define GPIO_MPU_I2C_IOMUX_SCL                                   (IOMUX_PINCM15)
-#define GPIO_MPU_I2C_IOMUX_SCL_FUNC                    IOMUX_PINCM15_PF_I2C1_SCL
+/* Defines for OLED_I2C */
+#define OLED_I2C_INST                                                       I2C1
+#define OLED_I2C_INST_IRQHandler                                 I2C1_IRQHandler
+#define OLED_I2C_INST_INT_IRQN                                     I2C1_INT_IRQn
+#define OLED_I2C_BUS_SPEED_HZ                                             100000
+#define GPIO_OLED_I2C_SDA_PORT                                             GPIOB
+#define GPIO_OLED_I2C_SDA_PIN                                      DL_GPIO_PIN_3
+#define GPIO_OLED_I2C_IOMUX_SDA                                  (IOMUX_PINCM16)
+#define GPIO_OLED_I2C_IOMUX_SDA_FUNC                   IOMUX_PINCM16_PF_I2C1_SDA
+#define GPIO_OLED_I2C_SCL_PORT                                             GPIOB
+#define GPIO_OLED_I2C_SCL_PIN                                      DL_GPIO_PIN_2
+#define GPIO_OLED_I2C_IOMUX_SCL                                  (IOMUX_PINCM15)
+#define GPIO_OLED_I2C_IOMUX_SCL_FUNC                   IOMUX_PINCM15_PF_I2C1_SCL
 
 
 /* Defines for DIAG_UART */
@@ -201,26 +201,6 @@ extern "C" {
 #define DIAG_GPIO_MOTOR_BIN2_SAFE_PORT                                   (GPIOB)
 #define DIAG_GPIO_MOTOR_BIN2_SAFE_PIN                           (DL_GPIO_PIN_24)
 #define DIAG_GPIO_MOTOR_BIN2_SAFE_IOMUX                          (IOMUX_PINCM52)
-/* Defines for TCRT_OUT1: GPIOA.25 with pinCMx 55 on package pin 26 */
-#define DIAG_GPIO_TCRT_OUT1_PORT                                         (GPIOA)
-#define DIAG_GPIO_TCRT_OUT1_PIN                                 (DL_GPIO_PIN_25)
-#define DIAG_GPIO_TCRT_OUT1_IOMUX                                (IOMUX_PINCM55)
-/* Defines for TCRT_OUT2: GPIOA.27 with pinCMx 60 on package pin 31 */
-#define DIAG_GPIO_TCRT_OUT2_PORT                                         (GPIOA)
-#define DIAG_GPIO_TCRT_OUT2_PIN                                 (DL_GPIO_PIN_27)
-#define DIAG_GPIO_TCRT_OUT2_IOMUX                                (IOMUX_PINCM60)
-/* Defines for TCRT_OUT3: GPIOA.16 with pinCMx 38 on package pin 9 */
-#define DIAG_GPIO_TCRT_OUT3_PORT                                         (GPIOA)
-#define DIAG_GPIO_TCRT_OUT3_PIN                                 (DL_GPIO_PIN_16)
-#define DIAG_GPIO_TCRT_OUT3_IOMUX                                (IOMUX_PINCM38)
-/* Defines for TCRT_OUT4: GPIOA.14 with pinCMx 36 on package pin 7 */
-#define DIAG_GPIO_TCRT_OUT4_PORT                                         (GPIOA)
-#define DIAG_GPIO_TCRT_OUT4_PIN                                 (DL_GPIO_PIN_14)
-#define DIAG_GPIO_TCRT_OUT4_IOMUX                                (IOMUX_PINCM36)
-/* Defines for TCRT_OUT5: GPIOB.20 with pinCMx 48 on package pin 19 */
-#define DIAG_GPIO_TCRT_OUT5_PORT                                         (GPIOB)
-#define DIAG_GPIO_TCRT_OUT5_PIN                                 (DL_GPIO_PIN_20)
-#define DIAG_GPIO_TCRT_OUT5_IOMUX                                (IOMUX_PINCM48)
 /* Defines for RADIO_CE: GPIOB.1 with pinCMx 13 on package pin 48 */
 #define DIAG_GPIO_RADIO_CE_PORT                                          (GPIOB)
 #define DIAG_GPIO_RADIO_CE_PIN                                   (DL_GPIO_PIN_1)
@@ -233,10 +213,10 @@ extern "C" {
 #define DIAG_GPIO_RADIO_IRQ_PORT                                         (GPIOB)
 #define DIAG_GPIO_RADIO_IRQ_PIN                                 (DL_GPIO_PIN_16)
 #define DIAG_GPIO_RADIO_IRQ_IOMUX                                (IOMUX_PINCM33)
-/* Defines for START_BUTTON: GPIOB.21 with pinCMx 49 on package pin 20 */
-#define DIAG_GPIO_START_BUTTON_PORT                                      (GPIOB)
+/* Defines for START_BUTTON: GPIOA.21 with pinCMx 46 on package pin 17 */
+#define DIAG_GPIO_START_BUTTON_PORT                                      (GPIOA)
 #define DIAG_GPIO_START_BUTTON_PIN                              (DL_GPIO_PIN_21)
-#define DIAG_GPIO_START_BUTTON_IOMUX                             (IOMUX_PINCM49)
+#define DIAG_GPIO_START_BUTTON_IOMUX                             (IOMUX_PINCM46)
 /* Defines for D36A_EN_SAFE: GPIOB.0 with pinCMx 12 on package pin 47 */
 #define DIAG_GPIO_D36A_EN_SAFE_PORT                                      (GPIOB)
 #define DIAG_GPIO_D36A_EN_SAFE_PIN                               (DL_GPIO_PIN_0)
@@ -259,8 +239,8 @@ void SYSCFG_DL_GPIO_init(void);
 void SYSCFG_DL_SYSCTL_init(void);
 void SYSCFG_DL_RIGHT_QEI_init(void);
 void SYSCFG_DL_LEFT_CAPTURE_init(void);
+void SYSCFG_DL_LINE_I2C_init(void);
 void SYSCFG_DL_OLED_I2C_init(void);
-void SYSCFG_DL_MPU_I2C_init(void);
 void SYSCFG_DL_DIAG_UART_init(void);
 void SYSCFG_DL_RADIO_SPI_init(void);
 

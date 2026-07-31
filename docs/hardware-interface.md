@@ -126,8 +126,10 @@ Reviewed by:
 | 模块 | 已提取资料 | 当前关键事实 | 阻塞项 |
 |---|---|---|---|
 | nRF24L01+ | `docs/hardware/modules/nrf24l01p.md` | 3.3 V SPI 无线 IC/模块候选，最高 2 Mbps 空口速率。 | 实物模块排针、用途、图传能力。 |
-| 八路灰度循迹 | `docs/hardware/modules/line-sensor-8ch.md` | 5 V 供电、AD0-AD2 选通、OUT 数字量；教程候选 PA14-PA17。 | OUT 电平、发光颜色、实测高度。 |
-| MPU6000A/MPU6050 | `docs/hardware/modules/mpu6000a.md` | PB2/PB3 I2C1 端点保持；模块从摆杆移到车体，只作为循迹扰动/角速度/加速度辅助候选。 | 实物型号、上拉电压、车体安装轴向、振动与收益对照。 |
+| HiWonder/AiBlock LineFollower_6CH V1.0 | `docs/hardware/modules/linefollower-6ch-i2c.md` | 5 V/85 mA，I²C 7 位地址 0x5C，六路数字状态和六路 16 位模拟值；原理图 I²C 上拉到 3.3 V。 | 实物版本、线序、总线上拉、I²C 速率、通道左右顺序、数字极性和阈值寄存器冲突。 |
+| 原八路灰度 / 五路 TCRT5000 | 历史资料 | 已被 LineFollower_6CH 主循迹选择替代。 | 保留资料与既有接线事实，不用于新模块接线或固件。 |
+| MPU6000A/MPU6050 | `docs/hardware/modules/mpu6000a.md` | `NOT FITTED / HISTORICAL OPTION`；PB2/PB3 已由 frozen v1.5 转给 OLED。 | 若未来恢复，重新确认接口、上拉、安装、振动和收益，不沿用旧共享总线假设。 |
+| ZJY096I0400WG01 OLED | `docs/hardware/modules/oled-0.96in-zjy096i0400wg01-new-module-facts.md` | 实物 `GND/VDD/SCK/SDA`；frozen v1.5 经原 MPU/GY 接口独占 I2C1 PB3/PB2。 | GY pad1观察面、断电连续性、SCK/SDA上拉电压、实际地址0x3C/0x3D。 |
 | DRV8870 双路 | `docs/hardware/modules/drv8870-dual.md` | 双电机控制、四路编码器输入、VIN/电流/接口资料。 | 实物板版本、电机参数、电池与电平。 |
 | 天猛星拓展板 V2.0 | `docs/hardware/modules/tianmengxing-expansion-board-v2.md` | EPRO 静态资料与实物正面装配照片均已归档；可见双稳压、TB6612、OLED、按键等区域。 | 背面照片、板号、排针线序、电平与实际供电路径。 |
 | MP1584EN 可调降压 | `docs/hardware/modules/mp1584en-adjustable-step-down.md` | 用户称 MP1584EN；参数图称 4.5–28 V 输入、0.8–20 V 可调输出、最大 3 A。 | 实物板型、输出设定/测量、负载、保护、热与接线。 |
@@ -135,7 +137,7 @@ Reviewed by:
 | MS42CG 编码器 | `docs/hardware/modules/ms42cg-encoder.md` | 3.3–5 V 供电，输出 A/B/PWM/Z；手册示例 A/B 1000 线、四倍频 4000 计数/圈。 | 实物线束、3.3 V 供电、A/B/PWM/Z 取线、MCU 捕获资源和最高边沿频率。 |
 | D36A 双路步进驱动 | `docs/hardware/modules/d36a-dual-stepper-driver.md` | 两路 STEP/DIR/EN，外部 12 V 示例、4 线两相步进输出，细分/电流拨码共用。 | 实际步进电机型号/相电流、控制电平时序、供电保护、热与物理连接。 |
 
-最终接线仍应只登记在本文件“已确认接线矩阵”中；在用户回答 `docs/hardware/module-questions.md` 的问题前，不得写入 `.syscfg` 或接线结论。
+当前设计端点以 `docs/pin-plan/README.md` 指向的最高修订和配套 harness 为准；本文件登记职责与接口状态。在 `docs/hardware/module-questions.md` 的实物、电气问题关闭且另获授权前，不得写入 `.syscfg` 或实施接线。
 
 ## 10. 最终 Pin Plan v1.0 设计登记（历史记录，已被 v1.2 取代）
 
@@ -181,9 +183,9 @@ Reviewed by:
 | `IF-V1.1-TCRT-REWIRE` | 五路 TCRT5000 | PA25/PA27/PA16/PA14/PB20 | H10 pin7/pin8/pin3/pin4/pin5 | 输出电平、极性、模块物理左右顺序和改线线束 |
 
 禁止把无线模块 pin1/pin2 接到任何电源或地；v1.1 已否决，禁止按本候选修改 `.syscfg`、接线或上电。
-## 12. 最终 Pin Plan v1.2 设计登记（当前唯一最新版，未接线）
+## 12. Pin Plan v1.2 基础资源登记（由 v1.3/v1.4/v1.5 分层修订）
 
-> **状态含义**：v1.2 已获用户批准并冻结为设计，但尚未接线。当前唯一权威文件是 `docs/pin-plan/mspm0g3507-pin-plan-frozen-v1.2.md` 与 `docs/pin-plan/mspm0g3507-adapter-harness-v1.2.md`。每个模块的 MCU 引脚、拓展板针位、线束端点和 DNC 只以这两个最新版文件为准。
+> **状态含义**：v1.2 是未被后续修订覆盖的基础资源；必须再依次应用 v1.3、v1.4 和当前 v1.5。当前索引见 `docs/pin-plan/README.md`；LineFollower/OLED/MPU/TCRT/U12/U8 的端点只以 frozen v1.5 与 v1.5 harness 为准。
 
 | Interface ID | 模块/接口 | MCU / 外设 | 物理路径 | 当前开放条件 |
 |---|---|---|---|---|
@@ -195,14 +197,27 @@ Reviewed by:
 
 `PB18` 按用户现场陈述标记为 `KEY3 / FORBIDDEN-FOR-RADIO`。v1.2 冻结只确认设计资源，不授权修改 `.syscfg`、接线、供电、构建、烧录或硬件测试。
 
-## 13. 传感器与执行器职责变更（2026-07-30，未改变接线）
+## 13. 传感器与执行器职责变更（当前方案）
 
 | 链路 | 当前职责 | 明确不承担 | 状态/门槛 |
 |---|---|---|---|
 | K230 → UART1 PA8/PA9 | 目标框经过标定后输出钢球相对 O 点的有符号位置，作为球位置外环唯一测量。 | 不直接证明杆角、执行器位置或视频图传已合规。 | 完整协议、时间戳、帧率/延迟、毫米标定和异常帧策略待验证。 |
 | MS42CG → PA29/PA30/PA13/PB23 | D36A 步进执行器的位置/角度内层反馈、回零/丢步监测候选。 | 不测钢球位置。 | 零位、方向、计数、PWM/Z 语义、几何映射与失步策略待验证。 |
 | D36A → PA26/PA24/PB0 | 控制步进电机改变摆杆右端高度，从而实现定轴转动。 | 不提供编码器反馈，也不能保证没有失步。 | 步频、加速度、限位、失能、相电流与温升待验证。 |
-| MPU6050 → I2C1 PB2/PB3 | 安装在车体，作为循迹扰动、角速度、加速度、倾斜或前馈候选。 | 不装摆杆、不测杆角、不替代 TCRT5000。 | 默认仅记录；安装轴向、零偏、振动和收益对照通过后才可加入控制。 |
-| TCRT5000 五路 | 小车循迹主反馈。 | 不测钢球位置。 | 电平、极性、车体左右顺序和赛道标定仍需关闭。 |
+| LineFollower_6CH → I2C0 PA28/PA31 | 小车红外循迹主反馈；读取 0x05 数字状态和 0x06 六路模拟值候选。 | 不测钢球位置；不使用原 TCRT 五根 GPIO。 | frozen v1.5设计已批准；通道顺序、极性、总线速率、200 Hz调度和异常恢复待验证。 |
+| OLED → I2C1 PB3/PB2 | 本地时间、模式和故障显示；经原 MPU/GY 接口重排线束接入。 | 不参与控制闭环。 | 实物 `VDD/SCK` 按正电源/I²C SCL映射；地址、上拉和线束连续性待验证。 |
+| MPU6050 | `NOT FITTED`。 | 不装摆杆、不装车体、不采样、不提供前馈。 | 若未来恢复，必须新建方案决策和 Pin Plan 修订。 |
 
-本节只改变系统职责，不改变 `docs/pin-plan/mspm0g3507-pin-plan-frozen-v1.2.md` 或 `docs/pin-plan/mspm0g3507-adapter-harness-v1.2.md` 的端点，不授权修改 `.syscfg`、接线、上电、构建、烧录或运动测试。
+本节反映 frozen v1.5 设计职责，但不授权修改 `.syscfg`、接线、上电、构建、烧录或运动测试。
+
+## 14. LineFollower/OLED/MPU v1.5 冻结接口
+
+| Interface ID | 模块 | MCU 资源 | 物理路径 | 状态/阻塞 |
+|---|---|---|---|---|
+| `IF-V1.5-LINE-I2C0` | HiWonder/AiBlock LineFollower_6CH V1.0 | PA31 I2C0 SCL、PA28 I2C0 SDA | U12 pin2 SCL、pin3 SDA、pin1 5V、pin4 GND；模块端按信号交叉 | FROZEN-DESIGN；未改 SysConfig、未制作线束、未上电 |
+| `IF-V1.5-OLED-I2C1` | ZJY096I0400WG01 / GM009605V4.3 OLED | PB2 I2C1 SCL、PB3 I2C1 SDA | 原 MPU/GY pad3 SCL、pad4 SDA、pad1 5V、pad2 GND；OLED `VDD/SCK` 分别对应正电源/SCL | FROZEN-DESIGN；禁止直通四芯线，地址/上拉待验 |
+| `IF-V1.5-MPU-DNC` | MPU6050 | 无 | 模块移除并绝缘保存；原接口改由 OLED 使用 | USER-APPROVED / NOT FITTED |
+| `IF-V1.5-TCRT-DNC` | 原五路 TCRT5000 | PA25/PA27/PA16/PA14/PB20 释放为 DNC | 旧交叉线束退出 | FROZEN-DNC；不自动授权分配给其他功能 |
+| `IF-V1.5-U8-DNC` | 旧 OLED U8 | PA0/PA1 释放为 DNC | U8 pad1～4 不接 | FROZEN-DNC；板载上拉网络仍存在 |
+
+H10 pin1/PB19、pin2/PB17、pin6/PB25 的无线 SPI0 Owner 不变。当前权威文件是 `docs/pin-plan/mspm0g3507-pin-plan-frozen-v1.5.md` 与 `docs/pin-plan/mspm0g3507-adapter-harness-v1.5.md`。

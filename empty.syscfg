@@ -25,7 +25,7 @@ const CAPTURE1 = CAPTURE.addInstance();
  * PB14/PA7 move to TIMA0 PWM only after a separate motor-test authorization.
  */
 GPIO1.$name = "DIAG_GPIO";
-GPIO1.associatedPins.create(16);
+GPIO1.associatedPins.create(11);
 
 GPIO1.associatedPins[0].$name        = "MOTOR_AIN1_SAFE";
 GPIO1.associatedPins[0].initialValue = "CLEARED";
@@ -40,45 +40,29 @@ GPIO1.associatedPins[3].$name        = "MOTOR_BIN2_SAFE";
 GPIO1.associatedPins[3].initialValue = "CLEARED";
 GPIO1.associatedPins[3].pin.$assign  = "PB24";
 
-GPIO1.associatedPins[4].$name       = "TCRT_OUT1";
-GPIO1.associatedPins[4].direction   = "INPUT";
-GPIO1.associatedPins[4].pin.$assign = "PA25";
-GPIO1.associatedPins[5].$name       = "TCRT_OUT2";
-GPIO1.associatedPins[5].direction   = "INPUT";
-GPIO1.associatedPins[5].pin.$assign = "PA27";
-GPIO1.associatedPins[6].$name       = "TCRT_OUT3";
-GPIO1.associatedPins[6].direction   = "INPUT";
-GPIO1.associatedPins[6].pin.$assign = "PA16";
-GPIO1.associatedPins[7].$name       = "TCRT_OUT4";
-GPIO1.associatedPins[7].direction   = "INPUT";
-GPIO1.associatedPins[7].pin.$assign = "PA14";
-GPIO1.associatedPins[8].$name       = "TCRT_OUT5";
-GPIO1.associatedPins[8].direction   = "INPUT";
-GPIO1.associatedPins[8].pin.$assign = "PB20";
-
-GPIO1.associatedPins[9].$name         = "RADIO_CE";
+GPIO1.associatedPins[4].$name         = "RADIO_CE";
+GPIO1.associatedPins[4].initialValue  = "CLEARED";
+GPIO1.associatedPins[4].pin.$assign   = "PB1";
+GPIO1.associatedPins[5].$name         = "RADIO_CSN";
+GPIO1.associatedPins[5].initialValue  = "SET";
+GPIO1.associatedPins[5].pin.$assign   = "PB25";
+GPIO1.associatedPins[6].$name         = "RADIO_IRQ";
+GPIO1.associatedPins[6].direction     = "INPUT";
+GPIO1.associatedPins[6].pin.$assign   = "PB16";
+/* User-verified expansion-board KEY2 is PA21; PB21 is unconnected. */
+GPIO1.associatedPins[7].$name            = "START_BUTTON";
+GPIO1.associatedPins[7].direction        = "INPUT";
+GPIO1.associatedPins[7].internalResistor = "PULL_UP";
+GPIO1.associatedPins[7].pin.$assign      = "PA21";
+GPIO1.associatedPins[8].$name         = "D36A_EN_SAFE";
+GPIO1.associatedPins[8].initialValue  = "CLEARED";
+GPIO1.associatedPins[8].pin.$assign   = "PB0";
+GPIO1.associatedPins[9].$name         = "D36A_DIR_SAFE";
 GPIO1.associatedPins[9].initialValue  = "CLEARED";
-GPIO1.associatedPins[9].pin.$assign   = "PB1";
-GPIO1.associatedPins[10].$name         = "RADIO_CSN";
-GPIO1.associatedPins[10].initialValue  = "SET";
-GPIO1.associatedPins[10].pin.$assign   = "PB25";
-GPIO1.associatedPins[11].$name         = "RADIO_IRQ";
-GPIO1.associatedPins[11].direction     = "INPUT";
-GPIO1.associatedPins[11].pin.$assign   = "PB16";
-/* PB21 board key is the local, low-active REQ-002 start input. */
-GPIO1.associatedPins[12].$name            = "START_BUTTON";
-GPIO1.associatedPins[12].direction        = "INPUT";
-GPIO1.associatedPins[12].internalResistor = "PULL_UP";
-GPIO1.associatedPins[12].pin.$assign      = "PB21";
-GPIO1.associatedPins[13].$name         = "D36A_EN_SAFE";
-GPIO1.associatedPins[13].initialValue  = "CLEARED";
-GPIO1.associatedPins[13].pin.$assign   = "PB0";
-GPIO1.associatedPins[14].$name         = "D36A_DIR_SAFE";
-GPIO1.associatedPins[14].initialValue  = "CLEARED";
-GPIO1.associatedPins[14].pin.$assign   = "PA24";
-GPIO1.associatedPins[15].$name         = "D36A_STEP_SAFE";
-GPIO1.associatedPins[15].initialValue  = "CLEARED";
-GPIO1.associatedPins[15].pin.$assign   = "PA26";
+GPIO1.associatedPins[9].pin.$assign   = "PA24";
+GPIO1.associatedPins[10].$name         = "D36A_STEP_SAFE";
+GPIO1.associatedPins[10].initialValue  = "CLEARED";
+GPIO1.associatedPins[10].pin.$assign   = "PA26";
 
 UART1.$name                    = "DIAG_UART";
 UART1.enableFIFO               = true;
@@ -91,15 +75,15 @@ UART1.peripheral.$assign       = "UART0";
 UART1.peripheral.rxPin.$assign = "PA11";
 UART1.peripheral.txPin.$assign = "PA10";
 
-I2C1.$name                     = "OLED_I2C";
+I2C1.$name                     = "LINE_I2C";
 I2C1.basicEnableController     = true;
 I2C1.basicControllerBusSpeed   = 100000;
 I2C1.advAnalogGlitchFilter     = "DISABLED";
 I2C1.peripheral.$assign        = "I2C0";
-I2C1.peripheral.sdaPin.$assign = "PA0";
-I2C1.peripheral.sclPin.$assign = "PA1";
+I2C1.peripheral.sdaPin.$assign = "PA28";
+I2C1.peripheral.sclPin.$assign = "PA31";
 
-I2C2.$name                     = "MPU_I2C";
+I2C2.$name                     = "OLED_I2C";
 I2C2.basicEnableController     = true;
 I2C2.basicControllerBusSpeed   = 100000;
 I2C2.advAnalogGlitchFilter     = "DISABLED";

@@ -149,3 +149,25 @@ K230 教程确认了示例使用 `TXD(IO9)`、`RXD(IO10)` 连接到教程 MSPM0 
 5. MS42CG PWM 的周期/占空比范围、最高边沿频率，以及 TIMG0 单通道双边沿捕获的 SysConfig 可生成性。
 
 当前不授权修改 `.syscfg`、接线、上电、构建、烧录、串口、SPI 或硬件动作。
+
+## 2026-07-31 frozen v1.5 实施前待确认
+
+> 用户已批准：LineFollower_6CH→U12/I2C0 PA28/PA31；OLED→原MPU6050/GY接口/I2C1 PB3/PB2；MPU6050移除。以下问题不阻塞设计冻结，但阻塞线束制作、SysConfig实施和上电。
+
+### LineFollower / U12
+
+1. 提供 LineFollower 模块正反面和4针插头观察面，确认与资料 `5V/GND/SDA/SCL` 一致。
+2. 提供 U12 近照并确认 pin1 观察方向；按 `5V→pin1、GND→pin4、SDA→pin3、SCL→pin2` 制作交叉线束。
+3. 断电测线束连续性和四线互不短路；上电前确认 U12 pin1 的5V极性和至少85mA资料负载能力。
+4. 首次逻辑域上电测 SDA/SCL 空闲电压和上升沿；确认 0x5C、目标I²C速率、NACK/超时恢复及200Hz调度余量。
+5. 冻结通道1～6的车体左→右顺序、黑线数字极性、模拟范围和实际安装高度；阈值寄存器冲突关闭前驱动不得依赖阈值读取。
+
+### OLED / 原MPU6050接口
+
+1. 用户照片已确认 OLED 实物针序为 pin1～4=`GND/VDD/SCK/SDA`；当前设计将 `VDD` 作为正电源、`SCK` 作为 I²C `SCL`，不是SPI。
+2. 仍需提供原MPU6050/GY接口近照，确认 pad1观察面及 `5V/GND/GY_SCL/GY_SDA` 顺序。
+3. 必须按信号重排：OLED GND→GY pad2、VDD→pad1、SCK→pad3/PB2、SDA→pad4/PB3；禁止直通四芯线。
+4. 断电测连续性和短路；首次上电测 SCK/SDA 空闲电压，确认不超过3.3V，并扫描实际7位地址0x3C/0x3D。
+5. MPU6050模块移除并绝缘保存；若未来恢复，必须重新申请方案、Pin Plan和总线上拉审查。
+
+当前不授权修改 `.syscfg`、源码、接线、上电、构建、烧录、串口、I²C或运动动作。

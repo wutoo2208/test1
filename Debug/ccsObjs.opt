@@ -11,6 +11,7 @@
 "./drivers/i2c_diag.o"
 "./drivers/line_sensors.o"
 "./drivers/nrf24_ptx.o"
+"./drivers/oled_ssd1306.o"
 "./drivers/start_button.o"
 -l"./device_linker.cmd"
 -ldevice.cmd.genlibs

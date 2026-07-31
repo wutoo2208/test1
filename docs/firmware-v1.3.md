@@ -6,7 +6,7 @@
 |---|---|
 | `app/` | Application dispatch and actuator-locked REQ-002 state/timing framework |
 | `bsp/` | SysTick timebase and continuously enforced motor/D36A safe lock |
-| `drivers/` | UART diagnostics, nRF24 PTX, I2C diagnostics, line inputs, encoders, debounced PB21 button |
+| `drivers/` | UART diagnostics, nRF24 PTX, I2C diagnostics, line inputs, encoders, debounced local start button |
 | `algorithm/` | Pure PID with output/integral limits, conditional anti-windup, integral freeze, derivative filtering |
 | `config/` | Reviewed RF profile and explicit invalid/disabled REQ-002 physical/control gates |
 | `firmware_tests/` | Host/source checks; excluded from the CCS target build |
@@ -17,7 +17,7 @@
 
 The framework exposes `IDLE`, `SAFE_LOCKED`, `BLOCKED_CALIBRATION`, `ARMED`, `DEPART_A`, `LAP_ACTIVE`, `RETURN_MARKER`, `STOPPING`, `COMPLETE`, and `FAULT`, with a 20 s timeout and elapsed/frozen timing fields. Marker/departure fields are scaffolding only: unknown line polarity/order cannot advance state.
 
-Calibration, actuation, physical-parameter, actuator-adapter, and PID gates are deliberately `0`. A debounced PB21 press therefore reports `BLOCKED_CALIBRATION`, leaves timing frozen, and preserves the motor/D36A lock. UART/RF cannot start REQ-002. No TIMA0 PWM or motor adapter exists.
+Calibration, actuation, physical-parameter, actuator-adapter, and PID gates are deliberately `0`. Under Pin Plan v1.4, a debounced PA21/KEY2 press therefore reports `BLOCKED_CALIBRATION`, leaves timing frozen, and preserves the motor/D36A lock. UART/RF cannot start REQ-002. No TIMA0 PWM or motor adapter exists.
 
 ## Preserved RF behavior
 
@@ -36,4 +36,5 @@ PB27 is absent from SysConfig and is DNC. Firmware does not intentionally drive 
 - OpenOCD flash and binary fallback verification: PASS at 500 kHz; target-side CRC acceleration timed out, then byte comparison reported no differences and `reset run` completed.
 - DAP virtual UART COM8 at 115200: firmware `req002-safe-0.3` observed; software safe-output self-test PASS, motor `00/00`, D36A disabled, REQ-002 actuator lock active with all physical/control gates `0`.
 - RF SPI register access: PASS (`CONFIG=0x0E`, `RF_CH=0x00`, `RF_SETUP=0x08`); one-shot ended in `MAX_RT`, then safely disarmed with queue empty. RF reception was not proven.
-- PB21 physical press, TCRT polarity/order, encoder movement, OLED, buzzer, motor, D36A, and vehicle motion validation: **NOT RUN**.
+- PB21 was disproved as the current hardware key: user verified PB21 is unconnected and KEY2 is PA21. PA21/KEY2 physical validation is pending under Pin Plan v1.4.
+- TCRT polarity/order, encoder movement, OLED, buzzer, motor, D36A, and vehicle motion validation: **NOT RUN**.

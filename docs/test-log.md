@@ -106,7 +106,19 @@
 | `TEST-018` | 功能静态核验 | 已实现软件 CSN、有界 SPI、初始化/读回、队列/分片、SysTick 状态机、`TX_DS/MAX_RT/timeout` 和统计。 | PASS | 尚未填入接收器 profile；dynamic-payload `ACTIVATE` 与 CRC/power profile 扩展仅在需要时补充。 |
 | `TEST-019` | 无线端到端 | 车载 nRF 配置、发包、COM7 接收和透明串口重组。 | BLOCKED | 缺 RF channel、地址/字节序、速率、CRC、payload 模式/宽度、ACK/重试及 COM7 输出格式。 |
 
-## 11. 测试记录模板
+## 11. 2026-07-31 六路巡线替换记录
+
+| ID | 类型 | 检查/动作 | 结果 | 证据与局限 |
+|---|---|---|---|---|
+| `TEST-020` | 用户决定 | 原五路 TCRT5000 性能不足，主循迹改用 HiWonder/AiBlock LineFollower_6CH V1.0。 | RECORDED | 只证明选型变化；新模块尚未接线、上电或跑赛道。 |
+| `TEST-021` | 资料复核 | 4 份 PDF、2 张尺寸图、原理图和多平台示例完成提取/页面复核。 | PASS | 资料确认 5 V、85 mA、I²C 0x5C、六路数字/模拟；阈值寄存器存在冲突。 |
+| `TEST-022` | 静态 IOMUX 核验 | H10 OUT1～OUT8 的 MCU 复用中不存在完整硬件 I²C SCL/SDA 对；PB2/PB3 I2C1 可与 MPU6050 共享候选。 | PASS | 依据 SysConfig 1.28 MSPM0G350X deviceData；不证明实物电气或 SysConfig 已配置。 |
+| `TEST-023` | 新模块台架/赛道 | I²C 读数、200 Hz 调度、通道方向、黑线极性、弯道和停车性能。 | NOT RUN | frozen v1.5设计已批准；仍等待 SysConfig/源码阶段授权、线束、电气和后续L3/L5授权。 |
+| `TEST-024` | 用户批准 + 静态网络核验 | 冻结 v1.5：LineFollower 经 U12→PA28/PA31 I2C0；OLED 经原MPU/GY→PB3/PB2 I2C1；MPU6050移除。 | PASS | 证明设计决策和文档/EPRO网络一致；不证明SysConfig、线束或硬件。 |
+| `TEST-025` | 用户实物照片复核 | OLED正面丝印再次清楚显示 pin1～4=`GND/VDD/SCK/SDA`。 | PASS | 设计将VDD映射为正电源、SCK映射为I²C SCL；未测供电、上拉、地址或通信。 |
+| `TEST-026` | v1.5实施验证 | SysConfig生成、构建、断电连续性、空闲电压、I²C扫描和显示/巡线读取。 | NOT RUN | 当前任务仅L1文档；禁止把静态核验写成硬件通过。 |
+
+## 12. 测试记录模板
 
 ```text
 Test ID: TEST-NNN

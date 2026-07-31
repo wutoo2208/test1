@@ -11,6 +11,7 @@ C_SRCS += \
 ../drivers/i2c_diag.c \
 ../drivers/line_sensors.c \
 ../drivers/nrf24_ptx.c \
+../drivers/oled_ssd1306.c \
 ../drivers/start_button.c 
 
 C_DEPS += \
@@ -19,6 +20,7 @@ C_DEPS += \
 ./drivers/i2c_diag.d \
 ./drivers/line_sensors.d \
 ./drivers/nrf24_ptx.d \
+./drivers/oled_ssd1306.d \
 ./drivers/start_button.d 
 
 OBJS += \
@@ -27,6 +29,7 @@ OBJS += \
 ./drivers/i2c_diag.o \
 ./drivers/line_sensors.o \
 ./drivers/nrf24_ptx.o \
+./drivers/oled_ssd1306.o \
 ./drivers/start_button.o 
 
 OBJS__QUOTED += \
@@ -35,6 +38,7 @@ OBJS__QUOTED += \
 "drivers\i2c_diag.o" \
 "drivers\line_sensors.o" \
 "drivers\nrf24_ptx.o" \
+"drivers\oled_ssd1306.o" \
 "drivers\start_button.o" 
 
 C_DEPS__QUOTED += \
@@ -43,6 +47,7 @@ C_DEPS__QUOTED += \
 "drivers\i2c_diag.d" \
 "drivers\line_sensors.d" \
 "drivers\nrf24_ptx.d" \
+"drivers\oled_ssd1306.d" \
 "drivers\start_button.d" 
 
 C_SRCS__QUOTED += \
@@ -51,6 +56,7 @@ C_SRCS__QUOTED += \
 "../drivers/i2c_diag.c" \
 "../drivers/line_sensors.c" \
 "../drivers/nrf24_ptx.c" \
+"../drivers/oled_ssd1306.c" \
 "../drivers/start_button.c" 
 
 

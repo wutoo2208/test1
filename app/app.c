@@ -19,6 +19,7 @@ void App_init(void)
     Timebase_init();
     nowMs = Timebase_nowMs();
     StartButton_init(&gStartButton, nowMs);
+    LineSensors_init(nowMs);
     Encoders_init();
     Req002_init(nowMs);
     DiagConsole_init();
@@ -32,6 +33,8 @@ void App_service(void)
 
     BoardSafety_service();
     StartButton_poll(&gStartButton, nowMs);
+    LineSensors_service(nowMs);
+    nowMs = Timebase_nowMs();
     Req002_service(nowMs, StartButton_takePress(&gStartButton),
         LineSensors_readRawBits());
     DiagConsole_service();

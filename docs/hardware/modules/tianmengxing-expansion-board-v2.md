@@ -27,11 +27,18 @@
 - `OLED`：`GND`、`5V`、`PA1`、`PA0`；
 - `H13`：`GND`、`BEEP`、`3.3V`。
 
+## 当前 frozen v1.5 使用
+
+- `U12`：LineFollower_6CH，pin1=5V、pin2=PA31/I2C0 SCL、pin3=PA28/I2C0 SDA、pin4=GND。
+- 原 `MPU6050模块` 接口：OLED，pad1=5V、pad2=GND、pad3=PB2/I2C1 SCL、pad4=PB3/I2C1 SDA。
+- MPU6050：NOT FITTED；旧 `OLED` U8接口：DNC。
+- 两个模块都必须使用按信号重排/交叉的线束，不能按插头位置直通。
+
 ## 禁止外推
 
 1. `5V`、`3.3V`、`PAx`、`PBx` 是 EPRO 网络标签，不能单独证明电压容限、信号方向、外设复用、上拉或当前 SysConfig 配置。
 2. `TB6612模块` 接口不是双路 DRV8870 的兼容性证明；本项目当前电机驱动须按实际 DRV8870 模块资料复核。
-3. 八路灰度 H10 不能直接认定适合五路 TCRT5000；先关闭五路板的供电、电平与极性问题。
+3. H10 pin1～8 是普通 OUT 网络，不是原生 I²C 插座。旧H10/GY共享候选已否决；frozen v1.5 使用 U12 的 `5V/SCL/SDA/GND` 网络连接 LineFollower，不切H10。
 4. 输入丝印范围和稳压模块网络不能代替连续电流、峰值、热、保护、纹波和带载台架证据。
 
 ## 进入 Pin Plan 前仍需具备
@@ -40,4 +47,5 @@
 - 所有外设实际型号、连接器线序、供电与输出电平；
 - 天猛星开发板原理图/引脚图与扩展板 80 针连接器的一致性核对；
 - TB6612 接口与现有 DRV8870 方案的明确取舍；
-- 五路 TCRT5000 的专用电气资料或获授权后的静态测量。
+- LineFollower_6CH 实物版本与插头观察面、U12 pin1观察面、交叉线束、5 V负载、I²C0上拉/速率、通道方向及断电连续性。
+- OLED `GND/VDD/SCK/SDA` 与原MPU/GY `5V/GND/SCL/SDA` 的重排线束、GY pad1观察面、I²C1上拉电压和实际地址。

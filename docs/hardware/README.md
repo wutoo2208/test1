@@ -19,11 +19,13 @@
 2. 表中标为“待确认”的内容不得直接用于接线或修改 `.syscfg`。
 3. 任何 GPIO 最终配置必须同时通过原理图、引脚图、MSPM0 SDK/SysConfig 和实际接线复核。
 4. 不要直接修改由 SysConfig 生成的 `ti_msp_dl_config.c/.h` 文件。
-## 模块资料（已整理，未确认接线）
+## 模块资料（已整理；设计冻结不等于已接线）
 
 - [modules/nrf24l01p.md](modules/nrf24l01p.md)
-- [modules/line-sensor-8ch.md](modules/line-sensor-8ch.md)
-- [modules/mpu6000a.md](modules/mpu6000a.md)
+- [modules/linefollower-6ch-i2c.md](modules/linefollower-6ch-i2c.md)：当前主循迹，frozen v1.5 经 U12 独占 I2C0，地址 0x5C。
+- [modules/oled-0.96in-zjy096i0400wg01-new-module-facts.md](modules/oled-0.96in-zjy096i0400wg01-new-module-facts.md)：当前 OLED，实物 `GND/VDD/SCK/SDA`，frozen v1.5 经原MPU/GY接口独占I2C1。
+- [modules/line-sensor-8ch.md](modules/line-sensor-8ch.md)：历史八路模块资料，不再作为当前主循迹。
+- [modules/mpu6000a.md](modules/mpu6000a.md)：`NOT FITTED / HISTORICAL OPTION`，当前接口已转给OLED。
 - [modules/drv8870-dual.md](modules/drv8870-dual.md)
 - [modules/tianmengxing-expansion-board-v2.md](modules/tianmengxing-expansion-board-v2.md)
 - [modules/mp1584en-adjustable-step-down.md](modules/mp1584en-adjustable-step-down.md)
