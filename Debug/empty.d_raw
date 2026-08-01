@@ -1,0 +1,176 @@
+empty.o: ..\empty.c \
+  C:\Users\Administrator\workspace_ccstheia\test1_2.2_recovered\Debug\ti_msp_dl_config.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\devices\msp\msp.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\devices\DeviceFamily.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\devices\msp\m0p\mspm0g350x.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\third_party\CMSIS\Core\Include\core_cm0plus.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\devices\msp\peripherals\hw_adc12.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\devices\msp\peripherals\hw_aes.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\devices\msp\peripherals\hw_comp.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\devices\msp\peripherals\hw_crc.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\devices\msp\peripherals\hw_dac12.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\devices\msp\peripherals\hw_dma.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\devices\msp\peripherals\hw_flashctl.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\devices\msp\peripherals\hw_gpio.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\devices\msp\peripherals\hw_gptimer.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\devices\msp\peripherals\hw_i2c.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\devices\msp\peripherals\hw_iomux.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\devices\msp\peripherals\hw_mathacl.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\devices\msp\peripherals\hw_mcan.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\devices\msp\peripherals\hw_oa.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\devices\msp\peripherals\hw_rtc.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\devices\msp\peripherals\hw_spi.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\devices\msp\peripherals\hw_trng.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\devices\msp\peripherals\hw_uart.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\devices\msp\peripherals\hw_vref.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\devices\msp\peripherals\hw_wuc.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\devices\msp\peripherals\hw_wwdt.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\devices\msp\peripherals\m0p\hw_factoryregion.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\devices\msp\peripherals\m0p\hw_cpuss.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\devices\msp\peripherals\m0p\hw_debugss.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\devices\msp\peripherals\m0p\hw_sysctl.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\devices\msp\peripherals\m0p\sysctl\hw_sysctl_mspm0g1x0x_g3x0x.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\driverlib.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_adc12.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_common.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\m0p\dl_factoryregion.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\m0p\dl_core.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_aes.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_aesadv.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_comp.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_crc.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_crcp.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_dac12.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_dma.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_flashctl.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\m0p\dl_sysctl.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\m0p\sysctl\dl_sysctl_mspm0g1x0x_g3x0x.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_gpamp.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_gpio.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_i2c.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_i2s.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_iwdt.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_lfss.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_keystorectl.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_lcd.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_mathacl.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_mcan.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_npu.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_opa.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_rtc.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_rtc_common.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_rtc_a.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_rtc_b.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_scratchpad.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_spgss.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_spi.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_tamperio.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_timera.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_timer.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_timerb.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_timerg.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_trng.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_uart_extend.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_uart.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_uart_main.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_unicomm.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_unicommi2cc.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_unicommi2ct.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_unicommspi.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_unicommuart.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_vref.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_wwdt.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\m0p\dl_interrupt.h \
+  D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\m0p\dl_systick.h \
+  ..\app\app.h ..\app\motor_test.h \
+  C:\Users\Administrator\workspace_ccstheia\test1_2.2_recovered\drivers\motor_driver.h \
+  ..\bsp\timebase.h ..\drivers\diag_console.h ..\drivers\encoders.h
+C:\Users\Administrator\workspace_ccstheia\test1_2.2_recovered\Debug\ti_msp_dl_config.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\devices\msp\msp.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\devices\DeviceFamily.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\devices\msp\m0p\mspm0g350x.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\third_party\CMSIS\Core\Include\core_cm0plus.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\devices\msp\peripherals\hw_adc12.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\devices\msp\peripherals\hw_aes.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\devices\msp\peripherals\hw_comp.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\devices\msp\peripherals\hw_crc.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\devices\msp\peripherals\hw_dac12.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\devices\msp\peripherals\hw_dma.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\devices\msp\peripherals\hw_flashctl.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\devices\msp\peripherals\hw_gpio.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\devices\msp\peripherals\hw_gptimer.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\devices\msp\peripherals\hw_i2c.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\devices\msp\peripherals\hw_iomux.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\devices\msp\peripherals\hw_mathacl.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\devices\msp\peripherals\hw_mcan.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\devices\msp\peripherals\hw_oa.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\devices\msp\peripherals\hw_rtc.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\devices\msp\peripherals\hw_spi.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\devices\msp\peripherals\hw_trng.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\devices\msp\peripherals\hw_uart.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\devices\msp\peripherals\hw_vref.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\devices\msp\peripherals\hw_wuc.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\devices\msp\peripherals\hw_wwdt.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\devices\msp\peripherals\m0p\hw_factoryregion.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\devices\msp\peripherals\m0p\hw_cpuss.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\devices\msp\peripherals\m0p\hw_debugss.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\devices\msp\peripherals\m0p\hw_sysctl.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\devices\msp\peripherals\m0p\sysctl\hw_sysctl_mspm0g1x0x_g3x0x.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\driverlib.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_adc12.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_common.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\m0p\dl_factoryregion.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\m0p\dl_core.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_aes.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_aesadv.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_comp.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_crc.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_crcp.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_dac12.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_dma.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_flashctl.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\m0p\dl_sysctl.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\m0p\sysctl\dl_sysctl_mspm0g1x0x_g3x0x.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_gpamp.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_gpio.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_i2c.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_i2s.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_iwdt.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_lfss.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_keystorectl.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_lcd.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_mathacl.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_mcan.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_npu.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_opa.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_rtc.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_rtc_common.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_rtc_a.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_rtc_b.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_scratchpad.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_spgss.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_spi.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_tamperio.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_timera.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_timer.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_timerb.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_timerg.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_trng.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_uart_extend.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_uart.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_uart_main.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_unicomm.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_unicommi2cc.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_unicommi2ct.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_unicommspi.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_unicommuart.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_vref.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\dl_wwdt.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\m0p\dl_interrupt.h:
+D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\m0p\dl_systick.h:
+..\app\app.h:
+..\app\motor_test.h:
+C:\Users\Administrator\workspace_ccstheia\test1_2.2_recovered\drivers\motor_driver.h:
+..\bsp\timebase.h:
+..\drivers\diag_console.h:
+..\drivers\encoders.h:

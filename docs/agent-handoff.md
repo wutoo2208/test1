@@ -48,7 +48,7 @@
 |---|---|---|
 | `[已确认|静态核验]` | 工程目标为 MSPM0G3507，当前应用为 PB22 LED 翻转空工程。 | `empty.syscfg`、`empty.c` |
 | `[已确认|资料复核]` | PB22 是板载 LED，PB21 是板载按键。 | 原理图 p1；`docs/reviewed/tianmengxing-mspm0g3507-source-facts.md` |
-| `[已确认|资料复核]` | PA19/PA20 用于 SWD；PA10/PA11 接板载 CH340E；PB6–PB9 存在 SPI Flash/LCD 资源占用。 | 原理图 p3；已复核摘要 |
+| `[资料复核 + 用户当前状态]` | PA19/PA20 用于 SWD；原理图记录 PA10/PA11 到板载 CH340E 网络；**用户确认当前 UART0 未接任何外设/线束，不能视为已连接或可用 COM 端口。** | 原理图 p3；用户现场陈述；已复核摘要 |
 | `[已确认|资料复核]` | 原始 PDF 是硬件事实源，提取稿仅供检索。 | `docs/PDF_WORKFLOW.md`、`docs/hardware/README.md` |
 
 以上不证明板卡当前连接、固件已烧录或 LED 已在实物上闪烁。

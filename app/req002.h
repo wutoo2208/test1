@@ -44,6 +44,7 @@ typedef enum {
 typedef struct {
     uint16_t analog[REQ002_LINE_SENSOR_COUNT];
     float centeredError;
+    float steeringCorrection;
     float confidence;
     float signalSum;
     uint32_t sampleSequence;
@@ -90,6 +91,9 @@ typedef struct {
     bool returnMarkerSeen;
     bool actuatorLocked;
     bool pidConfigured;
+    uint16_t leftDemandPermille;
+    uint16_t rightDemandPermille;
+    uint32_t controlSequence;
 } Req002Status;
 
 Req002ControlDecision Req002_evaluateTracking(
@@ -97,6 +101,7 @@ Req002ControlDecision Req002_evaluateTracking(
 void Req002_init(uint32_t nowMs);
 void Req002_service(uint32_t nowMs, bool buttonPress,
     const Req002TrackingInput *tracking);
+void Req002_abort(uint32_t nowMs);
 const Req002Status *Req002_getStatus(void);
 const char *Req002_stateName(Req002State state);
 const char *Req002_blockReasonName(Req002BlockReason reason);

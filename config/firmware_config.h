@@ -11,6 +11,10 @@
 #define I2C_DIAG_TIMEOUT_LOOPS             (200000U)
 #define LINE_SENSOR_POLL_PERIOD_MS         (5U)
 #define LINE_SENSOR_RETRY_PERIOD_MS        (50U)
+#define LINE_SENSOR_STARTUP_DELAY_MS       (200U)
+#define LINE_SENSOR_BUS_RECOVERY_PULSES    (9U)
+#define LINE_SENSOR_BUS_RECOVERY_HALF_PERIOD_CYCLES (160U)
+#define LINE_SENSOR_BUS_RECOVERY_WAIT_LOOPS (10000U)
 #define LINE_TRACKING_CENTER_OFFSET        (0.0821f)
 #define LINE_TRACKING_MIN_SIGNAL_SUM       (0.35f)
 #define LINE_TRACKING_SHADOW_KP            (0.80f)
@@ -37,31 +41,43 @@
 #endif
 
 #if MOTOR_SELFTEST_BUILD
-#define MOTOR_TEST_DUTY_PERMILLE            (120U)
-#define MOTOR_TEST_DURATION_MS              (1000U)
+#define MOTOR_TEST_DUTY_PERMILLE            (1000U)
+#define MOTOR_TEST_DURATION_MS              (120U)
 #endif
 
 #define RIGHT_ENCODER_COUNTS_PER_REV         (1650U)
 
 /*
- * REQ-002 remains actuator-locked. These gates are deliberately false until
- * calibration evidence, physical parameters, and a separately approved motor
- * adapter exist. No module in this firmware can create a motor command.
+ * Default Debug remains actuator-locked. The isolated MotorSelfTest build is
+ * the only build allowed to exercise the REQ-002 adapter during bring-up.
  */
-#define REQ002_CALIBRATION_VALID            (0U)
-#define REQ002_ACTUATION_GATE_VALID          (0U)
-#define REQ002_PHYSICAL_PARAMETERS_VALID     (0U)
-#define REQ002_ACTUATOR_ADAPTER_ENABLED      (0U)
+#ifndef REQ002_ACTUATION_BUILD
+#define REQ002_ACTUATION_BUILD              MOTOR_SELFTEST_BUILD
+#endif
 
-/* Unknown control values stay invalid/zero rather than being guessed. */
-#define REQ002_PID_ENABLED                   (0U)
-#define REQ002_PID_KP                        (0.0f)
-#define REQ002_PID_KI                        (0.0f)
-#define REQ002_PID_KD                        (0.0f)
-#define REQ002_PID_OUTPUT_MIN                (0.0f)
-#define REQ002_PID_OUTPUT_MAX                (0.0f)
-#define REQ002_PID_INTEGRAL_MIN              (0.0f)
-#define REQ002_PID_INTEGRAL_MAX              (0.0f)
-#define REQ002_PID_DERIVATIVE_ALPHA          (0.0f)
+#define REQ002_CALIBRATION_VALID            REQ002_ACTUATION_BUILD
+#define REQ002_ACTUATION_GATE_VALID          REQ002_ACTUATION_BUILD
+#define REQ002_PHYSICAL_PARAMETERS_VALID     REQ002_ACTUATION_BUILD
+#define REQ002_ACTUATOR_ADAPTER_ENABLED      REQ002_ACTUATION_BUILD
+#define REQ002_PID_ENABLED                   REQ002_ACTUATION_BUILD
+
+/* Reuse the verified LineTracking shadow PID; do not instantiate another PID. */
+#define REQ002_PID_KP                        LINE_TRACKING_SHADOW_KP
+#define REQ002_PID_KI                        LINE_TRACKING_SHADOW_KI
+#define REQ002_PID_KD                        LINE_TRACKING_SHADOW_KD
+#define REQ002_PID_OUTPUT_MIN                (-1.0f)
+#define REQ002_PID_OUTPUT_MAX                (1.0f)
+#define REQ002_PID_INTEGRAL_MIN              (-0.5f)
+#define REQ002_PID_INTEGRAL_MAX              (0.5f)
+#define REQ002_PID_DERIVATIVE_ALPHA          (0.8f)
+
+/* Initial bench-only actuator parameters; ground tuning is separately gated. */
+#define REQ002_CONTROL_PERIOD_MS             (5U)
+#define REQ002_START_KICK_MS                 (120U)
+#define REQ002_DEPART_CONFIRM_MS             (50U)
+#define REQ002_MARKER_CONFIRM_MS             (50U)
+#define REQ002_MARKER_MIN_BLACK              (4U)
+#define REQ002_BASE_PULSE_PERMILLE           (650U)
+#define REQ002_TURN_PULSE_PERMILLE           (350U)
 
 #endif /* CONFIG_FIRMWARE_CONFIG_H_ */

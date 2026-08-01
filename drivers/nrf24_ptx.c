@@ -41,6 +41,7 @@
 #define NRF_DYNPD_P0                (1U << 0U)
 #define NRF_RF_DR_LOW               (1U << 5U)
 #define NRF_RF_DR_HIGH              (1U << 3U)
+#define NRF_RF_PWR_0_DBM             (3U << 1U)
 #define RADIO_CE_PULSE_CYCLES       (CPUCLK_FREQ / 66667U)
 
 typedef enum {
@@ -254,10 +255,13 @@ static bool profileIsValid(void)
 static uint8_t rfSetupValue(void)
 {
     switch (gProfile.rate) {
-        case RADIO_RATE_250_KBPS: return NRF_RF_DR_LOW;
-        case RADIO_RATE_2_MBPS: return NRF_RF_DR_HIGH;
+        case RADIO_RATE_250_KBPS:
+            return NRF_RF_DR_LOW | NRF_RF_PWR_0_DBM;
+        case RADIO_RATE_2_MBPS:
+            return NRF_RF_DR_HIGH | NRF_RF_PWR_0_DBM;
         case RADIO_RATE_1_MBPS:
-        default: return 0U;
+        default:
+            return NRF_RF_PWR_0_DBM;
     }
 }
 

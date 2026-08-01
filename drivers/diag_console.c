@@ -18,7 +18,7 @@
 #include "ti_msp_dl_config.h"
 
 #if MOTOR_SELFTEST_BUILD
-#define MOTOR_TEST_HELP_COMMANDS ",motor_status,motor_test_left,motor_test_right"
+#define MOTOR_TEST_HELP_COMMANDS ",motor_status,motor_test_left,motor_test_right,motor_test_both"
 #else
 #define MOTOR_TEST_HELP_COMMANDS ""
 #endif
@@ -275,6 +275,9 @@ static void reportReq002(void)
     writeText(" adapter_enabled=");
     writeU32(REQ002_ACTUATOR_ADAPTER_ENABLED);
     writeText(" pid_enabled="); writeU32(REQ002_PID_ENABLED);
+    writeText(" left_demand="); writeU32(status->leftDemandPermille);
+    writeText(" right_demand="); writeU32(status->rightDemandPermille);
+    writeText(" control_seq="); writeU32(status->controlSequence);
     writeText(" elapsed_ms="); writeU32(status->elapsedMs);
     writeText(" frozen_ms="); writeU32(status->frozenElapsedMs);
     writeText(" timeout_ms="); writeU32(status->timeoutMs);
@@ -368,6 +371,14 @@ static void processCommand(const char *command)
         } else {
             writeText("@BLOCKED cmd=motor_test_right reason=DISABLED_BUSY_OR_FAULT\r\n");
         }
+    } else if ((strcmp(command, "motor test both") == 0) ||
+               (strcmp(command, "motor_test_both") == 0)) {
+        if (MotorTest_start(MOTOR_WHEEL_BOTH, Timebase_nowMs()) ==
+            MOTOR_TEST_START_OK) {
+            writeText("@OK cmd=motor_test_both "); reportMotorTest();
+        } else {
+            writeText("@BLOCKED cmd=motor_test_both reason=DISABLED_BUSY_OR_FAULT\r\n");
+        }
 #endif
     } else if ((strcmp(command, "oled test") == 0) ||
                (strcmp(command, "oled_test") == 0)) {
@@ -411,6 +422,7 @@ static void processCommand(const char *command)
         bool motorSafe;
         bool radioSafe;
         MotorTest_abort();
+        Req002_abort(Timebase_nowMs());
         BoardSafety_stop(BOARD_SAFETY_STOP_OPERATOR);
         Nrf24Ptx_disarm();
         motorSafe = BoardSafety_outputsSafe();

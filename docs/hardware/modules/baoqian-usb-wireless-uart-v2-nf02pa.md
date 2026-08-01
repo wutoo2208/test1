@@ -1,4 +1,4 @@
-﻿# USB 无线串口 V2.0 / NF-02-PA：MSPM0 对接契约
+# USB 无线串口 V2.0 / NF-02-PA：MSPM0 对接契约
 
 > **状态**：`PROTOCOL-REVIEWED / FACTORY-DEFAULT-KNOWN / ACTUAL-COM7-CONFIG-UNKNOWN / NOT TESTED`。
 >
@@ -6,7 +6,7 @@
 
 ## 1. 先纠正当前测试路径
 
-照片中的 COM7 是宝嵌 CH340T + 控制器 + nRF24L01 USB 无线串口适配器，不是天猛星板载 CH340。当前 MSPM0 的 `@BOOT/@STATUS` 仍走 PA10/UART0，不会自动进入 COM7。
+照片中的 COM7 是宝嵌 CH340T + 控制器 + nRF24L01 USB 无线串口适配器，不是天猛星板载 CH340。**当前用户确认 MSPM0 的 UART0（PA10/PA11）未接外设/线束，因此不得把历史 `@BOOT/@STATUS` 设想写成当前可用路径，也不会自动进入 COM7。**
 
 要让 COM7 收到 MSPM0 数据，MSPM0 必须：
 

@@ -1,4 +1,4 @@
-﻿# 塔克无线高速 DAP：MSPM0G3507 项目使用建议
+# 塔克无线高速 DAP：MSPM0G3507 项目使用建议
 
 > **状态**：`CANDIDATE DEBUG PROBE / MANUAL-REVIEWED / NOT CONNECTED / NOT TESTED`。
 >
@@ -48,7 +48,8 @@ XDS110 = 已知可用的主基线与救援探针
 
 手册要求交叉连接：DAP RX 接目标 TX，DAP TX 接目标 RX。
 
-当前项目 UART0 为：
+> **当前状态修正（用户确认）**：PA10/PA11 当前未接任何 UART0 外设或线束；没有已验证的 CH340/COM 链路。因此本文件中任何 DAP UART 接线、PA10 日志监听或 PA11 双驱动检查，均为未来候选步骤，当前不得执行或据此修改固件。
+历史原理图资料中的 UART0 路由为（**非当前已验证接线**）：
 
 ```text
 PA10 = UART0 TX / 板载 CH340 RX 路径

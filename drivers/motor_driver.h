@@ -6,7 +6,8 @@
 
 typedef enum {
     MOTOR_WHEEL_LEFT = 0,
-    MOTOR_WHEEL_RIGHT
+    MOTOR_WHEEL_RIGHT,
+    MOTOR_WHEEL_BOTH
 } MotorWheel;
 
 typedef enum {
@@ -24,6 +25,10 @@ typedef struct {
 void MotorDriver_init(void);
 MotorDriverResult MotorDriver_driveSinglePrimary(MotorWheel wheel,
     uint16_t dutyPermille);
+MotorDriverResult MotorDriver_driveVehicleForward(MotorWheel wheel,
+    uint16_t dutyPermille);
+MotorDriverResult MotorDriver_setVehicleForwardDuties(
+    uint16_t leftDutyPermille, uint16_t rightDutyPermille);
 void MotorDriver_stopAll(void);
 bool MotorDriver_outputsStopped(void);
 MotorDriverStatus MotorDriver_snapshot(void);

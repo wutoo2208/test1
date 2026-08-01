@@ -43,7 +43,7 @@ MotorTestStartResult MotorTest_start(MotorWheel wheel, uint32_t nowMs)
     gStatus.outputsActive = true;
     gTimedOut = false;
 
-    result = MotorDriver_driveSinglePrimary(wheel, gStatus.dutyPermille);
+    result = MotorDriver_driveVehicleForward(wheel, gStatus.dutyPermille);
     if (result != MOTOR_DRIVER_OK) {
         BoardSafety_stop(BOARD_SAFETY_STOP_TEST_ABORT);
         gStatus.outputsActive = false;

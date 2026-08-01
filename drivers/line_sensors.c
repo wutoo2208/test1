@@ -14,12 +14,28 @@
 static LineSensorSample gSample;
 static uint32_t gNextPollMs;
 
+static uint8_t readBusLevels(void)
+{
+    uint8_t levels = 0U;
+
+    if (DL_GPIO_readPins(GPIO_LINE_I2C_SDA_PORT,
+            GPIO_LINE_I2C_SDA_PIN) != 0U) {
+        levels |= LINE_SENSOR_BUS_LEVEL_SDA;
+    }
+    if (DL_GPIO_readPins(GPIO_LINE_I2C_SCL_PORT,
+            GPIO_LINE_I2C_SCL_PIN) != 0U) {
+        levels |= LINE_SENSOR_BUS_LEVEL_SCL;
+    }
+    return levels;
+}
+
 static bool recordFailure(
     LineSensorFailureStage stage, uint8_t reg, uint8_t received)
 {
     gSample.lastFailureStage = (uint8_t) stage;
     gSample.lastRegister = reg;
     gSample.lastReceivedBytes = received;
+    gSample.lastBusLevels = readBusLevels();
     gSample.lastControllerStatus =
         DL_I2C_getControllerStatus(LINE_I2C_INST);
     return false;
@@ -40,10 +56,126 @@ static void recoverController(void)
     SYSCFG_DL_LINE_I2C_init();
 }
 
+static void recoveryDelay(void)
+{
+    delay_cycles(LINE_SENSOR_BUS_RECOVERY_HALF_PERIOD_CYCLES);
+}
+
+static void releaseLine(GPIO_Regs *port, uint32_t pin)
+{
+    DL_GPIO_disableOutput(port, pin);
+}
+
+static void driveLineLow(GPIO_Regs *port, uint32_t pin)
+{
+    DL_GPIO_clearPins(port, pin);
+    DL_GPIO_enableOutput(port, pin);
+}
+
+static bool waitLineHigh(GPIO_Regs *port, uint32_t pin)
+{
+    uint32_t timeout = LINE_SENSOR_BUS_RECOVERY_WAIT_LOOPS;
+
+    while (timeout-- != 0U) {
+        if (DL_GPIO_readPins(port, pin) != 0U) return true;
+    }
+    return false;
+}
+
+static void configureRecoveryPins(void)
+{
+    DL_GPIO_clearPins(GPIO_LINE_I2C_SDA_PORT, GPIO_LINE_I2C_SDA_PIN);
+    DL_GPIO_clearPins(GPIO_LINE_I2C_SCL_PORT, GPIO_LINE_I2C_SCL_PIN);
+    DL_GPIO_disableOutput(GPIO_LINE_I2C_SDA_PORT, GPIO_LINE_I2C_SDA_PIN);
+    DL_GPIO_disableOutput(GPIO_LINE_I2C_SCL_PORT, GPIO_LINE_I2C_SCL_PIN);
+    DL_GPIO_initDigitalInput(GPIO_LINE_I2C_IOMUX_SDA);
+    DL_GPIO_initDigitalInput(GPIO_LINE_I2C_IOMUX_SCL);
+}
+
+static void restoreI2cPins(void)
+{
+    DL_GPIO_disableOutput(GPIO_LINE_I2C_SDA_PORT, GPIO_LINE_I2C_SDA_PIN);
+    DL_GPIO_disableOutput(GPIO_LINE_I2C_SCL_PORT, GPIO_LINE_I2C_SCL_PIN);
+    DL_GPIO_initPeripheralInputFunctionFeatures(GPIO_LINE_I2C_IOMUX_SDA,
+        GPIO_LINE_I2C_IOMUX_SDA_FUNC, DL_GPIO_INVERSION_DISABLE,
+        DL_GPIO_RESISTOR_NONE, DL_GPIO_HYSTERESIS_DISABLE,
+        DL_GPIO_WAKEUP_DISABLE);
+    DL_GPIO_initPeripheralInputFunctionFeatures(GPIO_LINE_I2C_IOMUX_SCL,
+        GPIO_LINE_I2C_IOMUX_SCL_FUNC, DL_GPIO_INVERSION_DISABLE,
+        DL_GPIO_RESISTOR_NONE, DL_GPIO_HYSTERESIS_DISABLE,
+        DL_GPIO_WAKEUP_DISABLE);
+    DL_GPIO_enableHiZ(GPIO_LINE_I2C_IOMUX_SDA);
+    DL_GPIO_enableHiZ(GPIO_LINE_I2C_IOMUX_SCL);
+}
+
 static bool controllerHasError(uint32_t status)
 {
     return (status & (DL_I2C_CONTROLLER_STATUS_ERROR |
         DL_I2C_CONTROLLER_STATUS_ARBITRATION_LOST)) != 0U;
+}
+
+static bool recoverBus(void)
+{
+    uint32_t pulse;
+    uint32_t status;
+    bool released = false;
+
+    gSample.recoveryCount++;
+    gSample.lastRecoverySucceeded = false;
+
+    DL_I2C_disableController(LINE_I2C_INST);
+    resetTransfer();
+    configureRecoveryPins();
+
+    releaseLine(GPIO_LINE_I2C_SDA_PORT, GPIO_LINE_I2C_SDA_PIN);
+    releaseLine(GPIO_LINE_I2C_SCL_PORT, GPIO_LINE_I2C_SCL_PIN);
+    recoveryDelay();
+
+    if (waitLineHigh(GPIO_LINE_I2C_SCL_PORT, GPIO_LINE_I2C_SCL_PIN)) {
+        for (pulse = 0U;
+             (pulse < LINE_SENSOR_BUS_RECOVERY_PULSES) &&
+             ((readBusLevels() & LINE_SENSOR_BUS_LEVEL_SDA) == 0U);
+             pulse++) {
+            driveLineLow(GPIO_LINE_I2C_SCL_PORT, GPIO_LINE_I2C_SCL_PIN);
+            recoveryDelay();
+            releaseLine(GPIO_LINE_I2C_SCL_PORT, GPIO_LINE_I2C_SCL_PIN);
+            if (!waitLineHigh(GPIO_LINE_I2C_SCL_PORT,
+                    GPIO_LINE_I2C_SCL_PIN)) {
+                break;
+            }
+            recoveryDelay();
+        }
+
+        /* Generate STOP without ever actively driving either line high. */
+        driveLineLow(GPIO_LINE_I2C_SCL_PORT, GPIO_LINE_I2C_SCL_PIN);
+        driveLineLow(GPIO_LINE_I2C_SDA_PORT, GPIO_LINE_I2C_SDA_PIN);
+        recoveryDelay();
+        releaseLine(GPIO_LINE_I2C_SCL_PORT, GPIO_LINE_I2C_SCL_PIN);
+        if (waitLineHigh(GPIO_LINE_I2C_SCL_PORT, GPIO_LINE_I2C_SCL_PIN)) {
+            recoveryDelay();
+            releaseLine(GPIO_LINE_I2C_SDA_PORT, GPIO_LINE_I2C_SDA_PIN);
+            recoveryDelay();
+        }
+    }
+
+    gSample.lastBusLevels = readBusLevels();
+    released = gSample.lastBusLevels ==
+        (LINE_SENSOR_BUS_LEVEL_SDA | LINE_SENSOR_BUS_LEVEL_SCL);
+
+    restoreI2cPins();
+    recoverController();
+    recoveryDelay();
+    status = DL_I2C_getControllerStatus(LINE_I2C_INST);
+
+    if (released && !controllerHasError(status) &&
+        ((status & (DL_I2C_CONTROLLER_STATUS_BUSY |
+                    DL_I2C_CONTROLLER_STATUS_BUSY_BUS)) == 0U)) {
+        gSample.lastRecoverySucceeded = true;
+        return true;
+    }
+
+    gSample.recoveryFailureCount++;
+    return false;
 }
 
 static bool waitForBusIdle(void)
@@ -145,7 +277,7 @@ static bool readRegisterBlock(uint8_t reg, uint8_t *data, uint8_t length)
 void LineSensors_init(uint32_t nowMs)
 {
     memset(&gSample, 0, sizeof(gSample));
-    gNextPollMs = nowMs;
+    gNextPollMs = nowMs + LINE_SENSOR_STARTUP_DELAY_MS;
 }
 
 void LineSensors_service(uint32_t nowMs)
@@ -162,7 +294,7 @@ void LineSensors_service(uint32_t nowMs)
     if (!readRegisterBlock(LINE_SENSOR_DIGITAL_REGISTER, &digital, 1U) ||
         !readRegisterBlock(LINE_SENSOR_ANALOG_REGISTER, analogBytes,
             sizeof(analogBytes))) {
-        recoverController();
+        (void) recoverBus();
         gSample.valid = false;
         gSample.errorCount++;
         gNextPollMs = Timebase_nowMs() + LINE_SENSOR_RETRY_PERIOD_MS;

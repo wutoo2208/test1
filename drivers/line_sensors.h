@@ -5,6 +5,8 @@
 #include <stdint.h>
 
 #define LINE_SENSOR_COUNT (6U)
+#define LINE_SENSOR_BUS_LEVEL_SDA (1U << 0)
+#define LINE_SENSOR_BUS_LEVEL_SCL (1U << 1)
 
 typedef enum {
     LINE_SENSOR_FAILURE_NONE = 0,
@@ -21,11 +23,15 @@ typedef struct {
     uint32_t sequence;
     uint32_t errorCount;
     uint32_t lastControllerStatus;
+    uint32_t recoveryCount;
+    uint32_t recoveryFailureCount;
     uint8_t digitalBits;
     uint8_t lastFailureStage;
     uint8_t lastRegister;
     uint8_t lastReceivedBytes;
+    uint8_t lastBusLevels;
     bool valid;
+    bool lastRecoverySucceeded;
 } LineSensorSample;
 
 void LineSensors_init(uint32_t nowMs);

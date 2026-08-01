@@ -47,7 +47,7 @@ USB-C VBUS
 | SWCLK | `PA20/SWCLK` | 保留给 XDS110/SWD。 |
 | Reset | `NRST` | 有 47 kΩ 3V3 上拉，按键接地。 |
 | BSL | `PA18/BSL` | 有 47 kΩ GND 下拉，BSL 按键接 3V3。 |
-| UART0 TX | `PA10/U0TX` | 板载 CH340E 串口路径。 |
-| UART0 RX | `PA11/U0RX` | 板载 CH340E 串口路径。 |
+| UART0 TX | `PA10/U0TX` | 原理图中的 CH340E 串口路径；当前未接外设/线束，未验证激活。 |
+| UART0 RX | `PA11/U0RX` | 原理图中的 CH340E 串口路径；当前未接外设/线束，未验证激活。 |
 
 > XDS110 出现连接问题时，优先确认 PA19/PA20 未被外部电路占用、NRST 可复位、PA18/BSL 未被意外拉高，再考虑恢复操作。
