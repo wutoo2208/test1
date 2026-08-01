@@ -205,12 +205,35 @@ class FirmwareSafetyTests(unittest.TestCase):
             config)
         self.assertIn("#define REQ002_BASE_PULSE_PERMILLE           (850U)", config)
         self.assertIn("#define REQ002_RIGHT_TRIM_PERMILLE            (420U)", config)
+        self.assertIn(
+            "#define REQ002_LEFT_SPEED_TARGET_RATIO          (1.20f)",
+            config)
         self.assertIn("#define REQ002_RIGHT_CURVE_SLOWDOWN_PERMILLE  (220U)", config)
         self.assertIn("#define REQ002_LEFT_CURVE_SLOWDOWN_PERMILLE   (100U)", config)
-        self.assertIn("#define REQ002_MAX_PULSE_PERMILLE             (850U)", config)
-        self.assertIn("#define REQ002_RIGHT_TURN_PULSE_PERMILLE      (500U)", config)
-        self.assertIn("#define REQ002_LEFT_TURN_PULSE_PERMILLE       (150U)", config)
+        self.assertIn("#define REQ002_MAX_PULSE_PERMILLE             (900U)", config)
+        self.assertIn(
+            "#define REQ002_TURN_MAX_PULSE_PERMILLE        (1000U)",
+            config)
+        self.assertIn(
+            "#define REQ002_TURN_RIGHT_MIN_PULSE_PERMILLE   (430U)",
+            config)
+        self.assertIn(
+            "#define REQ002_TURN_BASE_PULSE_PERMILLE        (650U)",
+            config)
+        self.assertIn("#define REQ002_RIGHT_TURN_PULSE_PERMILLE      (1340U)", config)
+        self.assertIn("#define REQ002_LEFT_TURN_PULSE_PERMILLE       (800U)", config)
+        self.assertIn("#define REQ002_TURN_MIN_CORRECTION             (0.25f)", config)
         self.assertIn("correctionMagnitude", req002)
+        self.assertIn("steeringCommand", req002)
+        self.assertIn("steeringMagnitude", req002)
+        self.assertIn("steeringMagnitude < REQ002_TURN_MIN_CORRECTION", req002)
+        self.assertIn("demandLimitPermille", req002)
+        self.assertIn("REQ002_TURN_MAX_PULSE_PERMILLE", req002)
+        self.assertIn("REQ002_TURN_RIGHT_MIN_PULSE_PERMILLE", req002)
+        self.assertIn("REQ002_TURN_BASE_PULSE_PERMILLE", req002)
+        self.assertIn("rightBase = leftBase;", req002)
+        self.assertIn("rightTurnMinimum", req002)
+        self.assertIn("clampDemand(leftDemand, demandLimitPermille)", req002)
         self.assertIn("if (correction < 0.0f)", req002)
         self.assertIn("rightBase = leftBase -", req002)
         self.assertIn("REQ002_RIGHT_TRIM_PERMILLE", req002)
@@ -226,9 +249,20 @@ class FirmwareSafetyTests(unittest.TestCase):
         self.assertNotIn("leftOutput = 1000U", req002)
         self.assertNotIn("rightOutput = 1000U", req002)
         self.assertIn("Req002_abort(Timebase_nowMs());", console)
-        self.assertIn("Ground-verified vehicle-forward polarity", motor)
+        for token in (
+            "last_left=",
+            "last_right=",
+            "speed_trim_milli=",
+            "speed_peak_milli=",
+            "encoder_missing_max_ms=",
+            "encoder_missing_events=",
+        ):
+            self.assertIn(token, console)
+        self.assertIn("Current physical vehicle-forward polarity", motor)
         self.assertIn("DIAG_GPIO_MOTOR_BIN2_SAFE", motor)
         self.assertIn("DIAG_GPIO_MOTOR_AIN2_SAFE", motor)
+        self.assertNotIn("1000U - dutyPermille", motor)
+        self.assertIn("setDuty(GPIO_MOTOR_PWM_C2_IDX, dutyPermille);", motor)
 
         self.assertNotIn("MotorDriver_", text("algorithm/line_tracking.c"))
         self.assertNotIn("motor_driver.h", text("algorithm/line_tracking.c"))
@@ -326,6 +360,7 @@ class FirmwareSafetyTests(unittest.TestCase):
 
         syscfg = text("empty.syscfg")
         req002 = text("app/req002.c")
+        header = text("app/req002.h")
         config = text("config/firmware_config.h")
         for token in (
             'GPIO1.associatedPins[9].$name            = "LEFT_ENCODER_B"',
@@ -345,17 +380,38 @@ class FirmwareSafetyTests(unittest.TestCase):
 
         for token in (
             "REQ002_LEFT_ENCODER_TO_QEI_SCALE",
+            "REQ002_LEFT_SPEED_TARGET_RATIO",
             "REQ002_SPEED_PI_STRAIGHT_THRESHOLD",
             "REQ002_SPEED_PI_OUTPUT_LIMIT",
+            "REQ002_ENCODER_FEEDBACK_FAULT_MS",
+            "REQ002_BLOCK_ENCODER_FEEDBACK_INVALID",
+            "encoderFeedbackMissingMaxMs",
+            "peakSpeedTrimPermille",
             "Pid_init(&gSpeedBalancePi",
-            "Pid_step(&gSpeedBalancePi",
+            "Pid_step(controller",
+            "Pid_init(&gTurnLeftPi",
+            "SPEED_BALANCE_MODE_RIGHT_TURN",
+            "speedTargetRatio = REQ002_LEFT_SPEED_TARGET_RATIO *",
+            "leftDemand / rightDemand",
             "speedBalanceStep",
+            "feedbackMonitorEnabled",
+            "speedBalanceStep(speedBalanceMode,",
             "leftDemand += speedTrim",
             "rightDemand -= speedTrim",
             "speed.leftAbsDelta == 0U",
             "speed.rightAbsDelta == 0U",
         ):
-            self.assertIn(token, config + req002)
+            self.assertIn(token, config + req002 + header)
+        self.assertIn("leftMissing && rightMissing", req002)
+        self.assertIn("speedPiConfig.outputMin = 0.0f", req002)
+        self.assertIn("speedPiConfig.integralMin = 0.0f", req002)
+        self.assertIn("&gTurnLeftPi : &gSpeedBalancePi", req002)
+        self.assertIn(
+            "speedBalanceMode == SPEED_BALANCE_MODE_RIGHT_TURN", req002)
+        self.assertIn("speedBalanceWatchdog(nowMs, leftMissing || rightMissing)", req002)
+        self.assertNotIn(
+            "if ((speed.leftAbsDelta == 0U) || (speed.rightAbsDelta == 0U)",
+            req002)
     def test_pid_contains_limits_freeze_filter_and_anti_windup(self) -> None:
         header = text("algorithm/pid.h")
         source = text("algorithm/pid.c")

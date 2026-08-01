@@ -16,6 +16,12 @@
 static Req002Status gStatus;
 
 #if REQ002_ACTUATION_BUILD
+typedef enum {
+    SPEED_BALANCE_MODE_DISABLED = 0,
+    SPEED_BALANCE_MODE_STRAIGHT,
+    SPEED_BALANCE_MODE_RIGHT_TURN
+} SpeedBalanceMode;
+
 static uint32_t gNextControlMs;
 static uint32_t gDepartSinceMs;
 static uint32_t gMarkerSinceMs;
@@ -25,8 +31,13 @@ static bool gTrackingFaultPending;
 static uint32_t gTrackingFaultSinceMs;
 static Req002BlockReason gTrackingFaultReason;
 static PidController gSpeedBalancePi;
+static PidController gTurnLeftPi;
+static SpeedBalanceMode gSpeedBalanceMode;
 static uint32_t gSpeedBalanceSampleCount;
 static float gSpeedBalanceTrimPermille;
+static bool gEncoderFeedbackMissing;
+static uint32_t gEncoderFeedbackMissingSinceMs;
+static bool gEncoderFeedbackFaulted;
 
 static void speedBalanceReset(void);
 #endif
@@ -164,6 +175,13 @@ void Req002_init(uint32_t nowMs)
     speedPiConfig.integralMax = REQ002_SPEED_PI_INTEGRAL_LIMIT;
     speedPiConfig.derivativeAlpha = 1.0f;
     Pid_init(&gSpeedBalancePi, &speedPiConfig);
+
+    /* The turn controller may only add a small amount to the outer left
+     * wheel. It reuses the field-tested gains and 5% output limit, but its
+     * one-sided limits prevent it from weakening the 93% turn feed-forward. */
+    speedPiConfig.outputMin = 0.0f;
+    speedPiConfig.integralMin = 0.0f;
+    Pid_init(&gTurnLeftPi, &speedPiConfig);
     speedBalanceReset();
 #endif
     setLocked(true);
@@ -223,11 +241,11 @@ static bool markerDetected(const Req002ControlDecision *decision)
             REQ002_MARKER_MIN_BLACK);
 }
 
-static uint16_t clampDemand(float demand)
+static uint16_t clampDemand(float demand, uint16_t maximumPermille)
 {
     if (demand <= 0.0f) return 0U;
-    if (demand >= (float) REQ002_MAX_PULSE_PERMILLE) {
-        return REQ002_MAX_PULSE_PERMILLE;
+    if (demand >= (float) maximumPermille) {
+        return maximumPermille;
     }
     return (uint16_t) demand;
 }
@@ -238,48 +256,115 @@ static void speedBalanceReset(void)
 
     gSpeedBalanceSampleCount = speed.sampleCount;
     gSpeedBalanceTrimPermille = 0.0f;
+    gSpeedBalanceMode = SPEED_BALANCE_MODE_DISABLED;
+    gEncoderFeedbackMissing = false;
+    gEncoderFeedbackMissingSinceMs = 0U;
+    gEncoderFeedbackFaulted = false;
     Pid_reset(&gSpeedBalancePi, 0.0f);
+    Pid_reset(&gTurnLeftPi, 0.0f);
 }
 
-static float speedBalanceStep(bool enabled)
+static void speedBalanceWatchdog(uint32_t nowMs, bool feedbackMissing)
+{
+    uint32_t missingMs;
+
+    if (!feedbackMissing) {
+        gEncoderFeedbackMissing = false;
+        gEncoderFeedbackMissingSinceMs = 0U;
+        return;
+    }
+    if (!gEncoderFeedbackMissing) {
+        gEncoderFeedbackMissing = true;
+        gEncoderFeedbackMissingSinceMs = nowMs;
+        gStatus.encoderFeedbackMissingEvents++;
+    }
+
+    missingMs = nowMs - gEncoderFeedbackMissingSinceMs;
+    if (missingMs > gStatus.encoderFeedbackMissingMaxMs) {
+        gStatus.encoderFeedbackMissingMaxMs = missingMs;
+    }
+    if (Timebase_reached(nowMs, gEncoderFeedbackMissingSinceMs +
+            REQ002_ENCODER_FEEDBACK_FAULT_MS)) {
+        gEncoderFeedbackFaulted = true;
+    }
+}
+
+static float speedBalanceStep(SpeedBalanceMode mode, bool monitorEnabled,
+    float targetRatio, uint32_t nowMs)
 {
     EncoderSpeedShadow speed;
+    PidController *controller;
     float leftNormalized;
     float rightNormalized;
     float measurement;
     float dtSeconds;
+    float trimMagnitude;
+    bool leftMissing;
+    bool rightMissing;
 
-    if (!enabled || (REQ002_SPEED_PI_ENABLED == 0U)) {
+    if (!monitorEnabled || (REQ002_SPEED_PI_ENABLED == 0U)) {
         speedBalanceReset();
         return 0.0f;
     }
 
+    if (gSpeedBalanceMode != mode) {
+        gSpeedBalanceMode = mode;
+        gSpeedBalanceTrimPermille = 0.0f;
+        Pid_reset(&gSpeedBalancePi, 0.0f);
+        Pid_reset(&gTurnLeftPi, 0.0f);
+    }
+
     speed = Encoders_speedShadowSnapshot();
-    if ((speed.initialized == 0U) ||
-        (speed.sampleCount == gSpeedBalanceSampleCount)) {
+    if (speed.initialized == 0U) {
+        return gSpeedBalanceTrimPermille;
+    }
+    if (speed.sampleCount == gSpeedBalanceSampleCount) {
+        if (gEncoderFeedbackMissing) {
+            speedBalanceWatchdog(nowMs, true);
+        }
         return gSpeedBalanceTrimPermille;
     }
     gSpeedBalanceSampleCount = speed.sampleCount;
 
-    /* Do not integrate against a missing encoder. A 1x left sample is scaled
-     * to the right hardware QEI's 4x count domain before comparison. */
-    if ((speed.leftAbsDelta == 0U) || (speed.rightAbsDelta == 0U) ||
-        (speed.windowMs == 0U)) {
+    if (speed.windowMs == 0U) {
+        return gSpeedBalanceTrimPermille;
+    }
+
+    leftMissing = speed.leftAbsDelta == 0U;
+    rightMissing = speed.rightAbsDelta == 0U;
+    speedBalanceWatchdog(nowMs, leftMissing || rightMissing);
+
+    /* Feedback monitoring stays active through all steering states. PI output
+     * is produced only for straight travel or the dominant right turn. */
+    if (mode == SPEED_BALANCE_MODE_DISABLED) {
         gSpeedBalanceTrimPermille = 0.0f;
-        Pid_reset(&gSpeedBalancePi, 0.0f);
         return 0.0f;
+    }
+
+    /* A single stalled wheel is a valid zero-speed measurement. If both sides
+     * remain at zero, hold the bounded trim and let the watchdog stop the run. */
+    if (leftMissing && rightMissing) {
+        return gSpeedBalanceTrimPermille;
     }
 
     leftNormalized = (float) speed.leftAbsDelta *
         REQ002_LEFT_ENCODER_TO_QEI_SCALE;
     rightNormalized = (float) speed.rightAbsDelta;
-    measurement = leftNormalized - rightNormalized;
+    measurement = leftNormalized - (rightNormalized * targetRatio);
     dtSeconds = (float) speed.windowMs * 0.001f;
-    gSpeedBalanceTrimPermille = Pid_step(&gSpeedBalancePi, 0.0f,
+    controller = (mode == SPEED_BALANCE_MODE_RIGHT_TURN) ?
+        &gTurnLeftPi : &gSpeedBalancePi;
+    gSpeedBalanceTrimPermille = Pid_step(controller, 0.0f,
         measurement, dtSeconds, false);
+
+    gStatus.lastSpeedTrimPermille = gSpeedBalanceTrimPermille;
+    trimMagnitude = (gSpeedBalanceTrimPermille >= 0.0f) ?
+        gSpeedBalanceTrimPermille : -gSpeedBalanceTrimPermille;
+    if (trimMagnitude > gStatus.peakSpeedTrimPermille) {
+        gStatus.peakSpeedTrimPermille = trimMagnitude;
+    }
     return gSpeedBalanceTrimPermille;
 }
-
 static void stopWithFault(uint32_t nowMs, Req002BlockReason reason)
 {
     BoardSafety_stop(BOARD_SAFETY_STOP_FAULT);
@@ -338,6 +423,12 @@ static void tryStart(uint32_t nowMs)
     gStatus.departedStartMarker = false;
     gStatus.returnMarkerSeen = false;
     gStatus.controlSequence = 0U;
+    gStatus.lastAppliedLeftDemandPermille = 0U;
+    gStatus.lastAppliedRightDemandPermille = 0U;
+    gStatus.lastSpeedTrimPermille = 0.0f;
+    gStatus.peakSpeedTrimPermille = 0.0f;
+    gStatus.encoderFeedbackMissingMaxMs = 0U;
+    gStatus.encoderFeedbackMissingEvents = 0U;
     gNextControlMs = nowMs;
     gDepartPending = false;
     gMarkerPending = false;
@@ -367,6 +458,8 @@ static bool applyControl(uint32_t nowMs)
 {
     float correction;
     float correctionMagnitude;
+    float steeringCommand;
+    float steeringMagnitude;
     float curveSlowdown;
     float turnAuthority;
     float leftBase;
@@ -374,8 +467,12 @@ static bool applyControl(uint32_t nowMs)
     float leftDemand;
     float rightDemand;
     float speedTrim;
+    float speedTargetRatio;
+    float rightTurnMinimum;
     float rampScale = 1.0f;
-    bool speedBalanceEnabled;
+    SpeedBalanceMode speedBalanceMode;
+    bool feedbackMonitorEnabled;
+    uint16_t demandLimitPermille;
     uint32_t elapsedMs;
 
     if (!Timebase_reached(nowMs, gNextControlMs)) return true;
@@ -391,41 +488,92 @@ static bool applyControl(uint32_t nowMs)
     if (correction < -1.0f) correction = -1.0f;
 
     correctionMagnitude = (correction >= 0.0f) ? correction : -correction;
+    steeringCommand = correction;
+    steeringMagnitude = correctionMagnitude;
+    if ((correctionMagnitude > REQ002_SPEED_PI_STRAIGHT_THRESHOLD) &&
+        (steeringMagnitude < REQ002_TURN_MIN_CORRECTION)) {
+        steeringMagnitude = REQ002_TURN_MIN_CORRECTION;
+        steeringCommand = (correction < 0.0f) ?
+            -steeringMagnitude : steeringMagnitude;
+    }
+
+    demandLimitPermille =
+        (correctionMagnitude <= REQ002_SPEED_PI_STRAIGHT_THRESHOLD) ?
+        REQ002_MAX_PULSE_PERMILLE : REQ002_TURN_MAX_PULSE_PERMILLE;
     if (correction < 0.0f) {
         /* Clockwise course: line on the right requires the dominant turn.
          * Slow the vehicle harder and apply greater left/right differential. */
-        curveSlowdown = correctionMagnitude *
+        curveSlowdown = steeringMagnitude *
             (float) REQ002_RIGHT_CURVE_SLOWDOWN_PERMILLE;
         turnAuthority = (float) REQ002_RIGHT_TURN_PULSE_PERMILLE;
     } else {
         /* Left steering remains only as a weaker recovery correction. */
-        curveSlowdown = correctionMagnitude *
+        curveSlowdown = steeringMagnitude *
             (float) REQ002_LEFT_CURVE_SLOWDOWN_PERMILLE;
         turnAuthority = (float) REQ002_LEFT_TURN_PULSE_PERMILLE;
     }
-    leftBase = (float) REQ002_BASE_PULSE_PERMILLE - curveSlowdown;
-    rightBase = leftBase - (float) REQ002_RIGHT_TRIM_PERMILLE;
+    if (correctionMagnitude > REQ002_SPEED_PI_STRAIGHT_THRESHOLD) {
+        /* Turn control must not inherit the large ground-load straight trim.
+         * Start both wheels from a common base so either steering sign can
+         * create an immediate and symmetric differential. */
+        leftBase = (float) REQ002_TURN_BASE_PULSE_PERMILLE -
+            curveSlowdown;
+        rightBase = leftBase;
+    } else {
+        leftBase = (float) REQ002_BASE_PULSE_PERMILLE - curveSlowdown;
+        rightBase = leftBase - (float) REQ002_RIGHT_TRIM_PERMILLE;
+    }
 
-    /* Ground observation: the right wheel runs faster at equal PWM. The
-     * permanent trim counters that leftward bias before steering is mixed. */
+    /* The large permanent trim applies only to straight ground travel. */
     leftDemand = rampScale *
-        (leftBase - (correction * turnAuthority));
+        (leftBase - (steeringCommand * turnAuthority));
     rightDemand = rampScale *
-        (rightBase + (correction * turnAuthority));
+        (rightBase + (steeringCommand * turnAuthority));
 
-    speedBalanceEnabled =
+    if (correctionMagnitude > REQ002_SPEED_PI_STRAIGHT_THRESHOLD) {
+        rightTurnMinimum = rampScale *
+            (float) REQ002_TURN_RIGHT_MIN_PULSE_PERMILLE;
+        if (rightDemand < rightTurnMinimum) {
+            rightDemand = rightTurnMinimum;
+        }
+    }
+
+    feedbackMonitorEnabled =
         (elapsedMs >= REQ002_SOFT_START_MS) &&
-        (correctionMagnitude <= REQ002_SPEED_PI_STRAIGHT_THRESHOLD) &&
         (leftDemand >= (float) REQ002_SPEED_PI_MIN_DEMAND_PERMILLE) &&
         (rightDemand >= (float) REQ002_SPEED_PI_MIN_DEMAND_PERMILLE);
-    speedTrim = speedBalanceStep(speedBalanceEnabled);
+    speedBalanceMode = SPEED_BALANCE_MODE_DISABLED;
+    speedTargetRatio = REQ002_LEFT_SPEED_TARGET_RATIO;
+    if (feedbackMonitorEnabled &&
+        (correctionMagnitude <= REQ002_SPEED_PI_STRAIGHT_THRESHOLD)) {
+        speedBalanceMode = SPEED_BALANCE_MODE_STRAIGHT;
+    } else if (feedbackMonitorEnabled &&
+        (correction < -REQ002_SPEED_PI_STRAIGHT_THRESHOLD) &&
+        (rightDemand > 0.0f)) {
+        /* Preserve the commanded turn ratio while allowing encoder PI to add
+         * at most 5% to the outer left wheel. The calibrated straight ratio
+         * compensates for the different 1x/4x encoder paths and wheel load. */
+        speedBalanceMode = SPEED_BALANCE_MODE_RIGHT_TURN;
+        speedTargetRatio = REQ002_LEFT_SPEED_TARGET_RATIO *
+            (leftDemand / rightDemand);
+    }
+    speedTrim = speedBalanceStep(speedBalanceMode,
+        feedbackMonitorEnabled, speedTargetRatio, nowMs);
+    if (gEncoderFeedbackFaulted) return false;
 
-    /* Positive trim means the right normalized count was higher: speed up
-     * the left wheel and slow the right wheel by the same bounded amount. */
-    leftDemand += speedTrim;
-    rightDemand -= speedTrim;
-    gStatus.leftDemandPermille = clampDemand(leftDemand);
-    gStatus.rightDemandPermille = clampDemand(rightDemand);
+    if (speedBalanceMode == SPEED_BALANCE_MODE_STRAIGHT) {
+        /* Positive trim means the right normalized count was higher. */
+        leftDemand += speedTrim;
+        rightDemand -= speedTrim;
+    } else if (speedBalanceMode == SPEED_BALANCE_MODE_RIGHT_TURN) {
+        /* Turn PI is one-sided: keep the 93% feed-forward and only boost the
+         * outer left wheel when encoder feedback says it is lagging. */
+        leftDemand += speedTrim;
+    }
+    gStatus.leftDemandPermille = clampDemand(leftDemand, demandLimitPermille);
+    gStatus.rightDemandPermille = clampDemand(rightDemand, demandLimitPermille);
+    gStatus.lastAppliedLeftDemandPermille = gStatus.leftDemandPermille;
+    gStatus.lastAppliedRightDemandPermille = gStatus.rightDemandPermille;
 
     gStatus.controlSequence++;
     return MotorDriver_setVehicleForwardDuties(
@@ -530,7 +678,10 @@ void Req002_service(uint32_t nowMs, bool buttonPress,
     }
 
     if (!applyControl(nowMs)) {
-        stopWithFault(nowMs, REQ002_BLOCK_ACTUATION_GATE_INVALID);
+        Req002BlockReason reason = gEncoderFeedbackFaulted ?
+            REQ002_BLOCK_ENCODER_FEEDBACK_INVALID :
+            REQ002_BLOCK_ACTUATION_GATE_INVALID;
+        stopWithFault(nowMs, reason);
     }
 #else
     if (buttonPress) {
@@ -585,6 +736,8 @@ const char *Req002_blockReasonName(Req002BlockReason reason)
         case REQ002_BLOCK_PHYSICAL_PARAMETERS_INVALID:
             return "PHYSICAL_PARAMETERS_INVALID";
         case REQ002_BLOCK_ACTUATOR_ADAPTER_DISABLED:
-        default: return "ACTUATOR_ADAPTER_DISABLED";
+            return "ACTUATOR_ADAPTER_DISABLED";
+        case REQ002_BLOCK_ENCODER_FEEDBACK_INVALID:
+        default: return "ENCODER_FEEDBACK_INVALID";
     }
 }

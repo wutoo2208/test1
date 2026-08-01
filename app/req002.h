@@ -29,7 +29,8 @@ typedef enum {
     REQ002_BLOCK_LINE_LOST,
     REQ002_BLOCK_ACTUATION_GATE_INVALID,
     REQ002_BLOCK_PHYSICAL_PARAMETERS_INVALID,
-    REQ002_BLOCK_ACTUATOR_ADAPTER_DISABLED
+    REQ002_BLOCK_ACTUATOR_ADAPTER_DISABLED,
+    REQ002_BLOCK_ENCODER_FEEDBACK_INVALID
 } Req002BlockReason;
 
 typedef enum {
@@ -94,6 +95,12 @@ typedef struct {
     uint16_t leftDemandPermille;
     uint16_t rightDemandPermille;
     uint32_t controlSequence;
+    uint16_t lastAppliedLeftDemandPermille;
+    uint16_t lastAppliedRightDemandPermille;
+    float lastSpeedTrimPermille;
+    float peakSpeedTrimPermille;
+    uint32_t encoderFeedbackMissingMaxMs;
+    uint32_t encoderFeedbackMissingEvents;
 } Req002Status;
 
 Req002ControlDecision Req002_evaluateTracking(

@@ -24,19 +24,12 @@ static void setDuty(uint32_t channel, uint16_t permille)
 
 static void setLeftVehicleForwardDuty(uint16_t dutyPermille)
 {
-    if (dutyPermille == 0U) {
-        setDuty(GPIO_MOTOR_PWM_C2_IDX, 0U);
-        DL_GPIO_clearPins(DIAG_GPIO_MOTOR_BIN2_SAFE_PORT,
-            DIAG_GPIO_MOTOR_BIN2_SAFE_PIN);
-    } else {
-        if (gStatus.leftDutyPermille == 0U) {
-            setDuty(GPIO_MOTOR_PWM_C2_IDX, 0U);
-            DL_GPIO_setPins(DIAG_GPIO_MOTOR_BIN2_SAFE_PORT,
-                DIAG_GPIO_MOTOR_BIN2_SAFE_PIN);
-        }
-        setDuty(GPIO_MOTOR_PWM_C2_IDX,
-            (uint16_t) (1000U - dutyPermille));
-    }
+    /* Current physical observation: BIN2 high with complemented BIN1 PWM
+     * drives the left wheel backward. Vehicle-forward therefore uses BIN2
+     * low with normal BIN1 PWM, matching the direct channel polarity. */
+    DL_GPIO_clearPins(DIAG_GPIO_MOTOR_BIN2_SAFE_PORT,
+        DIAG_GPIO_MOTOR_BIN2_SAFE_PIN);
+    setDuty(GPIO_MOTOR_PWM_C2_IDX, dutyPermille);
     gStatus.leftDutyPermille = dutyPermille;
 }
 
@@ -108,9 +101,8 @@ MotorDriverResult MotorDriver_setVehicleForwardDuties(
         return MOTOR_DRIVER_INVALID_DUTY;
     }
 
-    /* Ground-verified vehicle-forward polarity:
-     * left B channel reverses with BIN2 high and complemented BIN1 PWM;
-     * right A channel uses normal AIN1 PWM with AIN2 low. */
+    /* Current physical vehicle-forward polarity: both channels use their
+     * normal PWM input with the corresponding IN2 direction input low. */
     setLeftVehicleForwardDuty(leftDutyPermille);
     setRightVehicleForwardDuty(rightDutyPermille);
     return MOTOR_DRIVER_OK;

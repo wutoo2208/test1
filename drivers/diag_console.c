@@ -277,6 +277,18 @@ static void reportReq002(void)
     writeText(" pid_enabled="); writeU32(REQ002_PID_ENABLED);
     writeText(" left_demand="); writeU32(status->leftDemandPermille);
     writeText(" right_demand="); writeU32(status->rightDemandPermille);
+    writeText(" last_left=");
+    writeU32(status->lastAppliedLeftDemandPermille);
+    writeText(" last_right=");
+    writeU32(status->lastAppliedRightDemandPermille);
+    writeText(" speed_trim_milli=");
+    writeMilliFloat(status->lastSpeedTrimPermille);
+    writeText(" speed_peak_milli=");
+    writeMilliFloat(status->peakSpeedTrimPermille);
+    writeText(" encoder_missing_max_ms=");
+    writeU32(status->encoderFeedbackMissingMaxMs);
+    writeText(" encoder_missing_events=");
+    writeU32(status->encoderFeedbackMissingEvents);
     writeText(" control_seq="); writeU32(status->controlSequence);
     writeText(" elapsed_ms="); writeU32(status->elapsedMs);
     writeText(" frozen_ms="); writeU32(status->frozenElapsedMs);
