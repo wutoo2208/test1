@@ -189,8 +189,8 @@ class FirmwareSafetyTests(unittest.TestCase):
         self.assertIn(
             "#define REQ002_MARKER_MIN_BLACK              (4U)", config)
         self.assertIn("#define REQ002_SOFT_START_MS                 (300U)", config)
-        self.assertIn("#define REQ002_BASE_PULSE_PERMILLE           (600U)", config)
-        self.assertIn("#define REQ002_RIGHT_TRIM_PERMILLE            (60U)", config)
+        self.assertIn("#define REQ002_BASE_PULSE_PERMILLE           (700U)", config)
+        self.assertIn("#define REQ002_RIGHT_TRIM_PERMILLE            (80U)", config)
         self.assertIn("#define REQ002_RIGHT_CURVE_SLOWDOWN_PERMILLE  (220U)", config)
         self.assertIn("#define REQ002_LEFT_CURVE_SLOWDOWN_PERMILLE   (100U)", config)
         self.assertIn("#define REQ002_MAX_PULSE_PERMILLE             (800U)", config)
