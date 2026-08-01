@@ -115,26 +115,6 @@ extern "C" {
 #define GPIO_RIGHT_QEI_PHB_IOMUX_FUNC                IOMUX_PINCM28_PF_TIMG8_CCP1
 
 
-/* Defines for LEFT_CAPTURE */
-#define LEFT_CAPTURE_INST                                                (TIMA1)
-#define LEFT_CAPTURE_INST_IRQHandler                            TIMA1_IRQHandler
-#define LEFT_CAPTURE_INST_INT_IRQN                              (TIMA1_INT_IRQn)
-#define LEFT_CAPTURE_INST_LOAD_VALUE                                        (0U)
-/* GPIO defines for channel 0 */
-#define GPIO_LEFT_CAPTURE_C0_PORT                                          GPIOB
-#define GPIO_LEFT_CAPTURE_C0_PIN                                   DL_GPIO_PIN_4
-#define GPIO_LEFT_CAPTURE_C0_IOMUX                               (IOMUX_PINCM17)
-#define GPIO_LEFT_CAPTURE_C0_IOMUX_FUNC              IOMUX_PINCM17_PF_TIMA1_CCP0
-/* GPIO defines for channel 1 */
-#define GPIO_LEFT_CAPTURE_C1_PORT                                          GPIOB
-#define GPIO_LEFT_CAPTURE_C1_PIN                                   DL_GPIO_PIN_5
-#define GPIO_LEFT_CAPTURE_C1_IOMUX                               (IOMUX_PINCM18)
-#define GPIO_LEFT_CAPTURE_C1_IOMUX_FUNC              IOMUX_PINCM18_PF_TIMA1_CCP1
-
-
-
-
-
 
 /* Defines for LINE_I2C */
 #define LINE_I2C_INST                                                       I2C0
@@ -181,6 +161,22 @@ extern "C" {
 #define DIAG_UART_BAUD_RATE                                             (115200)
 #define DIAG_UART_IBRD_32_MHZ_115200_BAUD                                   (17)
 #define DIAG_UART_FBRD_32_MHZ_115200_BAUD                                   (23)
+/* Defines for K230_UART */
+#define K230_UART_INST                                                     UART1
+#define K230_UART_INST_FREQUENCY                                        32000000
+#define K230_UART_INST_IRQHandler                               UART1_IRQHandler
+#define K230_UART_INST_INT_IRQN                                   UART1_INT_IRQn
+#define GPIO_K230_UART_RX_PORT                                             GPIOA
+#define GPIO_K230_UART_TX_PORT                                             GPIOA
+#define GPIO_K230_UART_RX_PIN                                      DL_GPIO_PIN_9
+#define GPIO_K230_UART_TX_PIN                                      DL_GPIO_PIN_8
+#define GPIO_K230_UART_IOMUX_RX                                  (IOMUX_PINCM20)
+#define GPIO_K230_UART_IOMUX_TX                                  (IOMUX_PINCM19)
+#define GPIO_K230_UART_IOMUX_RX_FUNC                   IOMUX_PINCM20_PF_UART1_RX
+#define GPIO_K230_UART_IOMUX_TX_FUNC                   IOMUX_PINCM19_PF_UART1_TX
+#define K230_UART_BAUD_RATE                                             (115200)
+#define K230_UART_IBRD_32_MHZ_115200_BAUD                                   (17)
+#define K230_UART_FBRD_32_MHZ_115200_BAUD                                   (23)
 
 
 
@@ -241,6 +237,18 @@ extern "C" {
 #define DIAG_GPIO_D36A_STEP_SAFE_PORT                                    (GPIOA)
 #define DIAG_GPIO_D36A_STEP_SAFE_PIN                            (DL_GPIO_PIN_26)
 #define DIAG_GPIO_D36A_STEP_SAFE_IOMUX                           (IOMUX_PINCM59)
+/* Defines for LEFT_ENCODER_B: GPIOB.4 with pinCMx 17 on package pin 52 */
+#define DIAG_GPIO_LEFT_ENCODER_B_PORT                                    (GPIOB)
+#define DIAG_GPIO_LEFT_ENCODER_B_PIN                             (DL_GPIO_PIN_4)
+#define DIAG_GPIO_LEFT_ENCODER_B_IOMUX                           (IOMUX_PINCM17)
+/* Defines for LEFT_ENCODER_A: GPIOB.5 with pinCMx 18 on package pin 53 */
+#define DIAG_GPIO_LEFT_ENCODER_A_PORT                                    (GPIOB)
+// pins affected by this interrupt request:["LEFT_ENCODER_A"]
+#define DIAG_GPIO_INT_IRQN                                      (GPIOB_INT_IRQn)
+#define DIAG_GPIO_INT_IIDX                      (DL_INTERRUPT_GROUP1_IIDX_GPIOB)
+#define DIAG_GPIO_LEFT_ENCODER_A_IIDX                        (DL_GPIO_IIDX_DIO5)
+#define DIAG_GPIO_LEFT_ENCODER_A_PIN                             (DL_GPIO_PIN_5)
+#define DIAG_GPIO_LEFT_ENCODER_A_IOMUX                           (IOMUX_PINCM18)
 
 
 /* clang-format on */
@@ -251,10 +259,10 @@ void SYSCFG_DL_GPIO_init(void);
 void SYSCFG_DL_SYSCTL_init(void);
 void SYSCFG_DL_MOTOR_PWM_init(void);
 void SYSCFG_DL_RIGHT_QEI_init(void);
-void SYSCFG_DL_LEFT_CAPTURE_init(void);
 void SYSCFG_DL_LINE_I2C_init(void);
 void SYSCFG_DL_OLED_I2C_init(void);
 void SYSCFG_DL_DIAG_UART_init(void);
+void SYSCFG_DL_K230_UART_init(void);
 void SYSCFG_DL_RADIO_SPI_init(void);
 
 

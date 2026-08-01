@@ -42,7 +42,6 @@
 
 DL_TimerA_backupConfig gMOTOR_PWMBackup;
 DL_TimerG_backupConfig gRIGHT_QEIBackup;
-DL_TimerA_backupConfig gLEFT_CAPTUREBackup;
 DL_SPI_backupConfig gRADIO_SPIBackup;
 
 /*
@@ -57,15 +56,14 @@ SYSCONFIG_WEAK void SYSCFG_DL_init(void)
     SYSCFG_DL_SYSCTL_init();
     SYSCFG_DL_MOTOR_PWM_init();
     SYSCFG_DL_RIGHT_QEI_init();
-    SYSCFG_DL_LEFT_CAPTURE_init();
     SYSCFG_DL_LINE_I2C_init();
     SYSCFG_DL_OLED_I2C_init();
     SYSCFG_DL_DIAG_UART_init();
+    SYSCFG_DL_K230_UART_init();
     SYSCFG_DL_RADIO_SPI_init();
     /* Ensure backup structures have no valid state */
 	gMOTOR_PWMBackup.backupRdy 	= false;
 	gRIGHT_QEIBackup.backupRdy 	= false;
-	gLEFT_CAPTUREBackup.backupRdy 	= false;
 
 	gRADIO_SPIBackup.backupRdy 	= false;
 
@@ -80,7 +78,6 @@ SYSCONFIG_WEAK bool SYSCFG_DL_saveConfiguration(void)
 
 	retStatus &= DL_TimerA_saveConfiguration(MOTOR_PWM_INST, &gMOTOR_PWMBackup);
 	retStatus &= DL_TimerG_saveConfiguration(RIGHT_QEI_INST, &gRIGHT_QEIBackup);
-	retStatus &= DL_TimerA_saveConfiguration(LEFT_CAPTURE_INST, &gLEFT_CAPTUREBackup);
 	retStatus &= DL_SPI_saveConfiguration(RADIO_SPI_INST, &gRADIO_SPIBackup);
 
     return retStatus;
@@ -93,7 +90,6 @@ SYSCONFIG_WEAK bool SYSCFG_DL_restoreConfiguration(void)
 
 	retStatus &= DL_TimerA_restoreConfiguration(MOTOR_PWM_INST, &gMOTOR_PWMBackup, false);
 	retStatus &= DL_TimerG_restoreConfiguration(RIGHT_QEI_INST, &gRIGHT_QEIBackup, false);
-	retStatus &= DL_TimerA_restoreConfiguration(LEFT_CAPTURE_INST, &gLEFT_CAPTUREBackup, false);
 	retStatus &= DL_SPI_restoreConfiguration(RADIO_SPI_INST, &gRADIO_SPIBackup);
 
     return retStatus;
@@ -105,20 +101,20 @@ SYSCONFIG_WEAK void SYSCFG_DL_initPower(void)
     DL_GPIO_reset(GPIOB);
     DL_TimerA_reset(MOTOR_PWM_INST);
     DL_TimerG_reset(RIGHT_QEI_INST);
-    DL_TimerA_reset(LEFT_CAPTURE_INST);
     DL_I2C_reset(LINE_I2C_INST);
     DL_I2C_reset(OLED_I2C_INST);
     DL_UART_Main_reset(DIAG_UART_INST);
+    DL_UART_Main_reset(K230_UART_INST);
     DL_SPI_reset(RADIO_SPI_INST);
 
     DL_GPIO_enablePower(GPIOA);
     DL_GPIO_enablePower(GPIOB);
     DL_TimerA_enablePower(MOTOR_PWM_INST);
     DL_TimerG_enablePower(RIGHT_QEI_INST);
-    DL_TimerA_enablePower(LEFT_CAPTURE_INST);
     DL_I2C_enablePower(LINE_I2C_INST);
     DL_I2C_enablePower(OLED_I2C_INST);
     DL_UART_Main_enablePower(DIAG_UART_INST);
+    DL_UART_Main_enablePower(K230_UART_INST);
     DL_SPI_enablePower(RADIO_SPI_INST);
     delay_cycles(POWER_STARTUP_DELAY);
 }
@@ -133,9 +129,6 @@ SYSCONFIG_WEAK void SYSCFG_DL_GPIO_init(void)
 
     DL_GPIO_initPeripheralInputFunction(GPIO_RIGHT_QEI_PHA_IOMUX,GPIO_RIGHT_QEI_PHA_IOMUX_FUNC);
     DL_GPIO_initPeripheralInputFunction(GPIO_RIGHT_QEI_PHB_IOMUX,GPIO_RIGHT_QEI_PHB_IOMUX_FUNC);
-
-    DL_GPIO_initPeripheralInputFunction(GPIO_LEFT_CAPTURE_C0_IOMUX,GPIO_LEFT_CAPTURE_C0_IOMUX_FUNC);
-    DL_GPIO_initPeripheralInputFunction(GPIO_LEFT_CAPTURE_C1_IOMUX,GPIO_LEFT_CAPTURE_C1_IOMUX_FUNC);
 
     DL_GPIO_initPeripheralInputFunctionFeatures(GPIO_LINE_I2C_IOMUX_SDA,
         GPIO_LINE_I2C_IOMUX_SDA_FUNC, DL_GPIO_INVERSION_DISABLE,
@@ -162,6 +155,10 @@ SYSCONFIG_WEAK void SYSCFG_DL_GPIO_init(void)
         GPIO_DIAG_UART_IOMUX_TX, GPIO_DIAG_UART_IOMUX_TX_FUNC);
     DL_GPIO_initPeripheralInputFunction(
         GPIO_DIAG_UART_IOMUX_RX, GPIO_DIAG_UART_IOMUX_RX_FUNC);
+    DL_GPIO_initPeripheralOutputFunction(
+        GPIO_K230_UART_IOMUX_TX, GPIO_K230_UART_IOMUX_TX_FUNC);
+    DL_GPIO_initPeripheralInputFunction(
+        GPIO_K230_UART_IOMUX_RX, GPIO_K230_UART_IOMUX_RX_FUNC);
 
     DL_GPIO_initPeripheralOutputFunction(
         GPIO_RADIO_SPI_IOMUX_SCLK, GPIO_RADIO_SPI_IOMUX_SCLK_FUNC);
@@ -192,6 +189,14 @@ SYSCONFIG_WEAK void SYSCFG_DL_GPIO_init(void)
 
     DL_GPIO_initDigitalOutput(DIAG_GPIO_D36A_STEP_SAFE_IOMUX);
 
+    DL_GPIO_initDigitalInputFeatures(DIAG_GPIO_LEFT_ENCODER_B_IOMUX,
+		 DL_GPIO_INVERSION_DISABLE, DL_GPIO_RESISTOR_PULL_UP,
+		 DL_GPIO_HYSTERESIS_DISABLE, DL_GPIO_WAKEUP_DISABLE);
+
+    DL_GPIO_initDigitalInputFeatures(DIAG_GPIO_LEFT_ENCODER_A_IOMUX,
+		 DL_GPIO_INVERSION_DISABLE, DL_GPIO_RESISTOR_PULL_UP,
+		 DL_GPIO_HYSTERESIS_DISABLE, DL_GPIO_WAKEUP_DISABLE);
+
     DL_GPIO_clearPins(GPIOA, DIAG_GPIO_D36A_DIR_SAFE_PIN |
 		DIAG_GPIO_D36A_STEP_SAFE_PIN);
     DL_GPIO_enableOutput(GPIOA, DIAG_GPIO_D36A_DIR_SAFE_PIN |
@@ -206,6 +211,9 @@ SYSCONFIG_WEAK void SYSCFG_DL_GPIO_init(void)
 		DIAG_GPIO_RADIO_CE_PIN |
 		DIAG_GPIO_RADIO_CSN_PIN |
 		DIAG_GPIO_D36A_EN_SAFE_PIN);
+    DL_GPIO_setLowerPinsPolarity(GPIOB, DL_GPIO_PIN_5_EDGE_RISE);
+    DL_GPIO_clearInterruptStatus(GPIOB, DIAG_GPIO_LEFT_ENCODER_A_PIN);
+    DL_GPIO_enableInterrupt(GPIOB, DIAG_GPIO_LEFT_ENCODER_A_PIN);
 
 }
 
@@ -302,65 +310,6 @@ SYSCONFIG_WEAK void SYSCFG_DL_RIGHT_QEI_init(void) {
 }
 
 
-
-/*
- * Timer clock configuration to be sourced by BUSCLK /  (32000000 Hz)
- * timerClkFreq = (timerClkSrc / (timerClkDivRatio * (timerClkPrescale + 1)))
- *   32000000 Hz = 32000000 Hz / (1 * (0 + 1))
- */
-static const DL_TimerA_ClockConfig gLEFT_CAPTUREClockConfig = {
-    .clockSel    = DL_TIMER_CLOCK_BUSCLK,
-    .divideRatio = DL_TIMER_CLOCK_DIVIDE_1,
-    .prescale = 0U
-};
-
-/*
- * Timer load value (where the counter starts from) is calculated as (timerPeriod * timerClockFreq) - 1
- * LEFT_CAPTURE_INST_LOAD_VALUE = (0 ms * 32000000 Hz) - 1
- */
-
-SYSCONFIG_WEAK void SYSCFG_DL_LEFT_CAPTURE_init(void) {
-
-    DL_TimerA_setClockConfig(LEFT_CAPTURE_INST,
-        (DL_TimerA_ClockConfig *) &gLEFT_CAPTUREClockConfig);
-
-    DL_TimerA_setLoadValue(LEFT_CAPTURE_INST,-1);
-
-    DL_TimerA_setCounterMode(LEFT_CAPTURE_INST,DL_TIMER_COUNT_MODE_UP);
-
-    DL_TimerA_setCounterRepeatMode(LEFT_CAPTURE_INST,DL_TIMER_REPEAT_MODE_ENABLED);
-
-    DL_TimerA_setCounterValueAfterEnable(LEFT_CAPTURE_INST,DL_TIMER_COUNT_AFTER_EN_ZERO);
-
-    DL_TimerA_setCaptureCompareCtl(LEFT_CAPTURE_INST,
-    DL_TIMER_CC_MODE_CAPTURE, (DL_TIMER_CC_ZCOND_NONE | DL_TIMER_CC_ACOND_TIMCLK | DL_TIMER_CC_CCOND_TRIG_EDGE),
-    DL_TIMER_CC_0_INDEX);
-
-    DL_TimerA_setCaptureCompareInput(LEFT_CAPTURE_INST,
-        DL_TIMER_CC_INPUT_INV_NOINVERT,DL_TIMER_CC_IN_SEL_CCPX, DL_TIMER_CC_0_INDEX);
-
-    DL_TimerA_setCaptureCompareCtl(LEFT_CAPTURE_INST,
-    DL_TIMER_CC_MODE_CAPTURE, (DL_TIMER_CC_ZCOND_TRIG_FALL | DL_TIMER_CC_ACOND_TIMCLK | DL_TIMER_CC_CCOND_TRIG_EDGE),
-    DL_TIMER_CC_1_INDEX);
-
-    DL_TimerA_setCaptureCompareInput(LEFT_CAPTURE_INST,
-        DL_TIMER_CC_INPUT_INV_NOINVERT,DL_TIMER_CC_IN_SEL_CCPX, DL_TIMER_CC_1_INDEX);
-
-
-    DL_TimerA_setCounterControl(LEFT_CAPTURE_INST,
-        DL_TIMER_CZC_CCCTL1_ZCOND,
-        DL_TIMER_CAC_CCCTL1_ACOND,
-        DL_TIMER_CLC_CCCTL1_LCOND
-    );
-
-    DL_TimerA_enableInterrupt(LEFT_CAPTURE_INST , DL_TIMERA_INTERRUPT_CC0_UP_EVENT |
-		DL_TIMERA_INTERRUPT_CC1_UP_EVENT |
-		DL_TIMERA_INTERRUPT_LOAD_EVENT);
-
-    DL_TimerA_enableClock(LEFT_CAPTURE_INST);
-
-}
-
 static const DL_I2C_ClockConfig gLINE_I2CClockConfig = {
     .clockSel = DL_I2C_CLOCK_BUSCLK,
     .divideRatio = DL_I2C_CLOCK_DIVIDE_1,
@@ -450,6 +399,45 @@ SYSCONFIG_WEAK void SYSCFG_DL_DIAG_UART_init(void)
     DL_UART_Main_setTXFIFOThreshold(DIAG_UART_INST, DL_UART_TX_FIFO_LEVEL_1_2_EMPTY);
 
     DL_UART_Main_enable(DIAG_UART_INST);
+}
+static const DL_UART_Main_ClockConfig gK230_UARTClockConfig = {
+    .clockSel    = DL_UART_MAIN_CLOCK_BUSCLK,
+    .divideRatio = DL_UART_MAIN_CLOCK_DIVIDE_RATIO_1
+};
+
+static const DL_UART_Main_Config gK230_UARTConfig = {
+    .mode        = DL_UART_MAIN_MODE_NORMAL,
+    .direction   = DL_UART_MAIN_DIRECTION_TX_RX,
+    .flowControl = DL_UART_MAIN_FLOW_CONTROL_NONE,
+    .parity      = DL_UART_MAIN_PARITY_NONE,
+    .wordLength  = DL_UART_MAIN_WORD_LENGTH_8_BITS,
+    .stopBits    = DL_UART_MAIN_STOP_BITS_ONE
+};
+
+SYSCONFIG_WEAK void SYSCFG_DL_K230_UART_init(void)
+{
+    DL_UART_Main_setClockConfig(K230_UART_INST, (DL_UART_Main_ClockConfig *) &gK230_UARTClockConfig);
+
+    DL_UART_Main_init(K230_UART_INST, (DL_UART_Main_Config *) &gK230_UARTConfig);
+    /*
+     * Configure baud rate by setting oversampling and baud rate divisors.
+     *  Target baud rate: 115200
+     *  Actual baud rate: 115211.52
+     */
+    DL_UART_Main_setOversampling(K230_UART_INST, DL_UART_OVERSAMPLING_RATE_16X);
+    DL_UART_Main_setBaudRateDivisor(K230_UART_INST, K230_UART_IBRD_32_MHZ_115200_BAUD, K230_UART_FBRD_32_MHZ_115200_BAUD);
+
+
+    /* Configure Interrupts */
+    DL_UART_Main_enableInterrupt(K230_UART_INST,
+                                 DL_UART_MAIN_INTERRUPT_RX);
+
+    /* Configure FIFOs */
+    DL_UART_Main_enableFIFOs(K230_UART_INST);
+    DL_UART_Main_setRXFIFOThreshold(K230_UART_INST, DL_UART_RX_FIFO_LEVEL_ONE_ENTRY);
+    DL_UART_Main_setTXFIFOThreshold(K230_UART_INST, DL_UART_TX_FIFO_LEVEL_1_2_EMPTY);
+
+    DL_UART_Main_enable(K230_UART_INST);
 }
 
 static const DL_SPI_Config gRADIO_SPI_config = {

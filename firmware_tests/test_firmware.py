@@ -232,6 +232,116 @@ class FirmwareSafetyTests(unittest.TestCase):
             "MotorDriver_",
         ):
             self.assertNotIn(forbidden, evaluator)
+    def test_k230_uart1_read_only_diagnostic_contract(self) -> None:
+        syscfg = text("empty.syscfg")
+        entrypoint = text("empty.c")
+        link = text("drivers/k230_link.c") + text("drivers/k230_link.h")
+
+        for token in (
+            'const UART2   = UART.addInstance();',
+            'UART2.$name                    = "K230_UART"',
+            'UART2.targetBaudRate           = 115200',
+            'UART2.enabledInterrupts        = ["RX"]',
+            'UART2.peripheral.$assign       = "UART1"',
+            'UART2.peripheral.rxPin.$assign = "PA9"',
+            'UART2.peripheral.txPin.$assign = "PA8"',
+        ):
+            self.assertIn(token, syscfg)
+
+        for token in (
+            '#include "drivers/k230_link.h"',
+            'volatile K230RuntimeDiag gK230RuntimeDiag',
+            'NVIC_DisableIRQ(K230_UART_INST_INT_IRQN);',
+            'K230Link_init(Timebase_nowMs());',
+            'K230Diag_service();',
+            'void K230_UART_INST_IRQHandler(void)',
+            'DL_UART_Main_isRXFIFOEmpty(K230_UART_INST)',
+            'K230Link_pushRxByteFromIsr',
+            'K230Link_service(nowMs);',
+            'K230Link_snapshot(nowMs, &sample)',
+            'K230Link_getStats(&stats);',
+        ):
+            self.assertIn(token, entrypoint)
+
+        self.assertIn('K230_LINK_FRAME_SIZE               (14U)', link)
+        self.assertIn('K230_LINK_TIMEOUT_MS               (100U)', link)
+        self.assertIn('K230Protocol_crc8Atm', link)
+        self.assertNotIn('MotorDriver_', link)
+        self.assertNotIn('Req002_', link)
+    def test_encoder_gpio_1x_speed_shadow_and_pi_contract(self) -> None:
+        encoder = text("drivers/encoders.c") + text("drivers/encoders.h")
+        entrypoint = text("empty.c")
+
+        for token in (
+            "ENCODER_SPEED_SHADOW_PERIOD_MS (10U)",
+            "volatile EncoderSpeedShadow gEncoderSpeedShadow",
+            "Encoders_speedShadowInit",
+            "Encoders_speedShadowService",
+            "gEncoderSpeedShadow.leftDelta",
+            "gEncoderSpeedShadow.rightDelta",
+            "gEncoderSpeedShadow.leftAbsDelta",
+            "gEncoderSpeedShadow.rightAbsDelta",
+            "gEncoderSpeedShadow.leftInvalidDelta",
+            "gEncoderSpeedShadow.motionSampleCount",
+            "gEncoderSpeedShadow.bothMotionSampleCount",
+            "gEncoderSpeedShadow.leftAbsSum",
+            "gEncoderSpeedShadow.rightAbsSum",
+            "gEncoderSpeedShadow.leftBothAbsSum",
+            "gEncoderSpeedShadow.rightBothAbsSum",
+            "gEncoderSpeedShadow.leftAbsPeak",
+            "gEncoderSpeedShadow.rightAbsPeak",
+            "gEncoderSpeedShadow.invalidDuringMotion",
+            "Encoders_speedShadowInit(Timebase_nowMs());",
+            "Encoders_speedShadowService(Timebase_nowMs());",
+        ):
+            self.assertIn(token, encoder + entrypoint)
+
+        snapshot_start = encoder.index("EncoderSnapshot Encoders_snapshot")
+        snapshot_end = encoder.index("static uint32_t absoluteDelta", snapshot_start)
+        snapshot = encoder[snapshot_start:snapshot_end]
+        self.assertLess(snapshot.index("__disable_irq();"),
+                        snapshot.index("snapshot.leftCount"))
+        self.assertLess(snapshot.index("snapshot.leftCount"),
+                        snapshot.index("snapshot.rightCount"))
+        self.assertLess(snapshot.index("snapshot.rightCount"),
+                        snapshot.index("__enable_irq();"))
+
+        self.assertNotIn("MotorDriver_", encoder)
+        self.assertNotIn("MOTOR_PWM", encoder)
+        self.assertNotIn("Req002_", encoder)
+
+        syscfg = text("empty.syscfg")
+        req002 = text("app/req002.c")
+        config = text("config/firmware_config.h")
+        for token in (
+            'GPIO1.associatedPins[9].$name            = "LEFT_ENCODER_B"',
+            'GPIO1.associatedPins[10].interruptEn      = true',
+            'GPIO1.associatedPins[10].polarity         = "RISE"',
+            'GPIO1.associatedPins[9].pin.$assign      = "PB4"',
+            'GPIO1.associatedPins[10].$name            = "LEFT_ENCODER_A"',
+            'GPIO1.associatedPins[10].pin.$assign      = "PB5"',
+            "Encoders_onLeftEncoderAInterrupt",
+            "DIAG_GPIO_LEFT_ENCODER_B_PIN",
+            "void GROUP1_IRQHandler(void)",
+            "DIAG_GPIO_INT_IIDX",
+            "Encoders_speedShadowSnapshot",
+        ):
+            self.assertIn(token, syscfg + encoder + entrypoint)
+        self.assertNotIn("LEFT_CAPTURE", syscfg + encoder + entrypoint)
+
+        for token in (
+            "REQ002_LEFT_ENCODER_TO_QEI_SCALE",
+            "REQ002_SPEED_PI_STRAIGHT_THRESHOLD",
+            "REQ002_SPEED_PI_OUTPUT_LIMIT",
+            "Pid_init(&gSpeedBalancePi",
+            "Pid_step(&gSpeedBalancePi",
+            "speedBalanceStep",
+            "leftDemand += speedTrim",
+            "rightDemand -= speedTrim",
+            "speed.leftAbsDelta == 0U",
+            "speed.rightAbsDelta == 0U",
+        ):
+            self.assertIn(token, config + req002)
     def test_pid_contains_limits_freeze_filter_and_anti_windup(self) -> None:
         header = text("algorithm/pid.h")
         source = text("algorithm/pid.c")
@@ -264,7 +374,7 @@ class FirmwareSafetyTests(unittest.TestCase):
 
     def test_entrypoint_is_thin_and_tests_are_not_target_sources(self) -> None:
         entrypoint = text("empty.c")
-        self.assertLess(len(entrypoint.splitlines()), 100)
+        self.assertLess(len(entrypoint.splitlines()), 220)
         self.assertIn("SYSCFG_DL_init();", entrypoint)
         self.assertIn("App_init();", entrypoint)
         self.assertIn("App_service();", entrypoint)

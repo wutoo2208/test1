@@ -1,4 +1,4 @@
-#ifndef CONFIG_FIRMWARE_CONFIG_H_
+﻿#ifndef CONFIG_FIRMWARE_CONFIG_H_
 #define CONFIG_FIRMWARE_CONFIG_H_
 
 #define FW_VERSION                         "req002-safe-0.5"
@@ -84,5 +84,16 @@
 #define REQ002_MAX_PULSE_PERMILLE             (800U)
 #define REQ002_RIGHT_TURN_PULSE_PERMILLE      (350U)
 #define REQ002_LEFT_TURN_PULSE_PERMILLE       (150U)
+
+/* Initial straight-line wheel-speed PI candidate. The left GPIO path counts
+ * one A rising edge per encoder cycle; the right hardware QEI counts 4x. */
+#define REQ002_SPEED_PI_ENABLED                REQ002_ACTUATION_BUILD
+#define REQ002_LEFT_ENCODER_TO_QEI_SCALE       (4.0f)
+#define REQ002_SPEED_PI_STRAIGHT_THRESHOLD     (0.10f)
+#define REQ002_SPEED_PI_MIN_DEMAND_PERMILLE    (250U)
+#define REQ002_SPEED_PI_KP                     (1.0f)
+#define REQ002_SPEED_PI_KI                     (8.0f)
+#define REQ002_SPEED_PI_OUTPUT_LIMIT           (80.0f)
+#define REQ002_SPEED_PI_INTEGRAL_LIMIT         (10.0f)
 
 #endif /* CONFIG_FIRMWARE_CONFIG_H_ */

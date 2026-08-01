@@ -1,18 +1,18 @@
 ******************************************************************************
             TI ARM Clang Linker PC v5.1.1                      
 ******************************************************************************
->> Linked Sat Aug  1 11:11:47 2026
+>> Linked Sat Aug  1 16:05:51 2026
 
 OUTPUT FILE NAME:   <test1_motor_selftest.out>
-ENTRY POINT SYMBOL: "_c_int00_noargs"  address: 0000dd09
+ENTRY POINT SYMBOL: "_c_int00_noargs"  address: 0000e70d
 
 
 MEMORY CONFIGURATION
 
          name            origin    length      used     unused   attr    fill
 ----------------------  --------  ---------  --------  --------  ----  --------
-  FLASH                 00000000   00020000  0000ed68  00011298  R  X
-  SRAM                  20200000   00008000  0000099c  00007664  RW X
+  FLASH                 00000000   00020000  0000f878  00010788  R  X
+  SRAM                  20200000   00008000  00000b13  000074ed  RW X
   BCR_CONFIG            41c00000   000000ff  00000000  000000ff  R   
   BSL_CONFIG            41c00100   00000080  00000000  00000080  R   
 
@@ -21,14 +21,15 @@ SEGMENT ALLOCATION MAP
 
 run origin  load origin   length   init length attrs members
 ----------  ----------- ---------- ----------- ----- -------
-00000000    00000000    0000ed68   0000ed68    r-x
+00000000    00000000    0000eac8   0000eac8    r-x
   00000000    00000000    000000c0   000000c0    r-- .intvecs
-  000000c0    000000c0    0000dff0   0000dff0    r-x .text
-  0000e0b0    0000e0b0    00000c88   00000c88    r-- .rodata
-  0000ed38    0000ed38    00000030   00000030    r-- .cinit
-20200000    20200000    0000079c   00000000    rw-
-  20200000    20200000    0000079b   00000000    rw- .bss
-  2020079b    2020079b    00000001   00000000    rw- .data
+  000000c0    000000c0    0000ea08   0000ea08    r-x .text
+0000ead0    0000ead0    00000db0   00000db0    r--
+  0000ead0    0000ead0    00000d80   00000d80    r-- .rodata
+  0000f850    0000f850    00000030   00000030    r-- .cinit
+20200000    20200000    00000913   00000000    rw-
+  20200000    20200000    00000912   00000000    rw- .bss
+  20200912    20200912    00000001   00000000    rw- .data
 20207e00    20207e00    00000200   00000000    rw-
   20207e00    20207e00    00000200   00000000    rw- .stack
 
@@ -41,394 +42,424 @@ section   page    origin      length       input sections
 .intvecs   0    00000000    000000c0     
                   00000000    000000c0     startup_mspm0g350x_ticlang.o (.intvecs)
 
-.text      0    000000c0    0000dff0     
+.text      0    000000c0    0000ea08     
                   000000c0    00002194     diag_console.o (.text.DiagConsole_service)
                   00002254    0000207c     diag_console.o (.text.reportReq002)
                   000042d0    000016fc     diag_console.o (.text.reportRadioStatus)
                   000059cc    000014e4     diag_console.o (.text.reportLine)
                   00006eb0    00000bb8     diag_console.o (.text.reportMotorTest)
-                  00007a68    00000774     diag_console.o (.text.reportStatus)
-                  000081dc    00000698     req002.o (.text.Req002_service)
-                  00008874    000005cc     oled_ssd1306.o (.text.OledSsd1306_showReq002Status)
-                  00008e40    0000049c     nrf24_ptx.o (.text.Nrf24Ptx_service)
-                  000092dc    00000458     diag_console.o (.text.reportRadioRegisters)
-                  00009734    00000444     oled_ssd1306.o (.text.OledSsd1306_showTestPattern)
-                  00009b78    00000400     diag_console.o (.text.reportI2c)
-                  00009f78    00000304     diag_console.o (.text.runSelfTest)
-                  0000a27c    000002e4     line_tracking.o (.text.LineTracking_service)
-                  0000a560    000002bc     line_sensors.o (.text.readRegisterBlock)
-                  0000a81c    000002ac     oled_ssd1306.o (.text.OledSsd1306_forceAllPixelsOnSh1106)
-                  0000aac8    000002a4     oled_ssd1306.o (.text.OledSsd1306_forceAllPixelsOn)
-                  0000ad6c    0000023c     line_sensors.o (.text.LineSensors_service)
-                  0000afa8    00000208     diag_console.o (.text.forceOledAllOn)
-                  0000b1b0    000001a2     pid.o (.text.Pid_step)
-                  0000b352    00000002     startup_mspm0g350x_ticlang.o (.text.Default_Handler)
-                  0000b354    0000019c     diag_console.o (.text.DiagConsole_reportBoot)
-                  0000b4f0    00000184     nrf24_ptx.o (.text.transaction)
-                  0000b674    0000016c     diag_console.o (.text.writeI32)
-                  0000b7e0    00000154     diag_console.o (.text.writeU32)
-                  0000b934    00000148     diag_console.o (.text.clearOled)
-                  0000ba7c    00000140     motor_driver.o (.text.MotorDriver_driveVehicleForward)
-                  0000bbbc    0000012c     i2c_diag.o (.text.I2cDiag_scan)
-                  0000bce8    0000011c     nrf24_ptx.o (.text.Nrf24Ptx_captureDiagnosticChar)
-                  0000be04    0000011c     diag_console.o (.text.forceOledAllOnSh1106)
-                  0000bf20    0000011c     diag_console.o (.text.runOledTest)
-                  0000c03c    00000116     oled_ssd1306.o (.text.writePageData)
-                  0000c152    00000002     libclang_rt.builtins.a : aeabi_div0.c.obj (.text.__aeabi_idiv0)
-                  0000c154    00000104     driverlib.a : dl_timer.o (.text.DL_Timer_initFourCCPWMMode)
-                  0000c258    000000ec     app.o (.text.App_service)
-                  0000c344    000000ec     nrf24_ptx.o (.text.command)
-                  0000c430    000000dc     ti_msp_dl_config.o (.text.SYSCFG_DL_GPIO_init)
-                  0000c50c    000000d8     libclang_rt.builtins.a : addsf3.S.obj (.text)
-                  0000c5e4    000000c8     motor_driver.o (.text.MotorDriver_setVehicleForwardDuties)
-                  0000c6ac    000000b8     oled_ssd1306.o (.text.writeSmall)
-                  0000c764    000000b0     ti_msp_dl_config.o (.text.SYSCFG_DL_LEFT_CAPTURE_init)
-                  0000c814    0000009a     libc.a : memcpy16.S.obj (.text:memcpy)
-                  0000c8ae    00000002     --HOLE-- [fill = 0]
-                  0000c8b0    00000094     oled_ssd1306.o (.text.OledSsd1306_clear)
-                  0000c944    00000094     ti_msp_dl_config.o (.text.SYSCFG_DL_MOTOR_PWM_init)
-                  0000c9d8    00000090     encoders.o (.text.Encoders_init)
-                  0000ca68    0000008c     ti_msp_dl_config.o (.text.SYSCFG_DL_DIAG_UART_init)
-                  0000caf4    0000008c     libclang_rt.builtins.a : comparesf2.S.obj (.text)
-                  0000cb80    0000008c                            : mulsf3.S.obj (.text)
-                  0000cc0c    00000084     encoders.o (.text.Encoders_onLeftCaptureInterrupt)
-                  0000cc90    00000084     nrf24_ptx.o (.text.Nrf24Ptx_init)
-                  0000cd14    00000082     libclang_rt.builtins.a : divsf3.S.obj (.text)
-                  0000cd96    00000002     --HOLE-- [fill = 0]
-                  0000cd98    0000007c     ti_msp_dl_config.o (.text.SYSCFG_DL_initPower)
-                  0000ce14    0000007c     libc.a : copy_decompress_lzss.c.obj (.text:decompress:lzss)
-                  0000ce90    00000078     diag_console.o (.text.writeText)
-                  0000cf08    00000070     board_safety.o (.text.BoardSafety_service)
-                  0000cf78    00000070     motor_test.o (.text.MotorTest_start)
-                  0000cfe8    00000064     nrf24_ptx.o (.text.writeRegistersAndVerify)
-                  0000d04c    00000062     libc.a : memset16.S.obj (.text:memset)
-                  0000d0ae    00000002     --HOLE-- [fill = 0]
-                  0000d0b0    00000060     app.o (.text.App_init)
-                  0000d110    00000060     req002.o (.text.Req002_init)
-                  0000d170    0000005e     driverlib.a : dl_i2c.o (.text.DL_I2C_fillControllerTXFIFO)
-                  0000d1ce    00000002     --HOLE-- [fill = 0]
-                  0000d1d0    0000005c     diag_console.o (.text.DiagConsole_onUartInterrupt)
-                  0000d22c    0000005c     encoders.o (.text.Encoders_snapshot)
-                  0000d288    0000005c     ti_msp_dl_config.o (.text.SYSCFG_DL_RIGHT_QEI_init)
-                  0000d2e4    0000005a     libclang_rt.builtins.a : aeabi_fcmp.S.obj (.text)
-                  0000d33e    00000002     --HOLE-- [fill = 0]
-                  0000d340    00000058     motor_driver.o (.text.MotorDriver_init)
-                  0000d398    00000058     motor_driver.o (.text.MotorDriver_outputsStopped)
-                  0000d3f0    00000054     board_safety.o (.text.BoardSafety_stop)
-                  0000d444    00000054     driverlib.a : dl_spi.o (.text.DL_SPI_drainRXFIFO8)
-                  0000d498    00000054     nrf24_ptx.o (.text.Nrf24Ptx_getStatus)
-                  0000d4ec    00000054     nrf24_ptx.o (.text.Nrf24Ptx_readCoreRegisters)
-                  0000d540    00000054     req002.o (.text.Req002_abort)
-                  0000d594    00000054     ti_msp_dl_config.o (.text.SYSCFG_DL_LINE_I2C_init)
-                  0000d5e8    00000054     ti_msp_dl_config.o (.text.SYSCFG_DL_OLED_I2C_init)
-                  0000d63c    00000054     ti_msp_dl_config.o (.text.SYSCFG_DL_init)
-                  0000d690    00000050     board_safety.o (.text.BoardSafety_init)
-                  0000d6e0    00000050     nrf24_ptx.o (.text.Nrf24Ptx_arm)
-                  0000d730    0000004c     ti_msp_dl_config.o (.text.SYSCFG_DL_RADIO_SPI_init)
-                  0000d77c    0000004c     start_button.o (.text.StartButton_poll)
-                  0000d7c8    00000048     driverlib.a : dl_uart.o (.text.DL_UART_init)
-                  0000d810    00000048     diag_console.o (.text.DiagConsole_init)
-                  0000d858    00000048     line_tracking.o (.text.LineTracking_init)
-                  0000d8a0    00000048     nrf24_ptx.o (.text.writeAndVerify)
-                  0000d8e8    00000044     driverlib.a : dl_spi.o (.text.DL_SPI_init)
-                  0000d92c    00000044     req002.o (.text.completeRun)
-                  0000d970    00000040     motor_driver.o (.text.MotorDriver_stopAll)
-                  0000d9b0    00000040     motor_test.o (.text.MotorTest_service)
-                  0000d9f0    00000040     libclang_rt.builtins.a : aeabi_uidivmod.S.obj (.text)
-                  0000da30    0000003c     driverlib.a : dl_i2c.o (.text.DL_I2C_flushControllerTXFIFO)
-                  0000da6c    0000003c     nrf24_ptx.o (.text.Nrf24Ptx_disarm)
-                  0000daa8    0000003c     libc.a : autoinit.c.obj (.text:__TI_auto_init_nobinit_nopinit)
-                  0000dae4    0000003a     libclang_rt.builtins.a : muldsi3.S.obj (.text)
-                  0000db1e    00000002     --HOLE-- [fill = 0]
-                  0000db20    00000038     diag_console.o (.text.newLine)
-                  0000db58    00000038     libclang_rt.builtins.a : fixsfsi.S.obj (.text)
-                  0000db90    00000034     board_safety.o (.text.BoardSafety_outputsSafe)
-                  0000dbc4    00000030     driverlib.a : dl_i2c.o (.text.DL_I2C_flushControllerRXFIFO)
-                  0000dbf4    00000030                 : dl_uart.o (.text.DL_UART_transmitDataBlocking)
-                  0000dc24    00000030     motor_test.o (.text.MotorTest_onTimebaseTick)
-                  0000dc54    00000030     ti_msp_dl_config.o (.text.SYSCFG_DL_SYSCTL_init)
-                  0000dc84    00000030     timebase.o (.text.Timebase_init)
-                  0000dcb4    0000002c     nrf24_ptx.o (.text.Nrf24Ptx_safeWhenDisarmed)
-                  0000dce0    00000028     driverlib.a : dl_timer.o (.text.DL_Timer_setCaptureCompareCtl)
-                  0000dd08    00000028     libc.a : boot_cortex_m.c.obj (.text:_c_int00_noargs)
-                  0000dd30    00000028     libclang_rt.builtins.a : floatunsisf.S.obj (.text)
-                  0000dd58    00000026     driverlib.a : dl_i2c.o (.text.DL_I2C_setClockConfig)
-                  0000dd7e    00000002     --HOLE-- [fill = 0]
-                  0000dd80    00000020     motor_test.o (.text.MotorTest_abort)
-                  0000dda0    00000020     motor_test.o (.text.MotorTest_init)
-                  0000ddc0    00000020     start_button.o (.text.StartButton_init)
-                  0000dde0    00000020     libc.a : memcmp.c.obj (.text.memcmp)
-                  0000de00    0000001c     driverlib.a : dl_spi.o (.text.DL_SPI_receiveDataCheck8)
-                  0000de1c    0000001c                 : dl_spi.o (.text.DL_SPI_transmitDataCheck8)
-                  0000de38    0000001c                 : dl_timer.o (.text.DL_Timer_setCaptCompUpdateMethod)
-                  0000de54    0000001c                 : dl_timer.o (.text.DL_Timer_setClockConfig)
-                  0000de70    0000001c     line_sensors.o (.text.LineSensors_init)
-                  0000de8c    0000001c     motor_test.o (.text.MotorTest_snapshot)
-                  0000dea8    0000001c     pid.o (.text.Pid_init)
-                  0000dec4    0000001a     driverlib.a : dl_timer.o (.text.DL_Timer_setCaptureCompareInput)
-                  0000dede    00000002     --HOLE-- [fill = 0]
-                  0000dee0    0000001a     libclang_rt.builtins.a : aeabi_memset.S.obj (.text)
-                  0000defa    00000002     --HOLE-- [fill = 0]
-                  0000defc    00000018     driverlib.a : dl_timer.o (.text.DL_Timer_setCaptureCompareOutCtl)
-                  0000df14    00000018     line_sensors.o (.text.LineSensors_snapshot)
-                  0000df2c    00000018     motor_test.o (.text.MotorTest_stateName)
-                  0000df44    00000018     req002.o (.text.Req002_blockReasonName)
-                  0000df5c    00000018     req002.o (.text.Req002_stateName)
-                  0000df74    00000016     empty.o (.text.main)
-                  0000df8a    00000002     --HOLE-- [fill = 0]
-                  0000df8c    00000014     start_button.o (.text.StartButton_readHardwarePressed)
-                  0000dfa0    00000012     driverlib.a : dl_spi.o (.text.DL_SPI_setClockConfig)
-                  0000dfb2    00000012                 : dl_uart.o (.text.DL_UART_setClockConfig)
-                  0000dfc4    00000012     libc.a : copy_decompress_none.c.obj (.text:decompress:none)
-                  0000dfd6    00000002     --HOLE-- [fill = 0]
-                  0000dfd8    00000010     driverlib.a : dl_timer.o (.text.DL_Timer_getCaptureCompareValue)
-                  0000dfe8    00000010                 : dl_timer.o (.text.DL_Timer_setCaptureCompareValue)
-                  0000dff8    00000010     pid.o (.text.Pid_reset)
-                  0000e008    00000010     empty.o (.text.SysTick_Handler)
-                  0000e018    00000010     timebase.o (.text.Timebase_onSysTick)
-                  0000e028    00000010     libc.a : copy_zero_init.c.obj (.text:decompress:ZI)
-                  0000e038    0000000c     board_safety.o (.text.BoardSafety_faultLatched)
-                  0000e044    0000000c     timebase.o (.text.Timebase_nowMs)
-                  0000e050    0000000a     driverlib.a : dl_common.o (.text.DL_Common_delayCycles)
-                  0000e05a    0000000a     start_button.o (.text.StartButton_takePress)
-                  0000e064    00000008     board_safety.o (.text.BoardSafety_buzzerPolicy)
-                  0000e06c    00000008     line_tracking.o (.text.LineTracking_getStatus)
-                  0000e074    00000008     req002.o (.text.Req002_getStatus)
-                  0000e07c    00000008     empty.o (.text.TIMA1_IRQHandler)
-                  0000e084    00000008     timebase.o (.text.Timebase_reached)
-                  0000e08c    00000008     empty.o (.text.UART0_IRQHandler)
-                  0000e094    00000008     libclang_rt.builtins.a : aeabi_memcpy.S.obj (.text)
-                  0000e09c    00000006     libc.a : exit.c.obj (.text:abort)
-                  0000e0a2    00000004     libsysbm.a : hostexit.c.obj (.text.HOSTexit)
-                  0000e0a6    00000004     startup_mspm0g350x_ticlang.o (.text.Reset_Handler)
-                  0000e0aa    00000004     libc.a : pre_init.c.obj (.text._system_pre_init)
-                  0000e0ae    00000002     --HOLE-- [fill = 0]
+                  00007a68    00000834     req002.o (.text.Req002_service)
+                  0000829c    00000774     diag_console.o (.text.reportStatus)
+                  00008a10    000005cc     oled_ssd1306.o (.text.OledSsd1306_showReq002Status)
+                  00008fdc    0000049c     nrf24_ptx.o (.text.Nrf24Ptx_service)
+                  00009478    00000458     diag_console.o (.text.reportRadioRegisters)
+                  000098d0    00000444     oled_ssd1306.o (.text.OledSsd1306_showTestPattern)
+                  00009d14    00000400     diag_console.o (.text.reportI2c)
+                  0000a114    00000340     k230_link.o (.text.K230Link_service)
+                  0000a454    00000304     diag_console.o (.text.runSelfTest)
+                  0000a758    000002e4     line_tracking.o (.text.LineTracking_service)
+                  0000aa3c    000002bc     line_sensors.o (.text.readRegisterBlock)
+                  0000acf8    000002ac     oled_ssd1306.o (.text.OledSsd1306_forceAllPixelsOnSh1106)
+                  0000afa4    000002a4     oled_ssd1306.o (.text.OledSsd1306_forceAllPixelsOn)
+                  0000b248    0000023c     line_sensors.o (.text.LineSensors_service)
+                  0000b484    00000208     diag_console.o (.text.forceOledAllOn)
+                  0000b68c    000001a2     pid.o (.text.Pid_step)
+                  0000b82e    00000002     startup_mspm0g350x_ticlang.o (.text.Default_Handler)
+                  0000b830    0000019c     diag_console.o (.text.DiagConsole_reportBoot)
+                  0000b9cc    00000184     nrf24_ptx.o (.text.transaction)
+                  0000bb50    0000016c     diag_console.o (.text.writeI32)
+                  0000bcbc    00000168     encoders.o (.text.Encoders_speedShadowService)
+                  0000be24    00000154     diag_console.o (.text.writeU32)
+                  0000bf78    00000148     diag_console.o (.text.clearOled)
+                  0000c0c0    00000140     motor_driver.o (.text.MotorDriver_driveVehicleForward)
+                  0000c200    0000012c     i2c_diag.o (.text.I2cDiag_scan)
+                  0000c32c    0000011c     nrf24_ptx.o (.text.Nrf24Ptx_captureDiagnosticChar)
+                  0000c448    0000011c     diag_console.o (.text.forceOledAllOnSh1106)
+                  0000c564    0000011c     diag_console.o (.text.runOledTest)
+                  0000c680    00000116     oled_ssd1306.o (.text.writePageData)
+                  0000c796    00000002     libclang_rt.builtins.a : aeabi_div0.c.obj (.text.__aeabi_idiv0)
+                  0000c798    00000108     ti_msp_dl_config.o (.text.SYSCFG_DL_GPIO_init)
+                  0000c8a0    00000104     driverlib.a : dl_timer.o (.text.DL_Timer_initFourCCPWMMode)
+                  0000c9a4    00000104     empty.o (.text.main)
+                  0000caa8    000000ec     app.o (.text.App_service)
+                  0000cb94    000000ec     nrf24_ptx.o (.text.command)
+                  0000cc80    000000dc     req002.o (.text.Req002_init)
+                  0000cd5c    000000d8     libclang_rt.builtins.a : addsf3.S.obj (.text)
+                  0000ce34    000000c8     motor_driver.o (.text.MotorDriver_setVehicleForwardDuties)
+                  0000cefc    000000c0     encoders.o (.text.Encoders_speedShadowInit)
+                  0000cfbc    000000b8     oled_ssd1306.o (.text.writeSmall)
+                  0000d074    0000009a     libc.a : memcpy16.S.obj (.text:memcpy)
+                  0000d10e    00000002     --HOLE-- [fill = 0]
+                  0000d110    00000094     oled_ssd1306.o (.text.OledSsd1306_clear)
+                  0000d1a4    00000094     ti_msp_dl_config.o (.text.SYSCFG_DL_MOTOR_PWM_init)
+                  0000d238    00000090     k230_link.o (.text.K230Link_init)
+                  0000d2c8    0000008c     ti_msp_dl_config.o (.text.SYSCFG_DL_DIAG_UART_init)
+                  0000d354    0000008c     ti_msp_dl_config.o (.text.SYSCFG_DL_K230_UART_init)
+                  0000d3e0    0000008c     libclang_rt.builtins.a : comparesf2.S.obj (.text)
+                  0000d46c    0000008c                            : mulsf3.S.obj (.text)
+                  0000d4f8    00000084     nrf24_ptx.o (.text.Nrf24Ptx_init)
+                  0000d57c    00000082     libclang_rt.builtins.a : divsf3.S.obj (.text)
+                  0000d5fe    00000002     --HOLE-- [fill = 0]
+                  0000d600    0000007c     k230_link.o (.text.K230Link_snapshot)
+                  0000d67c    0000007c     req002.o (.text.Req002_abort)
+                  0000d6f8    0000007c     ti_msp_dl_config.o (.text.SYSCFG_DL_initPower)
+                  0000d774    0000007c     libc.a : copy_decompress_lzss.c.obj (.text:decompress:lzss)
+                  0000d7f0    00000078     diag_console.o (.text.writeText)
+                  0000d868    00000070     board_safety.o (.text.BoardSafety_service)
+                  0000d8d8    00000070     motor_test.o (.text.MotorTest_start)
+                  0000d948    0000006c     req002.o (.text.completeRun)
+                  0000d9b4    00000064     encoders.o (.text.Encoders_init)
+                  0000da18    00000064     nrf24_ptx.o (.text.writeRegistersAndVerify)
+                  0000da7c    00000062     libc.a : memset16.S.obj (.text:memset)
+                  0000dade    00000002     --HOLE-- [fill = 0]
+                  0000dae0    00000060     app.o (.text.App_init)
+                  0000db40    0000005e     driverlib.a : dl_i2c.o (.text.DL_I2C_fillControllerTXFIFO)
+                  0000db9e    00000002     --HOLE-- [fill = 0]
+                  0000dba0    0000005c     diag_console.o (.text.DiagConsole_onUartInterrupt)
+                  0000dbfc    0000005c     encoders.o (.text.Encoders_snapshot)
+                  0000dc58    0000005c     ti_msp_dl_config.o (.text.SYSCFG_DL_RIGHT_QEI_init)
+                  0000dcb4    0000005a     libclang_rt.builtins.a : aeabi_fcmp.S.obj (.text)
+                  0000dd0e    00000002     --HOLE-- [fill = 0]
+                  0000dd10    00000058     motor_driver.o (.text.MotorDriver_init)
+                  0000dd68    00000058     motor_driver.o (.text.MotorDriver_outputsStopped)
+                  0000ddc0    00000054     board_safety.o (.text.BoardSafety_stop)
+                  0000de14    00000054     driverlib.a : dl_spi.o (.text.DL_SPI_drainRXFIFO8)
+                  0000de68    00000054     nrf24_ptx.o (.text.Nrf24Ptx_getStatus)
+                  0000debc    00000054     nrf24_ptx.o (.text.Nrf24Ptx_readCoreRegisters)
+                  0000df10    00000054     ti_msp_dl_config.o (.text.SYSCFG_DL_LINE_I2C_init)
+                  0000df64    00000054     ti_msp_dl_config.o (.text.SYSCFG_DL_OLED_I2C_init)
+                  0000dfb8    00000050     board_safety.o (.text.BoardSafety_init)
+                  0000e008    00000050     nrf24_ptx.o (.text.Nrf24Ptx_arm)
+                  0000e058    0000004c     ti_msp_dl_config.o (.text.SYSCFG_DL_RADIO_SPI_init)
+                  0000e0a4    0000004c     ti_msp_dl_config.o (.text.SYSCFG_DL_init)
+                  0000e0f0    0000004c     start_button.o (.text.StartButton_poll)
+                  0000e13c    00000048     driverlib.a : dl_uart.o (.text.DL_UART_init)
+                  0000e184    00000048     diag_console.o (.text.DiagConsole_init)
+                  0000e1cc    00000048     k230_link.o (.text.K230Link_pushRxByteFromIsr)
+                  0000e214    00000048     line_tracking.o (.text.LineTracking_init)
+                  0000e25c    00000048     nrf24_ptx.o (.text.writeAndVerify)
+                  0000e2a4    00000044     driverlib.a : dl_spi.o (.text.DL_SPI_init)
+                  0000e2e8    00000044     empty.o (.text.UART1_IRQHandler)
+                  0000e32c    00000040     motor_driver.o (.text.MotorDriver_stopAll)
+                  0000e36c    00000040     motor_test.o (.text.MotorTest_service)
+                  0000e3ac    00000040     libclang_rt.builtins.a : aeabi_uidivmod.S.obj (.text)
+                  0000e3ec    0000003c     driverlib.a : dl_i2c.o (.text.DL_I2C_flushControllerTXFIFO)
+                  0000e428    0000003c     encoders.o (.text.Encoders_onLeftEncoderAInterrupt)
+                  0000e464    0000003c     nrf24_ptx.o (.text.Nrf24Ptx_disarm)
+                  0000e4a0    0000003c     libc.a : autoinit.c.obj (.text:__TI_auto_init_nobinit_nopinit)
+                  0000e4dc    0000003a     libclang_rt.builtins.a : muldsi3.S.obj (.text)
+                  0000e516    00000002     --HOLE-- [fill = 0]
+                  0000e518    00000038     diag_console.o (.text.newLine)
+                  0000e550    00000038     libclang_rt.builtins.a : fixsfsi.S.obj (.text)
+                  0000e588    00000034     board_safety.o (.text.BoardSafety_outputsSafe)
+                  0000e5bc    00000034     k230_link.o (.text.K230Link_getStats)
+                  0000e5f0    00000030     driverlib.a : dl_i2c.o (.text.DL_I2C_flushControllerRXFIFO)
+                  0000e620    00000030                 : dl_uart.o (.text.DL_UART_transmitDataBlocking)
+                  0000e650    00000030     motor_test.o (.text.MotorTest_onTimebaseTick)
+                  0000e680    00000030     ti_msp_dl_config.o (.text.SYSCFG_DL_SYSCTL_init)
+                  0000e6b0    00000030     timebase.o (.text.Timebase_init)
+                  0000e6e0    0000002c     nrf24_ptx.o (.text.Nrf24Ptx_safeWhenDisarmed)
+                  0000e70c    00000028     libc.a : boot_cortex_m.c.obj (.text:_c_int00_noargs)
+                  0000e734    00000028     libclang_rt.builtins.a : floatunsisf.S.obj (.text)
+                  0000e75c    00000026     driverlib.a : dl_i2c.o (.text.DL_I2C_setClockConfig)
+                  0000e782    00000002     --HOLE-- [fill = 0]
+                  0000e784    00000024     empty.o (.text.GROUP1_IRQHandler)
+                  0000e7a8    00000020     motor_test.o (.text.MotorTest_abort)
+                  0000e7c8    00000020     motor_test.o (.text.MotorTest_init)
+                  0000e7e8    00000020     start_button.o (.text.StartButton_init)
+                  0000e808    00000020     libc.a : memcmp.c.obj (.text.memcmp)
+                  0000e828    0000001c     driverlib.a : dl_spi.o (.text.DL_SPI_receiveDataCheck8)
+                  0000e844    0000001c                 : dl_spi.o (.text.DL_SPI_transmitDataCheck8)
+                  0000e860    0000001c                 : dl_timer.o (.text.DL_Timer_setCaptCompUpdateMethod)
+                  0000e87c    0000001c                 : dl_timer.o (.text.DL_Timer_setClockConfig)
+                  0000e898    0000001c     line_sensors.o (.text.LineSensors_init)
+                  0000e8b4    0000001c     motor_test.o (.text.MotorTest_snapshot)
+                  0000e8d0    0000001c     pid.o (.text.Pid_init)
+                  0000e8ec    0000001a     libclang_rt.builtins.a : aeabi_memset.S.obj (.text)
+                  0000e906    00000002     --HOLE-- [fill = 0]
+                  0000e908    00000018     driverlib.a : dl_timer.o (.text.DL_Timer_setCaptureCompareOutCtl)
+                  0000e920    00000018     k230_link.o (.text.K230Link_pendingBytes)
+                  0000e938    00000018     line_sensors.o (.text.LineSensors_snapshot)
+                  0000e950    00000018     motor_test.o (.text.MotorTest_stateName)
+                  0000e968    00000018     req002.o (.text.Req002_blockReasonName)
+                  0000e980    00000018     req002.o (.text.Req002_stateName)
+                  0000e998    00000014     encoders.o (.text.Encoders_speedShadowSnapshot)
+                  0000e9ac    00000014     start_button.o (.text.StartButton_readHardwarePressed)
+                  0000e9c0    00000012     driverlib.a : dl_spi.o (.text.DL_SPI_setClockConfig)
+                  0000e9d2    00000012                 : dl_uart.o (.text.DL_UART_setClockConfig)
+                  0000e9e4    00000012     libc.a : copy_decompress_none.c.obj (.text:decompress:none)
+                  0000e9f6    00000002     --HOLE-- [fill = 0]
+                  0000e9f8    00000010     driverlib.a : dl_timer.o (.text.DL_Timer_getCaptureCompareValue)
+                  0000ea08    00000010                 : dl_timer.o (.text.DL_Timer_setCaptureCompareValue)
+                  0000ea18    00000010     pid.o (.text.Pid_reset)
+                  0000ea28    00000010     empty.o (.text.SysTick_Handler)
+                  0000ea38    00000010     timebase.o (.text.Timebase_onSysTick)
+                  0000ea48    00000010     libc.a : copy_zero_init.c.obj (.text:decompress:ZI)
+                  0000ea58    0000000c     board_safety.o (.text.BoardSafety_faultLatched)
+                  0000ea64    0000000c     timebase.o (.text.Timebase_nowMs)
+                  0000ea70    0000000a     driverlib.a : dl_common.o (.text.DL_Common_delayCycles)
+                  0000ea7a    0000000a     start_button.o (.text.StartButton_takePress)
+                  0000ea84    00000008     board_safety.o (.text.BoardSafety_buzzerPolicy)
+                  0000ea8c    00000008     line_tracking.o (.text.LineTracking_getStatus)
+                  0000ea94    00000008     req002.o (.text.Req002_getStatus)
+                  0000ea9c    00000008     timebase.o (.text.Timebase_reached)
+                  0000eaa4    00000008     empty.o (.text.UART0_IRQHandler)
+                  0000eaac    00000008     libclang_rt.builtins.a : aeabi_memcpy.S.obj (.text)
+                  0000eab4    00000006     libc.a : exit.c.obj (.text:abort)
+                  0000eaba    00000004     libsysbm.a : hostexit.c.obj (.text.HOSTexit)
+                  0000eabe    00000004     startup_mspm0g350x_ticlang.o (.text.Reset_Handler)
+                  0000eac2    00000004     libc.a : pre_init.c.obj (.text._system_pre_init)
+                  0000eac6    00000002     --HOLE-- [fill = 0]
 
-.cinit     0    0000ed38    00000030     
-                  0000ed38    0000000c     (__TI_handler_table)
-                  0000ed44    00000008     (.cinit..bss.load) [load image, compression = zero_init]
-                  0000ed4c    00000005     (.cinit..data.load) [load image, compression = lzss]
-                  0000ed51    00000003     --HOLE-- [fill = 0]
-                  0000ed54    00000010     (__TI_cinit_table)
-                  0000ed64    00000004     --HOLE-- [fill = 0]
+.cinit     0    0000f850    00000030     
+                  0000f850    0000000c     (__TI_handler_table)
+                  0000f85c    00000008     (.cinit..bss.load) [load image, compression = zero_init]
+                  0000f864    00000005     (.cinit..data.load) [load image, compression = lzss]
+                  0000f869    00000003     --HOLE-- [fill = 0]
+                  0000f86c    00000010     (__TI_cinit_table)
+                  0000f87c    00000004     --HOLE-- [fill = 0]
 
-.rodata    0    0000e0b0    00000c88     
-                  0000e0b0    00000105     diag_console.o (.rodata.str1.14153271371939189678.1)
-                  0000e1b5    00000082     oled_ssd1306.o (.rodata.gLetters)
-                  0000e237    00000063     diag_console.o (.rodata.str1.7732308573000650393.1)
-                  0000e29a    00000048     diag_console.o (.rodata.str1.5644620926150322957.1)
-                  0000e2e2    00000044     diag_console.o (.rodata.str1.8805550004262250290.1)
-                  0000e326    0000003e     diag_console.o (.rodata.str1.2437401455240083982.1)
-                  0000e364    0000003d     diag_console.o (.rodata.str1.10020677278003191597.1)
-                  0000e3a1    0000003d     diag_console.o (.rodata.str1.9757831788182070933.1)
-                  0000e3de    0000003b     diag_console.o (.rodata.str1.5824879526590977974.1)
-                  0000e419    00000038     diag_console.o (.rodata.str1.15435677839657748720.1)
-                  0000e451    00000036     diag_console.o (.rodata.str1.16565755701334802317.1)
-                  0000e487    00000035     diag_console.o (.rodata.str1.9768974661061496881.1)
-                  0000e4bc    00000034     diag_console.o (.rodata.str1.1098690429273333905.1)
-                  0000e4f0    00000032     oled_ssd1306.o (.rodata.gDigits)
-                  0000e522    00000032     board_safety.o (.rodata.str1.1461871966798876460.1)
-                  0000e554    00000031     diag_console.o (.rodata.str1.7985117199416049152.1)
-                  0000e585    0000002f     diag_console.o (.rodata.str1.16351352736247536359.1)
-                  0000e5b4    0000002f     diag_console.o (.rodata.str1.17340833469015162294.1)
-                  0000e5e3    0000002b     diag_console.o (.rodata.str1.12544225967345112596.1)
-                  0000e60e    00000028     diag_console.o (.rodata.str1.8496639322861540170.1)
-                  0000e636    00000026     diag_console.o (.rodata.str1.13160629704296733059.1)
-                  0000e65c    00000026     diag_console.o (.rodata.str1.5503653601839616668.1)
-                  0000e682    00000002     ti_msp_dl_config.o (.rodata.gDIAG_UARTClockConfig)
-                  0000e684    00000024     req002.o (.rodata..Lswitch.table.Req002_blockReasonName)
-                  0000e6a8    00000024     req002.o (.rodata..Lswitch.table.Req002_stateName)
-                  0000e6cc    00000023     diag_console.o (.rodata.str1.13023684794075449413.1)
-                  0000e6ef    00000023     diag_console.o (.rodata.str1.6066754825680800963.1)
-                  0000e712    00000022     diag_console.o (.rodata.str1.5303670245239573129.1)
-                  0000e734    00000020     line_tracking.o (.rodata.cst32)
-                  0000e754    0000001f     diag_console.o (.rodata.str1.5976961520280002565.1)
-                  0000e773    0000001c     req002.o (.rodata.str1.13275248019535299154.1)
-                  0000e78f    0000001a     diag_console.o (.rodata.str1.1008767523004470630.1)
-                  0000e7a9    0000001a     diag_console.o (.rodata.str1.2111541797422310849.1)
-                  0000e7c3    0000001a     req002.o (.rodata.str1.9392822210274423405.1)
-                  0000e7dd    00000019     diag_console.o (.rodata.str1.18237275900639492659.1)
-                  0000e7f6    00000002     ti_msp_dl_config.o (.rodata.gLINE_I2CClockConfig)
-                  0000e7f8    00000019     nrf24_ptx.o (.rodata.str1.6094559527043233380.4)
-                  0000e811    00000019     diag_console.o (.rodata.str1.810607564276269461.1)
-                  0000e82a    00000002     ti_msp_dl_config.o (.rodata.gOLED_I2CClockConfig)
-                  0000e82c    00000018     nrf24_ptx.o (.rodata..Lswitch.table.Nrf24Ptx_getStatus)
-                  0000e844    00000018     oled_ssd1306.o (.rodata.initializeAt.commands)
-                  0000e85c    00000018     diag_console.o (.rodata.str1.8406304233448172400.1)
-                  0000e874    00000017     req002.o (.rodata.str1.10230131912623405435.1)
-                  0000e88b    00000017     diag_console.o (.rodata.str1.3430916125074368270.1)
-                  0000e8a2    00000016     diag_console.o (.rodata.str1.10354475084875452907.1)
-                  0000e8b8    00000016     diag_console.o (.rodata.str1.13280886091191530476.1)
-                  0000e8ce    00000016     diag_console.o (.rodata.str1.5084688477215926447.1)
-                  0000e8e4    00000015     req002.o (.rodata.str1.9213031953659428922.1)
-                  0000e8f9    00000003     ti_msp_dl_config.o (.rodata.gLEFT_CAPTUREClockConfig)
-                  0000e8fc    00000014     motor_test.o (.rodata..Lswitch.table.MotorTest_stateName)
-                  0000e910    00000014     req002.o (.rodata.str1.1536853367382378965.1)
-                  0000e924    00000014     req002.o (.rodata.str1.7316036974658646067.1)
-                  0000e938    00000014     diag_console.o (.rodata.str1.7838710351760113446.1)
-                  0000e94c    00000014     req002.o (.rodata.str1.9277730485512377852.1)
-                  0000e960    00000013     diag_console.o (.rodata.str1.9050062146647658507.1)
-                  0000e973    00000011     req002.o (.rodata.str1.11801953346847374107.1)
-                  0000e984    00000011     diag_console.o (.rodata.str1.17217747830118470281.1)
-                  0000e995    00000011     diag_console.o (.rodata.str1.17570078357027493973.1)
-                  0000e9a6    00000011     req002.o (.rodata.str1.246851255980436067.1)
-                  0000e9b7    00000011     diag_console.o (.rodata.str1.9305979691969886280.1)
-                  0000e9c8    00000010     oled_ssd1306.o (.rodata.OledSsd1306_showReq002Status.stateText)
-                  0000e9d8    00000010     encoders.o (.rodata.cst16)
-                  0000e9e8    00000010     diag_console.o (.rodata.str1.11858721499567804342.1)
-                  0000e9f8    00000010     diag_console.o (.rodata.str1.15804963083468125269.1)
-                  0000ea08    00000010     nrf24_ptx.o (.rodata.str1.17419335730769077557.1)
-                  0000ea18    00000010     diag_console.o (.rodata.str1.8341931057821991107.1)
-                  0000ea28    00000010     diag_console.o (.rodata.str1.9009639935792097996.1)
-                  0000ea38    0000000f     diag_console.o (.rodata.str1.15191501805510545095.1)
-                  0000ea47    0000000f     diag_console.o (.rodata.str1.719103272933316442.1)
-                  0000ea56    0000000e     nrf24_ptx.o (.rodata.gProfile)
-                  0000ea64    0000000e     req002.o (.rodata.str1.11012809159570234960.1)
-                  0000ea72    0000000e     diag_console.o (.rodata.str1.17463021491389519269.1)
-                  0000ea80    0000000e     diag_console.o (.rodata.str1.1837592952361879117.1)
-                  0000ea8e    0000000d     diag_console.o (.rodata.str1.10547048922053563066.1)
-                  0000ea9b    0000000d     diag_console.o (.rodata.str1.11767802008270839024.1)
-                  0000eaa8    0000000d     diag_console.o (.rodata.str1.15307067426115469236.1)
-                  0000eab5    0000000d     diag_console.o (.rodata.str1.15759258491055097000.1)
-                  0000eac2    0000000d     diag_console.o (.rodata.str1.17103627226480421635.1)
-                  0000eacf    0000000d     diag_console.o (.rodata.str1.3586807474570239301.1)
-                  0000eadc    0000000d     nrf24_ptx.o (.rodata.str1.632614121974113092.1)
-                  0000eae9    0000000d     diag_console.o (.rodata.str1.8382040091638840980.1)
-                  0000eaf6    0000000c     req002.o (.rodata.str1.14163026172649738486.1)
-                  0000eb02    0000000c     diag_console.o (.rodata.str1.15625074855538008002.1)
-                  0000eb0e    0000000c     nrf24_ptx.o (.rodata.str1.18158066330371006656.1)
-                  0000eb1a    0000000c     diag_console.o (.rodata.str1.4753132208752387408.1)
-                  0000eb26    0000000b     diag_console.o (.rodata.str1.10021391958218067169.1)
-                  0000eb31    0000000b     diag_console.o (.rodata.str1.10779067380086453065.1)
-                  0000eb3c    0000000b     diag_console.o (.rodata.str1.10838375267284401125.1)
-                  0000eb47    0000000b     diag_console.o (.rodata.str1.12889734105675417804.1)
-                  0000eb52    0000000b     req002.o (.rodata.str1.14519661726848775581.1)
-                  0000eb5d    0000000b     diag_console.o (.rodata.str1.17854535991371942916.1)
-                  0000eb68    0000000b     diag_console.o (.rodata.str1.2047669683145328269.1)
-                  0000eb73    0000000b     diag_console.o (.rodata.str1.2566524860297826098.1)
-                  0000eb7e    0000000b     diag_console.o (.rodata.str1.4088845919059740246.1)
-                  0000eb89    0000000b     diag_console.o (.rodata.str1.475083551094971178.1)
-                  0000eb94    0000000b     diag_console.o (.rodata.str1.8714582252565932376.1)
-                  0000eb9f    0000000a     app.o (.rodata..Lswitch.table.App_service)
-                  0000eba9    00000001     --HOLE-- [fill = 0]
-                  0000ebaa    0000000a     ti_msp_dl_config.o (.rodata.gDIAG_UARTConfig)
-                  0000ebb4    0000000a     ti_msp_dl_config.o (.rodata.gRADIO_SPI_config)
-                  0000ebbe    0000000a     req002.o (.rodata.str1.11700141885548915133.1)
-                  0000ebc8    0000000a     diag_console.o (.rodata.str1.15004393915158247055.1)
-                  0000ebd2    0000000a     diag_console.o (.rodata.str1.15947943532119924092.1)
-                  0000ebdc    0000000a     diag_console.o (.rodata.str1.3251375336230076641.1)
-                  0000ebe6    0000000a     diag_console.o (.rodata.str1.5171941431370459453.1)
-                  0000ebf0    00000009     motor_test.o (.rodata.str1.10617380224381297162.1)
-                  0000ebf9    00000009     req002.o (.rodata.str1.12553014538444358850.1)
-                  0000ec02    00000009     nrf24_ptx.o (.rodata.str1.1466761408321915565.1)
-                  0000ec0b    00000009     diag_console.o (.rodata.str1.16718133499535619421.1)
-                  0000ec14    00000009     diag_console.o (.rodata.str1.17197432830885351810.1)
-                  0000ec1d    00000009     oled_ssd1306.o (.rodata.str1.18394381519249814195.1)
-                  0000ec26    00000009     diag_console.o (.rodata.str1.2411401244139123524.1)
-                  0000ec2f    00000009     nrf24_ptx.o (.rodata.str1.3287502044353476605.1)
-                  0000ec38    00000009     req002.o (.rodata.str1.4498054223093770164.1)
-                  0000ec41    00000009     motor_test.o (.rodata.str1.7683472691658088772.1)
-                  0000ec4a    00000009     diag_console.o (.rodata.str1.854387782545475029.1)
-                  0000ec53    00000009     req002.o (.rodata.str1.9783865751474204056.1)
-                  0000ec5c    00000008     ti_msp_dl_config.o (.rodata.gMOTOR_PWMConfig)
-                  0000ec64    00000008     diag_console.o (.rodata.str1.1116829374954328495.1)
-                  0000ec6c    00000008     oled_ssd1306.o (.rodata.str1.3044767245126136175.1)
-                  0000ec74    00000008     motor_test.o (.rodata.str1.4772308527699974066.1)
-                  0000ec7c    00000008     motor_test.o (.rodata.str1.8645205534088111832.1)
-                  0000ec84    00000007     diag_console.o (.rodata.str1.11175911738739839896.1)
-                  0000ec8b    00000007     diag_console.o (.rodata.str1.5926118724489890093.1)
-                  0000ec92    00000007     diag_console.o (.rodata.str1.7767364581813029062.1)
-                  0000ec99    00000006     diag_console.o (.rodata.str1.1105957340841019786.1)
-                  0000ec9f    00000006     diag_console.o (.rodata.str1.11297099101431644167.1)
-                  0000eca5    00000006     req002.o (.rodata.str1.1330840565073376.1)
-                  0000ecab    00000006     diag_console.o (.rodata.str1.14265534512352903045.1)
-                  0000ecb1    00000006     oled_ssd1306.o (.rodata.str1.155559926808992207.1)
-                  0000ecb7    00000006     diag_console.o (.rodata.str1.16084514406273351987.1)
-                  0000ecbd    00000006     nrf24_ptx.o (.rodata.str1.17809926154172099862.1)
-                  0000ecc3    00000006     oled_ssd1306.o (.rodata.str1.17912449882519859512.1)
-                  0000ecc9    00000006     motor_test.o (.rodata.str1.2583511979257442240.1)
-                  0000eccf    00000006     req002.o (.rodata.str1.404665452499805758.1)
-                  0000ecd5    00000005     req002.o (.rodata..Lswitch.table.Req002_service)
-                  0000ecda    00000005     diag_console.o (.rodata.str1.10706949176496340975.1)
-                  0000ecdf    00000005     diag_console.o (.rodata.str1.11000238090859226487.1)
-                  0000ece4    00000005     req002.o (.rodata.str1.11884172484412477609.1)
-                  0000ece9    00000005     nrf24_ptx.o (.rodata.str1.1246111486341945488.1)
-                  0000ecee    00000005     oled_ssd1306.o (.rodata.str1.14073963438480896185.1)
-                  0000ecf3    00000005     diag_console.o (.rodata.str1.14635969394841560451.1)
-                  0000ecf8    00000005     diag_console.o (.rodata.str1.15834373091208215214.1)
-                  0000ecfd    00000005     diag_console.o (.rodata.str1.2661480226688204501.1)
-                  0000ed02    00000005     req002.o (.rodata.str1.4278235483893593186.1)
-                  0000ed07    00000005     diag_console.o (.rodata.str1.8182549175682356078.1)
-                  0000ed0c    00000005     motor_test.o (.rodata.str1.8458586334456837306.1)
-                  0000ed11    00000005     diag_console.o (.rodata.str1.8521603489394202036.1)
-                  0000ed16    00000005     diag_console.o (.rodata.str1.8535165006884115289.1)
-                  0000ed1b    00000005     diag_console.o (.rodata.str1.9239603917100908406.1)
-                  0000ed20    00000004     diag_console.o (.rodata.str1.16152622102795241315.1)
-                  0000ed24    00000004     diag_console.o (.rodata.str1.2181998341318385279.1)
-                  0000ed28    00000004     oled_ssd1306.o (.rodata.str1.4552292588570905864.1)
-                  0000ed2c    00000003     ti_msp_dl_config.o (.rodata.gMOTOR_PWMClockConfig)
-                  0000ed2f    00000003     ti_msp_dl_config.o (.rodata.gRIGHT_QEIClockConfig)
-                  0000ed32    00000003     diag_console.o (.rodata.str1.16469263393576567306.1)
-                  0000ed35    00000002     ti_msp_dl_config.o (.rodata.gRADIO_SPI_clockConfig)
-                  0000ed37    00000001     --HOLE-- [fill = 0]
+.rodata    0    0000ead0    00000d80     
+                  0000ead0    00000105     diag_console.o (.rodata.str1.14153271371939189678.1)
+                  0000ebd5    0000000b     diag_console.o (.rodata.str1.10021391958218067169.1)
+                  0000ebe0    00000100     k230_link.o (.rodata..L.crctable)
+                  0000ece0    00000082     oled_ssd1306.o (.rodata.gLetters)
+                  0000ed62    00000063     diag_console.o (.rodata.str1.7732308573000650393.1)
+                  0000edc5    00000048     diag_console.o (.rodata.str1.5644620926150322957.1)
+                  0000ee0d    00000044     diag_console.o (.rodata.str1.8805550004262250290.1)
+                  0000ee51    0000003e     diag_console.o (.rodata.str1.2437401455240083982.1)
+                  0000ee8f    0000003d     diag_console.o (.rodata.str1.10020677278003191597.1)
+                  0000eecc    0000003d     diag_console.o (.rodata.str1.9757831788182070933.1)
+                  0000ef09    0000003b     diag_console.o (.rodata.str1.5824879526590977974.1)
+                  0000ef44    00000038     diag_console.o (.rodata.str1.15435677839657748720.1)
+                  0000ef7c    00000036     diag_console.o (.rodata.str1.16565755701334802317.1)
+                  0000efb2    00000035     diag_console.o (.rodata.str1.9768974661061496881.1)
+                  0000efe7    00000034     diag_console.o (.rodata.str1.1098690429273333905.1)
+                  0000f01b    00000032     oled_ssd1306.o (.rodata.gDigits)
+                  0000f04d    00000032     board_safety.o (.rodata.str1.1461871966798876460.1)
+                  0000f07f    00000031     diag_console.o (.rodata.str1.7985117199416049152.1)
+                  0000f0b0    0000002f     diag_console.o (.rodata.str1.16351352736247536359.1)
+                  0000f0df    0000002f     diag_console.o (.rodata.str1.17340833469015162294.1)
+                  0000f10e    0000002b     diag_console.o (.rodata.str1.12544225967345112596.1)
+                  0000f139    00000028     diag_console.o (.rodata.str1.8496639322861540170.1)
+                  0000f161    00000026     diag_console.o (.rodata.str1.13160629704296733059.1)
+                  0000f187    00000026     diag_console.o (.rodata.str1.5503653601839616668.1)
+                  0000f1ad    00000003     ti_msp_dl_config.o (.rodata.gMOTOR_PWMClockConfig)
+                  0000f1b0    00000024     req002.o (.rodata..Lswitch.table.Req002_blockReasonName)
+                  0000f1d4    00000024     req002.o (.rodata..Lswitch.table.Req002_stateName)
+                  0000f1f8    00000023     diag_console.o (.rodata.str1.13023684794075449413.1)
+                  0000f21b    00000023     diag_console.o (.rodata.str1.6066754825680800963.1)
+                  0000f23e    00000022     diag_console.o (.rodata.str1.5303670245239573129.1)
+                  0000f260    00000020     line_tracking.o (.rodata.cst32)
+                  0000f280    0000001f     diag_console.o (.rodata.str1.5976961520280002565.1)
+                  0000f29f    0000001c     req002.o (.rodata.str1.13275248019535299154.1)
+                  0000f2bb    0000001a     diag_console.o (.rodata.str1.1008767523004470630.1)
+                  0000f2d5    0000001a     diag_console.o (.rodata.str1.2111541797422310849.1)
+                  0000f2ef    0000001a     req002.o (.rodata.str1.9392822210274423405.1)
+                  0000f309    00000019     diag_console.o (.rodata.str1.18237275900639492659.1)
+                  0000f322    00000002     ti_msp_dl_config.o (.rodata.gDIAG_UARTClockConfig)
+                  0000f324    00000019     nrf24_ptx.o (.rodata.str1.6094559527043233380.4)
+                  0000f33d    00000019     diag_console.o (.rodata.str1.810607564276269461.1)
+                  0000f356    00000002     ti_msp_dl_config.o (.rodata.gK230_UARTClockConfig)
+                  0000f358    00000018     nrf24_ptx.o (.rodata..Lswitch.table.Nrf24Ptx_getStatus)
+                  0000f370    00000018     oled_ssd1306.o (.rodata.initializeAt.commands)
+                  0000f388    00000018     diag_console.o (.rodata.str1.8406304233448172400.1)
+                  0000f3a0    00000017     req002.o (.rodata.str1.10230131912623405435.1)
+                  0000f3b7    00000017     diag_console.o (.rodata.str1.3430916125074368270.1)
+                  0000f3ce    00000016     diag_console.o (.rodata.str1.10354475084875452907.1)
+                  0000f3e4    00000016     diag_console.o (.rodata.str1.13280886091191530476.1)
+                  0000f3fa    00000016     diag_console.o (.rodata.str1.5084688477215926447.1)
+                  0000f410    00000015     req002.o (.rodata.str1.9213031953659428922.1)
+                  0000f425    00000003     ti_msp_dl_config.o (.rodata.gRIGHT_QEIClockConfig)
+                  0000f428    00000014     motor_test.o (.rodata..Lswitch.table.MotorTest_stateName)
+                  0000f43c    00000014     req002.o (.rodata.str1.1536853367382378965.1)
+                  0000f450    00000014     req002.o (.rodata.str1.7316036974658646067.1)
+                  0000f464    00000014     diag_console.o (.rodata.str1.7838710351760113446.1)
+                  0000f478    00000014     req002.o (.rodata.str1.9277730485512377852.1)
+                  0000f48c    00000013     diag_console.o (.rodata.str1.9050062146647658507.1)
+                  0000f49f    00000011     req002.o (.rodata.str1.11801953346847374107.1)
+                  0000f4b0    00000011     diag_console.o (.rodata.str1.17217747830118470281.1)
+                  0000f4c1    00000011     diag_console.o (.rodata.str1.17570078357027493973.1)
+                  0000f4d2    00000011     req002.o (.rodata.str1.246851255980436067.1)
+                  0000f4e3    00000011     diag_console.o (.rodata.str1.9305979691969886280.1)
+                  0000f4f4    00000010     oled_ssd1306.o (.rodata.OledSsd1306_showReq002Status.stateText)
+                  0000f504    00000010     diag_console.o (.rodata.str1.11858721499567804342.1)
+                  0000f514    00000010     diag_console.o (.rodata.str1.15804963083468125269.1)
+                  0000f524    00000010     nrf24_ptx.o (.rodata.str1.17419335730769077557.1)
+                  0000f534    00000010     diag_console.o (.rodata.str1.8341931057821991107.1)
+                  0000f544    00000010     diag_console.o (.rodata.str1.9009639935792097996.1)
+                  0000f554    0000000f     diag_console.o (.rodata.str1.15191501805510545095.1)
+                  0000f563    0000000f     diag_console.o (.rodata.str1.719103272933316442.1)
+                  0000f572    0000000e     nrf24_ptx.o (.rodata.gProfile)
+                  0000f580    0000000e     req002.o (.rodata.str1.11012809159570234960.1)
+                  0000f58e    0000000e     diag_console.o (.rodata.str1.17463021491389519269.1)
+                  0000f59c    0000000e     diag_console.o (.rodata.str1.1837592952361879117.1)
+                  0000f5aa    0000000d     diag_console.o (.rodata.str1.10547048922053563066.1)
+                  0000f5b7    0000000d     diag_console.o (.rodata.str1.11767802008270839024.1)
+                  0000f5c4    0000000d     diag_console.o (.rodata.str1.15307067426115469236.1)
+                  0000f5d1    0000000d     diag_console.o (.rodata.str1.15759258491055097000.1)
+                  0000f5de    0000000d     diag_console.o (.rodata.str1.17103627226480421635.1)
+                  0000f5eb    0000000d     diag_console.o (.rodata.str1.3586807474570239301.1)
+                  0000f5f8    0000000d     nrf24_ptx.o (.rodata.str1.632614121974113092.1)
+                  0000f605    0000000d     diag_console.o (.rodata.str1.8382040091638840980.1)
+                  0000f612    0000000c     req002.o (.rodata.str1.14163026172649738486.1)
+                  0000f61e    0000000c     diag_console.o (.rodata.str1.15625074855538008002.1)
+                  0000f62a    0000000c     nrf24_ptx.o (.rodata.str1.18158066330371006656.1)
+                  0000f636    0000000c     diag_console.o (.rodata.str1.4753132208752387408.1)
+                  0000f642    0000000b     diag_console.o (.rodata.str1.10779067380086453065.1)
+                  0000f64d    0000000b     diag_console.o (.rodata.str1.10838375267284401125.1)
+                  0000f658    0000000b     diag_console.o (.rodata.str1.12889734105675417804.1)
+                  0000f663    0000000b     req002.o (.rodata.str1.14519661726848775581.1)
+                  0000f66e    0000000b     diag_console.o (.rodata.str1.17854535991371942916.1)
+                  0000f679    0000000b     diag_console.o (.rodata.str1.2047669683145328269.1)
+                  0000f684    0000000b     diag_console.o (.rodata.str1.2566524860297826098.1)
+                  0000f68f    0000000b     diag_console.o (.rodata.str1.4088845919059740246.1)
+                  0000f69a    0000000b     diag_console.o (.rodata.str1.475083551094971178.1)
+                  0000f6a5    0000000b     diag_console.o (.rodata.str1.8714582252565932376.1)
+                  0000f6b0    0000000a     app.o (.rodata..Lswitch.table.App_service)
+                  0000f6ba    0000000a     ti_msp_dl_config.o (.rodata.gDIAG_UARTConfig)
+                  0000f6c4    0000000a     ti_msp_dl_config.o (.rodata.gK230_UARTConfig)
+                  0000f6ce    0000000a     ti_msp_dl_config.o (.rodata.gRADIO_SPI_config)
+                  0000f6d8    0000000a     req002.o (.rodata.str1.11700141885548915133.1)
+                  0000f6e2    0000000a     diag_console.o (.rodata.str1.15004393915158247055.1)
+                  0000f6ec    0000000a     diag_console.o (.rodata.str1.15947943532119924092.1)
+                  0000f6f6    0000000a     diag_console.o (.rodata.str1.3251375336230076641.1)
+                  0000f700    0000000a     diag_console.o (.rodata.str1.5171941431370459453.1)
+                  0000f70a    00000009     motor_test.o (.rodata.str1.10617380224381297162.1)
+                  0000f713    00000009     req002.o (.rodata.str1.12553014538444358850.1)
+                  0000f71c    00000009     nrf24_ptx.o (.rodata.str1.1466761408321915565.1)
+                  0000f725    00000009     diag_console.o (.rodata.str1.16718133499535619421.1)
+                  0000f72e    00000009     diag_console.o (.rodata.str1.17197432830885351810.1)
+                  0000f737    00000009     oled_ssd1306.o (.rodata.str1.18394381519249814195.1)
+                  0000f740    00000009     diag_console.o (.rodata.str1.2411401244139123524.1)
+                  0000f749    00000009     nrf24_ptx.o (.rodata.str1.3287502044353476605.1)
+                  0000f752    00000009     req002.o (.rodata.str1.4498054223093770164.1)
+                  0000f75b    00000009     motor_test.o (.rodata.str1.7683472691658088772.1)
+                  0000f764    00000009     diag_console.o (.rodata.str1.854387782545475029.1)
+                  0000f76d    00000009     req002.o (.rodata.str1.9783865751474204056.1)
+                  0000f776    00000002     ti_msp_dl_config.o (.rodata.gLINE_I2CClockConfig)
+                  0000f778    00000008     ti_msp_dl_config.o (.rodata.gMOTOR_PWMConfig)
+                  0000f780    00000008     diag_console.o (.rodata.str1.1116829374954328495.1)
+                  0000f788    00000008     oled_ssd1306.o (.rodata.str1.3044767245126136175.1)
+                  0000f790    00000008     motor_test.o (.rodata.str1.4772308527699974066.1)
+                  0000f798    00000008     motor_test.o (.rodata.str1.8645205534088111832.1)
+                  0000f7a0    00000007     diag_console.o (.rodata.str1.11175911738739839896.1)
+                  0000f7a7    00000007     diag_console.o (.rodata.str1.5926118724489890093.1)
+                  0000f7ae    00000007     diag_console.o (.rodata.str1.7767364581813029062.1)
+                  0000f7b5    00000006     diag_console.o (.rodata.str1.1105957340841019786.1)
+                  0000f7bb    00000006     diag_console.o (.rodata.str1.11297099101431644167.1)
+                  0000f7c1    00000006     req002.o (.rodata.str1.1330840565073376.1)
+                  0000f7c7    00000006     diag_console.o (.rodata.str1.14265534512352903045.1)
+                  0000f7cd    00000006     oled_ssd1306.o (.rodata.str1.155559926808992207.1)
+                  0000f7d3    00000006     diag_console.o (.rodata.str1.16084514406273351987.1)
+                  0000f7d9    00000006     nrf24_ptx.o (.rodata.str1.17809926154172099862.1)
+                  0000f7df    00000006     oled_ssd1306.o (.rodata.str1.17912449882519859512.1)
+                  0000f7e5    00000006     motor_test.o (.rodata.str1.2583511979257442240.1)
+                  0000f7eb    00000006     req002.o (.rodata.str1.404665452499805758.1)
+                  0000f7f1    00000005     req002.o (.rodata..Lswitch.table.Req002_service)
+                  0000f7f6    00000005     diag_console.o (.rodata.str1.10706949176496340975.1)
+                  0000f7fb    00000005     diag_console.o (.rodata.str1.11000238090859226487.1)
+                  0000f800    00000005     req002.o (.rodata.str1.11884172484412477609.1)
+                  0000f805    00000005     nrf24_ptx.o (.rodata.str1.1246111486341945488.1)
+                  0000f80a    00000005     oled_ssd1306.o (.rodata.str1.14073963438480896185.1)
+                  0000f80f    00000005     diag_console.o (.rodata.str1.14635969394841560451.1)
+                  0000f814    00000005     diag_console.o (.rodata.str1.15834373091208215214.1)
+                  0000f819    00000005     diag_console.o (.rodata.str1.2661480226688204501.1)
+                  0000f81e    00000005     req002.o (.rodata.str1.4278235483893593186.1)
+                  0000f823    00000005     diag_console.o (.rodata.str1.8182549175682356078.1)
+                  0000f828    00000005     motor_test.o (.rodata.str1.8458586334456837306.1)
+                  0000f82d    00000005     diag_console.o (.rodata.str1.8521603489394202036.1)
+                  0000f832    00000005     diag_console.o (.rodata.str1.8535165006884115289.1)
+                  0000f837    00000005     diag_console.o (.rodata.str1.9239603917100908406.1)
+                  0000f83c    00000004     diag_console.o (.rodata.str1.16152622102795241315.1)
+                  0000f840    00000004     diag_console.o (.rodata.str1.2181998341318385279.1)
+                  0000f844    00000004     oled_ssd1306.o (.rodata.str1.4552292588570905864.1)
+                  0000f848    00000003     diag_console.o (.rodata.str1.16469263393576567306.1)
+                  0000f84b    00000002     ti_msp_dl_config.o (.rodata.gOLED_I2CClockConfig)
+                  0000f84d    00000002     ti_msp_dl_config.o (.rodata.gRADIO_SPI_clockConfig)
+                  0000f84f    00000001     --HOLE-- [fill = 0]
 
 .init_array 
 *          0    00000000    00000000     UNINITIALIZED
 
 .binit     0    00000000    00000000     
 
-.bss       0    20200000    0000079b     UNINITIALIZED
+.bss       0    20200000    00000912     UNINITIALIZED
                   20200000    00000240     nrf24_ptx.o (.bss.gQueue)
                   20200240    000000c0     nrf24_ptx.o (.bss.gDiagLine)
-                  20200300    000000bc     (.common:gLEFT_CAPTUREBackup)
-                  202003bc    000000bc     (.common:gMOTOR_PWMBackup)
-                  20200478    000000a0     (.common:gRIGHT_QEIBackup)
-                  20200518    00000080     diag_console.o (.bss.gRxBuffer)
-                  20200598    00000078     req002.o (.bss.gStatus)
-                  20200610    00000050     diag_console.o (.bss.gCommand)
-                  20200660    0000003c     line_tracking.o (.bss.gStatus)
-                  2020069c    00000030     line_tracking.o (.bss.gShadowPid)
-                  202006cc    0000002c     line_sensors.o (.bss.gSample)
-                  202006f8    00000028     (.common:gRADIO_SPIBackup)
-                  20200720    0000001c     nrf24_ptx.o (.bss.gStats)
-                  2020073c    00000010     motor_test.o (.bss.gStatus)
-                  2020074c    00000008     app.o (.bss.gStartButton)
-                  20200754    00000006     motor_driver.o (.bss.gStatus)
-                  2020075a    00000002     nrf24_ptx.o (.bss.gDiagLineLength)
-                  2020075c    00000004     nrf24_ptx.o (.bss.gDeadline)
-                  20200760    00000004     req002.o (.bss.gDepartSinceMs)
-                  20200764    00000004     encoders.o (.bss.gLeftCount)
-                  20200768    00000004     encoders.o (.bss.gLeftInvalidTransitions)
-                  2020076c    00000004     req002.o (.bss.gMarkerSinceMs)
-                  20200770    00000004     timebase.o (.bss.gMilliseconds)
-                  20200774    00000004     req002.o (.bss.gNextControlMs)
-                  20200778    00000004     line_sensors.o (.bss.gNextPollMs)
-                  2020077c    00000004     diag_console.o (.bss.gRxOverflow)
-                  20200780    00000003     oled_ssd1306.o (.bss.gStatus)
-                  20200783    00000001     nrf24_ptx.o (.bss.gArmed)
-                  20200784    00000002     nrf24_ptx.o (.bss.gNextMessageId)
-                  20200786    00000002     diag_console.o (.bss.gRxHead)
-                  20200788    00000002     diag_console.o (.bss.gRxTail)
-                  2020078a    00000001     diag_console.o (.bss.gCaptureEnabled)
-                  2020078b    00000001     diag_console.o (.bss.gCommandLength)
-                  2020078c    00000001     req002.o (.bss.gDepartPending)
-                  2020078d    00000001     nrf24_ptx.o (.bss.gDiagLineOverflow)
-                  2020078e    00000001     diag_console.o (.bss.gDiscardLine)
-                  2020078f    00000001     app.o (.bss.gLastOledReq002State)
-                  20200790    00000001     encoders.o (.bss.gLeftState)
-                  20200791    00000001     req002.o (.bss.gMarkerPending)
-                  20200792    00000001     line_tracking.o (.bss.gNeedsReacquire)
-                  20200793    00000001     nrf24_ptx.o (.bss.gOneShotQueued)
-                  20200794    00000001     nrf24_ptx.o (.bss.gQueueCount)
-                  20200795    00000001     nrf24_ptx.o (.bss.gQueueHead)
-                  20200796    00000001     nrf24_ptx.o (.bss.gQueueTail)
-                  20200797    00000001     nrf24_ptx.o (.bss.gState)
-                  20200798    00000001     board_safety.o (.bss.gStatus.0)
-                  20200799    00000001     board_safety.o (.bss.gStatus.3)
-                  2020079a    00000001     motor_test.o (.bss.gTimedOut)
+                  20200300    000000bc     (.common:gMOTOR_PWMBackup)
+                  202003bc    000000a0     (.common:gRIGHT_QEIBackup)
+                  2020045c    00000084     (.common:gK230RuntimeDiag)
+                  202004e0    00000080     diag_console.o (.bss.gRxBuffer)
+                  20200560    00000080     k230_link.o (.bss.gRxQueue)
+                  202005e0    00000078     req002.o (.bss.gStatus)
+                  20200658    00000060     (.common:gEncoderSpeedShadow)
+                  202006b8    00000050     diag_console.o (.bss.gCommand)
+                  20200708    0000003c     k230_link.o (.bss.gStats)
+                  20200744    0000003c     line_tracking.o (.bss.gStatus)
+                  20200780    00000030     line_tracking.o (.bss.gShadowPid)
+                  202007b0    00000030     req002.o (.bss.gSpeedBalancePi)
+                  202007e0    0000002c     line_sensors.o (.bss.gSample)
+                  2020080c    00000028     (.common:gRADIO_SPIBackup)
+                  20200834    00000020     k230_link.o (.bss.gLatest)
+                  20200854    0000001c     nrf24_ptx.o (.bss.gStats)
+                  20200870    00000010     motor_test.o (.bss.gStatus)
+                  20200880    0000000e     k230_link.o (.bss.gFrame)
+                  2020088e    00000002     nrf24_ptx.o (.bss.gDiagLineLength)
+                  20200890    00000008     app.o (.bss.gStartButton)
+                  20200898    00000006     motor_driver.o (.bss.gStatus)
+                  2020089e    00000002     nrf24_ptx.o (.bss.gNextMessageId)
+                  202008a0    00000004     nrf24_ptx.o (.bss.gDeadline)
+                  202008a4    00000004     req002.o (.bss.gDepartSinceMs)
+                  202008a8    00000004     k230_link.o (.bss.gLastObservedOverflow)
+                  202008ac    00000004     k230_link.o (.bss.gLastSequenceAdvanceMs)
+                  202008b0    00000004     encoders.o (.bss.gLeftCount)
+                  202008b4    00000004     encoders.o (.bss.gLeftInvalidTransitions)
+                  202008b8    00000004     req002.o (.bss.gMarkerSinceMs)
+                  202008bc    00000004     timebase.o (.bss.gMilliseconds)
+                  202008c0    00000004     req002.o (.bss.gNextControlMs)
+                  202008c4    00000004     line_sensors.o (.bss.gNextPollMs)
+                  202008c8    00000004     k230_link.o (.bss.gQueueOverflowsFromIsr)
+                  202008cc    00000004     k230_link.o (.bss.gRxBytesFromIsr)
+                  202008d0    00000004     diag_console.o (.bss.gRxOverflow)
+                  202008d4    00000004     encoders.o (.bss.gShadowLastSampleMs)
+                  202008d8    00000004     encoders.o (.bss.gShadowNextSampleMs)
+                  202008dc    00000004     encoders.o (.bss.gShadowPreviousInvalidTransitions)
+                  202008e0    00000004     encoders.o (.bss.gShadowPreviousLeftCount)
+                  202008e4    00000004     encoders.o (.bss.gShadowPreviousRightCount)
+                  202008e8    00000004     req002.o (.bss.gSpeedBalanceSampleCount)
+                  202008ec    00000004     req002.o (.bss.gSpeedBalanceTrimPermille)
+                  202008f0    00000003     oled_ssd1306.o (.bss.gStatus)
+                  202008f3    00000001     nrf24_ptx.o (.bss.gArmed)
+                  202008f4    00000002     diag_console.o (.bss.gRxHead)
+                  202008f6    00000002     k230_link.o (.bss.gRxHead)
+                  202008f8    00000002     diag_console.o (.bss.gRxTail)
+                  202008fa    00000002     k230_link.o (.bss.gRxTail)
+                  202008fc    00000001     diag_console.o (.bss.gCaptureEnabled)
+                  202008fd    00000001     diag_console.o (.bss.gCommandLength)
+                  202008fe    00000001     req002.o (.bss.gDepartPending)
+                  202008ff    00000001     nrf24_ptx.o (.bss.gDiagLineOverflow)
+                  20200900    00000001     diag_console.o (.bss.gDiscardLine)
+                  20200901    00000001     k230_link.o (.bss.gFrameIndex)
+                  20200902    00000001     k230_link.o (.bss.gHaveFrame)
+                  20200903    00000001     app.o (.bss.gLastOledReq002State)
+                  20200904    00000001     k230_link.o (.bss.gLastSequence)
+                  20200905    00000001     encoders.o (.bss.gLeftState)
+                  20200906    00000001     req002.o (.bss.gMarkerPending)
+                  20200907    00000001     line_tracking.o (.bss.gNeedsReacquire)
+                  20200908    00000001     nrf24_ptx.o (.bss.gOneShotQueued)
+                  20200909    00000001     nrf24_ptx.o (.bss.gQueueCount)
+                  2020090a    00000001     nrf24_ptx.o (.bss.gQueueHead)
+                  2020090b    00000001     nrf24_ptx.o (.bss.gQueueTail)
+                  2020090c    00000001     k230_link.o (.bss.gSequenceInitialized)
+                  2020090d    00000001     nrf24_ptx.o (.bss.gState)
+                  2020090e    00000001     board_safety.o (.bss.gStatus.0)
+                  2020090f    00000001     board_safety.o (.bss.gStatus.3)
+                  20200910    00000001     k230_link.o (.bss.gTimedOut)
+                  20200911    00000001     motor_test.o (.bss.gTimedOut)
 
-.data      0    2020079b    00000001     UNINITIALIZED
-                  2020079b    00000001     oled_ssd1306.o (.data.gAddress)
+.data      0    20200912    00000001     UNINITIALIZED
+                  20200912    00000001     oled_ssd1306.o (.data.gAddress)
 
 .stack     0    20207e00    00000200     UNINITIALIZED
                   20207e00    00000004     libc.a : boot_cortex_m.c.obj (.stack)
@@ -445,11 +476,11 @@ MODULE SUMMARY
        Module                         code    ro data   rw data
        ------                         ----    -------   -------
     .\
-       ti_msp_dl_config.o             1276    45        576    
+       ti_msp_dl_config.o             1276    54        388    
+       empty.o                        388     0         132    
        startup_mspm0g350x_ticlang.o   6       192       0      
-       empty.o                        54      0         0      
     +--+------------------------------+-------+---------+---------+
-       Total:                         1336    237       576    
+       Total:                         1670    246       520    
                                                                
     .\algorithm\
        line_tracking.o                820     32        109    
@@ -458,11 +489,11 @@ MODULE SUMMARY
        Total:                         1282    32        109    
                                                                
     .\app\
-       req002.o                       1992    365       134    
+       req002.o                       2608    365       190    
        motor_test.o                   340     65        17     
        app.o                          332     10        9      
     +--+------------------------------+-------+---------+---------+
-       Total:                         2664    440       160    
+       Total:                         3280    440       216    
                                                                
     .\bsp\
        board_safety.o                 348     50        2      
@@ -474,22 +505,23 @@ MODULE SUMMARY
        diag_console.o                 38832   2232      219    
        oled_ssd1306.o                 4546    258       4      
        nrf24_ptx.o                    2744    133       811    
+       k230_link.o                    1248    256       259    
        line_sensors.o                 1324    0         48     
+       encoders.o                     824     0         125    
        motor_driver.o                 760     0         6      
-       encoders.o                     368     16        9      
        i2c_diag.o                     300     0         0      
        start_button.o                 138     0         0      
     +--+------------------------------+-------+---------+---------+
-       Total:                         49012   2639      1097   
+       Total:                         50716   2879      1472   
                                                                
     D:/AAADiansai/CCS/mspm0_sdk_2_11_00_07/source/ti/driverlib/lib/ticlang/m0p/mspm0g1x0x_g3x0x/driverlib.a
-       dl_timer.o                     438     0         0      
+       dl_timer.o                     372     0         0      
        dl_i2c.o                       240     0         0      
        dl_spi.o                       226     0         0      
        dl_uart.o                      138     0         0      
        dl_common.o                    10      0         0      
     +--+------------------------------+-------+---------+---------+
-       Total:                         1052    0         0      
+       Total:                         986     0         0      
                                                                
     D:\AAADiansai\CCS\ccs\tools\compiler\ti-cgt-armllvm_5.1.1.LTS\lib\armv6m-ti-none-eabi/c/libc.a
        memcpy16.S.obj                 154     0         0      
@@ -529,19 +561,19 @@ MODULE SUMMARY
        Stack:                         0       0         512    
        Linker Generated:              0       41        0      
     +--+------------------------------+-------+---------+---------+
-       Grand Total:                   57304   3439      2460   
+       Grand Total:                   59892   3688      2835   
 
 
 LINKER GENERATED COPY TABLES
 
-__TI_cinit_table @ 0000ed54 records: 2, size/record: 8, table size: 16
-	.bss: load addr=0000ed44, load size=00000008 bytes, run addr=20200000, run size=0000079b bytes, compression=zero_init
-	.data: load addr=0000ed4c, load size=00000005 bytes, run addr=2020079b, run size=00000001 bytes, compression=lzss
+__TI_cinit_table @ 0000f86c records: 2, size/record: 8, table size: 16
+	.bss: load addr=0000f85c, load size=00000008 bytes, run addr=20200000, run size=00000912 bytes, compression=zero_init
+	.data: load addr=0000f864, load size=00000005 bytes, run addr=20200912, run size=00000001 bytes, compression=lzss
 
 
 LINKER GENERATED HANDLER TABLE
 
-__TI_handler_table @ 0000ed38 records: 3, size/record: 4, table size: 12
+__TI_handler_table @ 0000f850 records: 3, size/record: 4, table size: 12
 	index: 0, handler: __TI_decompress_lzss
 	index: 1, handler: __TI_decompress_none
 	index: 2, handler: __TI_zero_init
@@ -551,135 +583,142 @@ GLOBAL SYMBOLS: SORTED ALPHABETICALLY BY Name
 
 address   name                               
 -------   ----                               
-0000b353  ADC0_IRQHandler                    
-0000b353  ADC1_IRQHandler                    
-0000b353  AES_IRQHandler                     
-0000d0b1  App_init                           
-0000c259  App_service                        
-0000e065  BoardSafety_buzzerPolicy           
-0000e039  BoardSafety_faultLatched           
-0000d691  BoardSafety_init                   
-0000db91  BoardSafety_outputsSafe            
-0000cf09  BoardSafety_service                
-0000d3f1  BoardSafety_stop                   
-0000e0a2  C$$EXIT                            
-0000b353  CANFD0_IRQHandler                  
-0000b353  DAC0_IRQHandler                    
-0000e051  DL_Common_delayCycles              
-0000d171  DL_I2C_fillControllerTXFIFO        
-0000dbc5  DL_I2C_flushControllerRXFIFO       
-0000da31  DL_I2C_flushControllerTXFIFO       
-0000dd59  DL_I2C_setClockConfig              
-0000d445  DL_SPI_drainRXFIFO8                
-0000d8e9  DL_SPI_init                        
-0000de01  DL_SPI_receiveDataCheck8           
-0000dfa1  DL_SPI_setClockConfig              
-0000de1d  DL_SPI_transmitDataCheck8          
-0000dfd9  DL_Timer_getCaptureCompareValue    
-0000c155  DL_Timer_initFourCCPWMMode         
-0000de39  DL_Timer_setCaptCompUpdateMethod   
-0000dce1  DL_Timer_setCaptureCompareCtl      
-0000dec5  DL_Timer_setCaptureCompareInput    
-0000defd  DL_Timer_setCaptureCompareOutCtl   
-0000dfe9  DL_Timer_setCaptureCompareValue    
-0000de55  DL_Timer_setClockConfig            
-0000d7c9  DL_UART_init                       
-0000dfb3  DL_UART_setClockConfig             
-0000dbf5  DL_UART_transmitDataBlocking       
-0000b353  DMA_IRQHandler                     
-0000b353  Default_Handler                    
-0000d811  DiagConsole_init                   
-0000d1d1  DiagConsole_onUartInterrupt        
-0000b355  DiagConsole_reportBoot             
+0000b82f  ADC0_IRQHandler                    
+0000b82f  ADC1_IRQHandler                    
+0000b82f  AES_IRQHandler                     
+0000dae1  App_init                           
+0000caa9  App_service                        
+0000ea85  BoardSafety_buzzerPolicy           
+0000ea59  BoardSafety_faultLatched           
+0000dfb9  BoardSafety_init                   
+0000e589  BoardSafety_outputsSafe            
+0000d869  BoardSafety_service                
+0000ddc1  BoardSafety_stop                   
+0000eaba  C$$EXIT                            
+0000b82f  CANFD0_IRQHandler                  
+0000b82f  DAC0_IRQHandler                    
+0000ea71  DL_Common_delayCycles              
+0000db41  DL_I2C_fillControllerTXFIFO        
+0000e5f1  DL_I2C_flushControllerRXFIFO       
+0000e3ed  DL_I2C_flushControllerTXFIFO       
+0000e75d  DL_I2C_setClockConfig              
+0000de15  DL_SPI_drainRXFIFO8                
+0000e2a5  DL_SPI_init                        
+0000e829  DL_SPI_receiveDataCheck8           
+0000e9c1  DL_SPI_setClockConfig              
+0000e845  DL_SPI_transmitDataCheck8          
+0000e9f9  DL_Timer_getCaptureCompareValue    
+0000c8a1  DL_Timer_initFourCCPWMMode         
+0000e861  DL_Timer_setCaptCompUpdateMethod   
+0000e909  DL_Timer_setCaptureCompareOutCtl   
+0000ea09  DL_Timer_setCaptureCompareValue    
+0000e87d  DL_Timer_setClockConfig            
+0000e13d  DL_UART_init                       
+0000e9d3  DL_UART_setClockConfig             
+0000e621  DL_UART_transmitDataBlocking       
+0000b82f  DMA_IRQHandler                     
+0000b82f  Default_Handler                    
+0000e185  DiagConsole_init                   
+0000dba1  DiagConsole_onUartInterrupt        
+0000b831  DiagConsole_reportBoot             
 000000c1  DiagConsole_service                
-0000c9d9  Encoders_init                      
-0000cc0d  Encoders_onLeftCaptureInterrupt    
-0000d22d  Encoders_snapshot                  
-0000b353  GROUP0_IRQHandler                  
-0000b353  GROUP1_IRQHandler                  
-0000e0a3  HOSTexit                           
-0000b353  HardFault_Handler                  
-0000b353  I2C0_IRQHandler                    
-0000b353  I2C1_IRQHandler                    
-0000bbbd  I2cDiag_scan                       
-0000de71  LineSensors_init                   
-0000ad6d  LineSensors_service                
-0000df15  LineSensors_snapshot               
-0000e06d  LineTracking_getStatus             
-0000d859  LineTracking_init                  
-0000a27d  LineTracking_service               
-0000ba7d  MotorDriver_driveVehicleForward    
-0000d341  MotorDriver_init                   
-0000d399  MotorDriver_outputsStopped         
-0000c5e5  MotorDriver_setVehicleForwardDuties
-0000d971  MotorDriver_stopAll                
-0000dd81  MotorTest_abort                    
-0000dda1  MotorTest_init                     
-0000dc25  MotorTest_onTimebaseTick           
-0000d9b1  MotorTest_service                  
-0000de8d  MotorTest_snapshot                 
-0000cf79  MotorTest_start                    
-0000df2d  MotorTest_stateName                
-0000b353  NMI_Handler                        
-0000d6e1  Nrf24Ptx_arm                       
-0000bce9  Nrf24Ptx_captureDiagnosticChar     
-0000da6d  Nrf24Ptx_disarm                    
-0000d499  Nrf24Ptx_getStatus                 
-0000cc91  Nrf24Ptx_init                      
-0000d4ed  Nrf24Ptx_readCoreRegisters         
-0000dcb5  Nrf24Ptx_safeWhenDisarmed          
-00008e41  Nrf24Ptx_service                   
-0000c8b1  OledSsd1306_clear                  
-0000aac9  OledSsd1306_forceAllPixelsOn       
-0000a81d  OledSsd1306_forceAllPixelsOnSh1106 
-00008875  OledSsd1306_showReq002Status       
-00009735  OledSsd1306_showTestPattern        
-0000b353  PendSV_Handler                     
-0000dea9  Pid_init                           
-0000dff9  Pid_reset                          
-0000b1b1  Pid_step                           
-0000b353  RTC_IRQHandler                     
-0000d541  Req002_abort                       
-0000df45  Req002_blockReasonName             
-0000e075  Req002_getStatus                   
-0000d111  Req002_init                        
-000081dd  Req002_service                     
-0000df5d  Req002_stateName                   
-0000e0a7  Reset_Handler                      
-0000b353  SPI0_IRQHandler                    
-0000b353  SPI1_IRQHandler                    
-0000b353  SVC_Handler                        
-0000ca69  SYSCFG_DL_DIAG_UART_init           
-0000c431  SYSCFG_DL_GPIO_init                
-0000c765  SYSCFG_DL_LEFT_CAPTURE_init        
-0000d595  SYSCFG_DL_LINE_I2C_init            
-0000c945  SYSCFG_DL_MOTOR_PWM_init           
-0000d5e9  SYSCFG_DL_OLED_I2C_init            
-0000d731  SYSCFG_DL_RADIO_SPI_init           
-0000d289  SYSCFG_DL_RIGHT_QEI_init           
-0000dc55  SYSCFG_DL_SYSCTL_init              
-0000d63d  SYSCFG_DL_init                     
-0000cd99  SYSCFG_DL_initPower                
-0000ddc1  StartButton_init                   
-0000d77d  StartButton_poll                   
-0000df8d  StartButton_readHardwarePressed    
-0000e05b  StartButton_takePress              
-0000e009  SysTick_Handler                    
-0000b353  TIMA0_IRQHandler                   
-0000e07d  TIMA1_IRQHandler                   
-0000b353  TIMG0_IRQHandler                   
-0000b353  TIMG12_IRQHandler                  
-0000b353  TIMG6_IRQHandler                   
-0000b353  TIMG7_IRQHandler                   
-0000b353  TIMG8_IRQHandler                   
-0000dc85  Timebase_init                      
-0000e045  Timebase_nowMs                     
-0000e019  Timebase_onSysTick                 
-0000e085  Timebase_reached                   
-0000e08d  UART0_IRQHandler                   
-0000b353  UART1_IRQHandler                   
-0000b353  UART2_IRQHandler                   
-0000b353  UART3_IRQHandler                   
+0000d9b5  Encoders_init                      
+0000e429  Encoders_onLeftEncoderAInterrupt   
+0000dbfd  Encoders_snapshot                  
+0000cefd  Encoders_speedShadowInit           
+0000bcbd  Encoders_speedShadowService        
+0000e999  Encoders_speedShadowSnapshot       
+0000b82f  GROUP0_IRQHandler                  
+0000e785  GROUP1_IRQHandler                  
+0000eabb  HOSTexit                           
+0000b82f  HardFault_Handler                  
+0000b82f  I2C0_IRQHandler                    
+0000b82f  I2C1_IRQHandler                    
+0000c201  I2cDiag_scan                       
+0000e5bd  K230Link_getStats                  
+0000d239  K230Link_init                      
+0000e921  K230Link_pendingBytes              
+0000e1cd  K230Link_pushRxByteFromIsr         
+0000a115  K230Link_service                   
+0000d601  K230Link_snapshot                  
+0000e899  LineSensors_init                   
+0000b249  LineSensors_service                
+0000e939  LineSensors_snapshot               
+0000ea8d  LineTracking_getStatus             
+0000e215  LineTracking_init                  
+0000a759  LineTracking_service               
+0000c0c1  MotorDriver_driveVehicleForward    
+0000dd11  MotorDriver_init                   
+0000dd69  MotorDriver_outputsStopped         
+0000ce35  MotorDriver_setVehicleForwardDuties
+0000e32d  MotorDriver_stopAll                
+0000e7a9  MotorTest_abort                    
+0000e7c9  MotorTest_init                     
+0000e651  MotorTest_onTimebaseTick           
+0000e36d  MotorTest_service                  
+0000e8b5  MotorTest_snapshot                 
+0000d8d9  MotorTest_start                    
+0000e951  MotorTest_stateName                
+0000b82f  NMI_Handler                        
+0000e009  Nrf24Ptx_arm                       
+0000c32d  Nrf24Ptx_captureDiagnosticChar     
+0000e465  Nrf24Ptx_disarm                    
+0000de69  Nrf24Ptx_getStatus                 
+0000d4f9  Nrf24Ptx_init                      
+0000debd  Nrf24Ptx_readCoreRegisters         
+0000e6e1  Nrf24Ptx_safeWhenDisarmed          
+00008fdd  Nrf24Ptx_service                   
+0000d111  OledSsd1306_clear                  
+0000afa5  OledSsd1306_forceAllPixelsOn       
+0000acf9  OledSsd1306_forceAllPixelsOnSh1106 
+00008a11  OledSsd1306_showReq002Status       
+000098d1  OledSsd1306_showTestPattern        
+0000b82f  PendSV_Handler                     
+0000e8d1  Pid_init                           
+0000ea19  Pid_reset                          
+0000b68d  Pid_step                           
+0000b82f  RTC_IRQHandler                     
+0000d67d  Req002_abort                       
+0000e969  Req002_blockReasonName             
+0000ea95  Req002_getStatus                   
+0000cc81  Req002_init                        
+00007a69  Req002_service                     
+0000e981  Req002_stateName                   
+0000eabf  Reset_Handler                      
+0000b82f  SPI0_IRQHandler                    
+0000b82f  SPI1_IRQHandler                    
+0000b82f  SVC_Handler                        
+0000d2c9  SYSCFG_DL_DIAG_UART_init           
+0000c799  SYSCFG_DL_GPIO_init                
+0000d355  SYSCFG_DL_K230_UART_init           
+0000df11  SYSCFG_DL_LINE_I2C_init            
+0000d1a5  SYSCFG_DL_MOTOR_PWM_init           
+0000df65  SYSCFG_DL_OLED_I2C_init            
+0000e059  SYSCFG_DL_RADIO_SPI_init           
+0000dc59  SYSCFG_DL_RIGHT_QEI_init           
+0000e681  SYSCFG_DL_SYSCTL_init              
+0000e0a5  SYSCFG_DL_init                     
+0000d6f9  SYSCFG_DL_initPower                
+0000e7e9  StartButton_init                   
+0000e0f1  StartButton_poll                   
+0000e9ad  StartButton_readHardwarePressed    
+0000ea7b  StartButton_takePress              
+0000ea29  SysTick_Handler                    
+0000b82f  TIMA0_IRQHandler                   
+0000b82f  TIMA1_IRQHandler                   
+0000b82f  TIMG0_IRQHandler                   
+0000b82f  TIMG12_IRQHandler                  
+0000b82f  TIMG6_IRQHandler                   
+0000b82f  TIMG7_IRQHandler                   
+0000b82f  TIMG8_IRQHandler                   
+0000e6b1  Timebase_init                      
+0000ea65  Timebase_nowMs                     
+0000ea39  Timebase_onSysTick                 
+0000ea9d  Timebase_reached                   
+0000eaa5  UART0_IRQHandler                   
+0000e2e9  UART1_IRQHandler                   
+0000b82f  UART2_IRQHandler                   
+0000b82f  UART3_IRQHandler                   
 20208000  __STACK_END                        
 00000200  __STACK_SIZE                       
 00000000  __TI_ATRegion0_region_sz           
@@ -691,79 +730,80 @@ address   name
 00000000  __TI_ATRegion2_region_sz           
 00000000  __TI_ATRegion2_src_addr            
 00000000  __TI_ATRegion2_trg_addr            
-0000ed54  __TI_CINIT_Base                    
-0000ed64  __TI_CINIT_Limit                   
-0000ed64  __TI_CINIT_Warm                    
-0000ed38  __TI_Handler_Table_Base            
-0000ed44  __TI_Handler_Table_Limit           
-0000daa9  __TI_auto_init_nobinit_nopinit     
-0000ce15  __TI_decompress_lzss               
-0000dfc5  __TI_decompress_none               
+0000f86c  __TI_CINIT_Base                    
+0000f87c  __TI_CINIT_Limit                   
+0000f87c  __TI_CINIT_Warm                    
+0000f850  __TI_Handler_Table_Base            
+0000f85c  __TI_Handler_Table_Limit           
+0000e4a1  __TI_auto_init_nobinit_nopinit     
+0000d775  __TI_decompress_lzss               
+0000e9e5  __TI_decompress_none               
 ffffffff  __TI_pprof_out_hndl                
 ffffffff  __TI_prof_data_size                
 ffffffff  __TI_prof_data_start               
 00000000  __TI_static_base__                 
-0000e029  __TI_zero_init                     
-0000c517  __addsf3                           
-0000db59  __aeabi_f2iz                       
-0000c517  __aeabi_fadd                       
-0000d2e5  __aeabi_fcmpeq                     
-0000d31b  __aeabi_fcmpge                     
-0000d32d  __aeabi_fcmpgt                     
-0000d309  __aeabi_fcmple                     
-0000d2f7  __aeabi_fcmplt                     
-0000cb6b  __aeabi_fcmpun                     
-0000cd15  __aeabi_fdiv                       
-0000cb81  __aeabi_fmul                       
-0000c50d  __aeabi_fsub                       
-0000c153  __aeabi_idiv0                      
-0000deef  __aeabi_memclr                     
-0000deef  __aeabi_memclr4                    
-0000deef  __aeabi_memclr8                    
-0000e095  __aeabi_memcpy                     
-0000e095  __aeabi_memcpy4                    
-0000e095  __aeabi_memcpy8                    
-0000dee1  __aeabi_memset                     
-0000dee1  __aeabi_memset4                    
-0000dee1  __aeabi_memset8                    
-0000dd31  __aeabi_ui2f                       
-0000d9f1  __aeabi_uidiv                      
-0000d9f1  __aeabi_uidivmod                   
+0000ea49  __TI_zero_init                     
+0000cd67  __addsf3                           
+0000e551  __aeabi_f2iz                       
+0000cd67  __aeabi_fadd                       
+0000dcb5  __aeabi_fcmpeq                     
+0000dceb  __aeabi_fcmpge                     
+0000dcfd  __aeabi_fcmpgt                     
+0000dcd9  __aeabi_fcmple                     
+0000dcc7  __aeabi_fcmplt                     
+0000d457  __aeabi_fcmpun                     
+0000d57d  __aeabi_fdiv                       
+0000d46d  __aeabi_fmul                       
+0000cd5d  __aeabi_fsub                       
+0000c797  __aeabi_idiv0                      
+0000e8fb  __aeabi_memclr                     
+0000e8fb  __aeabi_memclr4                    
+0000e8fb  __aeabi_memclr8                    
+0000eaad  __aeabi_memcpy                     
+0000eaad  __aeabi_memcpy4                    
+0000eaad  __aeabi_memcpy8                    
+0000e8ed  __aeabi_memset                     
+0000e8ed  __aeabi_memset4                    
+0000e8ed  __aeabi_memset8                    
+0000e735  __aeabi_ui2f                       
+0000e3ad  __aeabi_uidiv                      
+0000e3ad  __aeabi_uidivmod                   
 ffffffff  __binit__                          
-0000caf5  __cmpsf2                           
-0000cd15  __divsf3                           
-0000caf5  __eqsf2                            
-0000db59  __fixsfsi                          
-0000dd31  __floatunsisf                      
-0000cb2f  __gesf2                            
-0000cb2f  __gtsf2                            
-0000caf5  __lesf2                            
-0000caf5  __ltsf2                            
+0000d3e1  __cmpsf2                           
+0000d57d  __divsf3                           
+0000d3e1  __eqsf2                            
+0000e551  __fixsfsi                          
+0000e735  __floatunsisf                      
+0000d41b  __gesf2                            
+0000d41b  __gtsf2                            
+0000d3e1  __lesf2                            
+0000d3e1  __ltsf2                            
 UNDEFED   __mpu_init                         
-0000dae5  __muldsi3                          
-0000cb81  __mulsf3                           
-0000caf5  __nesf2                            
+0000e4dd  __muldsi3                          
+0000d46d  __mulsf3                           
+0000d3e1  __nesf2                            
 20207e00  __stack                            
 20200000  __start___llvm_prf_bits            
 20200000  __start___llvm_prf_cnts            
 20200000  __stop___llvm_prf_bits             
 20200000  __stop___llvm_prf_cnts             
-0000c50d  __subsf3                           
-0000cb6b  __unordsf2                         
-0000dd09  _c_int00_noargs                    
+0000cd5d  __subsf3                           
+0000d457  __unordsf2                         
+0000e70d  _c_int00_noargs                    
 UNDEFED   _system_post_cinit                 
-0000e0ab  _system_pre_init                   
-0000e09d  abort                              
+0000eac3  _system_pre_init                   
+0000eab5  abort                              
 ffffffff  binit                              
-20200300  gLEFT_CAPTUREBackup                
-202003bc  gMOTOR_PWMBackup                   
-202006f8  gRADIO_SPIBackup                   
-20200478  gRIGHT_QEIBackup                   
+20200658  gEncoderSpeedShadow                
+2020045c  gK230RuntimeDiag                   
+20200300  gMOTOR_PWMBackup                   
+2020080c  gRADIO_SPIBackup                   
+202003bc  gRIGHT_QEIBackup                   
 00000000  interruptVectors                   
-0000df75  main                               
-0000dde1  memcmp                             
-0000c815  memcpy                             
-0000d04d  memset                             
+0000c9a5  main                               
+0000e809  memcmp                             
+0000d075  memcpy                             
+0000da7d  memset                             
 
 
 GLOBAL SYMBOLS: SORTED BY Symbol Address 
@@ -783,197 +823,205 @@ address   name
 00000000  interruptVectors                   
 000000c1  DiagConsole_service                
 00000200  __STACK_SIZE                       
-000081dd  Req002_service                     
-00008875  OledSsd1306_showReq002Status       
-00008e41  Nrf24Ptx_service                   
-00009735  OledSsd1306_showTestPattern        
-0000a27d  LineTracking_service               
-0000a81d  OledSsd1306_forceAllPixelsOnSh1106 
-0000aac9  OledSsd1306_forceAllPixelsOn       
-0000ad6d  LineSensors_service                
-0000b1b1  Pid_step                           
-0000b353  ADC0_IRQHandler                    
-0000b353  ADC1_IRQHandler                    
-0000b353  AES_IRQHandler                     
-0000b353  CANFD0_IRQHandler                  
-0000b353  DAC0_IRQHandler                    
-0000b353  DMA_IRQHandler                     
-0000b353  Default_Handler                    
-0000b353  GROUP0_IRQHandler                  
-0000b353  GROUP1_IRQHandler                  
-0000b353  HardFault_Handler                  
-0000b353  I2C0_IRQHandler                    
-0000b353  I2C1_IRQHandler                    
-0000b353  NMI_Handler                        
-0000b353  PendSV_Handler                     
-0000b353  RTC_IRQHandler                     
-0000b353  SPI0_IRQHandler                    
-0000b353  SPI1_IRQHandler                    
-0000b353  SVC_Handler                        
-0000b353  TIMA0_IRQHandler                   
-0000b353  TIMG0_IRQHandler                   
-0000b353  TIMG12_IRQHandler                  
-0000b353  TIMG6_IRQHandler                   
-0000b353  TIMG7_IRQHandler                   
-0000b353  TIMG8_IRQHandler                   
-0000b353  UART1_IRQHandler                   
-0000b353  UART2_IRQHandler                   
-0000b353  UART3_IRQHandler                   
-0000b355  DiagConsole_reportBoot             
-0000ba7d  MotorDriver_driveVehicleForward    
-0000bbbd  I2cDiag_scan                       
-0000bce9  Nrf24Ptx_captureDiagnosticChar     
-0000c153  __aeabi_idiv0                      
-0000c155  DL_Timer_initFourCCPWMMode         
-0000c259  App_service                        
-0000c431  SYSCFG_DL_GPIO_init                
-0000c50d  __aeabi_fsub                       
-0000c50d  __subsf3                           
-0000c517  __addsf3                           
-0000c517  __aeabi_fadd                       
-0000c5e5  MotorDriver_setVehicleForwardDuties
-0000c765  SYSCFG_DL_LEFT_CAPTURE_init        
-0000c815  memcpy                             
-0000c8b1  OledSsd1306_clear                  
-0000c945  SYSCFG_DL_MOTOR_PWM_init           
-0000c9d9  Encoders_init                      
-0000ca69  SYSCFG_DL_DIAG_UART_init           
-0000caf5  __cmpsf2                           
-0000caf5  __eqsf2                            
-0000caf5  __lesf2                            
-0000caf5  __ltsf2                            
-0000caf5  __nesf2                            
-0000cb2f  __gesf2                            
-0000cb2f  __gtsf2                            
-0000cb6b  __aeabi_fcmpun                     
-0000cb6b  __unordsf2                         
-0000cb81  __aeabi_fmul                       
-0000cb81  __mulsf3                           
-0000cc0d  Encoders_onLeftCaptureInterrupt    
-0000cc91  Nrf24Ptx_init                      
-0000cd15  __aeabi_fdiv                       
-0000cd15  __divsf3                           
-0000cd99  SYSCFG_DL_initPower                
-0000ce15  __TI_decompress_lzss               
-0000cf09  BoardSafety_service                
-0000cf79  MotorTest_start                    
-0000d04d  memset                             
-0000d0b1  App_init                           
-0000d111  Req002_init                        
-0000d171  DL_I2C_fillControllerTXFIFO        
-0000d1d1  DiagConsole_onUartInterrupt        
-0000d22d  Encoders_snapshot                  
-0000d289  SYSCFG_DL_RIGHT_QEI_init           
-0000d2e5  __aeabi_fcmpeq                     
-0000d2f7  __aeabi_fcmplt                     
-0000d309  __aeabi_fcmple                     
-0000d31b  __aeabi_fcmpge                     
-0000d32d  __aeabi_fcmpgt                     
-0000d341  MotorDriver_init                   
-0000d399  MotorDriver_outputsStopped         
-0000d3f1  BoardSafety_stop                   
-0000d445  DL_SPI_drainRXFIFO8                
-0000d499  Nrf24Ptx_getStatus                 
-0000d4ed  Nrf24Ptx_readCoreRegisters         
-0000d541  Req002_abort                       
-0000d595  SYSCFG_DL_LINE_I2C_init            
-0000d5e9  SYSCFG_DL_OLED_I2C_init            
-0000d63d  SYSCFG_DL_init                     
-0000d691  BoardSafety_init                   
-0000d6e1  Nrf24Ptx_arm                       
-0000d731  SYSCFG_DL_RADIO_SPI_init           
-0000d77d  StartButton_poll                   
-0000d7c9  DL_UART_init                       
-0000d811  DiagConsole_init                   
-0000d859  LineTracking_init                  
-0000d8e9  DL_SPI_init                        
-0000d971  MotorDriver_stopAll                
-0000d9b1  MotorTest_service                  
-0000d9f1  __aeabi_uidiv                      
-0000d9f1  __aeabi_uidivmod                   
-0000da31  DL_I2C_flushControllerTXFIFO       
-0000da6d  Nrf24Ptx_disarm                    
-0000daa9  __TI_auto_init_nobinit_nopinit     
-0000dae5  __muldsi3                          
-0000db59  __aeabi_f2iz                       
-0000db59  __fixsfsi                          
-0000db91  BoardSafety_outputsSafe            
-0000dbc5  DL_I2C_flushControllerRXFIFO       
-0000dbf5  DL_UART_transmitDataBlocking       
-0000dc25  MotorTest_onTimebaseTick           
-0000dc55  SYSCFG_DL_SYSCTL_init              
-0000dc85  Timebase_init                      
-0000dcb5  Nrf24Ptx_safeWhenDisarmed          
-0000dce1  DL_Timer_setCaptureCompareCtl      
-0000dd09  _c_int00_noargs                    
-0000dd31  __aeabi_ui2f                       
-0000dd31  __floatunsisf                      
-0000dd59  DL_I2C_setClockConfig              
-0000dd81  MotorTest_abort                    
-0000dda1  MotorTest_init                     
-0000ddc1  StartButton_init                   
-0000dde1  memcmp                             
-0000de01  DL_SPI_receiveDataCheck8           
-0000de1d  DL_SPI_transmitDataCheck8          
-0000de39  DL_Timer_setCaptCompUpdateMethod   
-0000de55  DL_Timer_setClockConfig            
-0000de71  LineSensors_init                   
-0000de8d  MotorTest_snapshot                 
-0000dea9  Pid_init                           
-0000dec5  DL_Timer_setCaptureCompareInput    
-0000dee1  __aeabi_memset                     
-0000dee1  __aeabi_memset4                    
-0000dee1  __aeabi_memset8                    
-0000deef  __aeabi_memclr                     
-0000deef  __aeabi_memclr4                    
-0000deef  __aeabi_memclr8                    
-0000defd  DL_Timer_setCaptureCompareOutCtl   
-0000df15  LineSensors_snapshot               
-0000df2d  MotorTest_stateName                
-0000df45  Req002_blockReasonName             
-0000df5d  Req002_stateName                   
-0000df75  main                               
-0000df8d  StartButton_readHardwarePressed    
-0000dfa1  DL_SPI_setClockConfig              
-0000dfb3  DL_UART_setClockConfig             
-0000dfc5  __TI_decompress_none               
-0000dfd9  DL_Timer_getCaptureCompareValue    
-0000dfe9  DL_Timer_setCaptureCompareValue    
-0000dff9  Pid_reset                          
-0000e009  SysTick_Handler                    
-0000e019  Timebase_onSysTick                 
-0000e029  __TI_zero_init                     
-0000e039  BoardSafety_faultLatched           
-0000e045  Timebase_nowMs                     
-0000e051  DL_Common_delayCycles              
-0000e05b  StartButton_takePress              
-0000e065  BoardSafety_buzzerPolicy           
-0000e06d  LineTracking_getStatus             
-0000e075  Req002_getStatus                   
-0000e07d  TIMA1_IRQHandler                   
-0000e085  Timebase_reached                   
-0000e08d  UART0_IRQHandler                   
-0000e095  __aeabi_memcpy                     
-0000e095  __aeabi_memcpy4                    
-0000e095  __aeabi_memcpy8                    
-0000e09d  abort                              
-0000e0a2  C$$EXIT                            
-0000e0a3  HOSTexit                           
-0000e0a7  Reset_Handler                      
-0000e0ab  _system_pre_init                   
-0000ed38  __TI_Handler_Table_Base            
-0000ed44  __TI_Handler_Table_Limit           
-0000ed54  __TI_CINIT_Base                    
-0000ed64  __TI_CINIT_Limit                   
-0000ed64  __TI_CINIT_Warm                    
+00007a69  Req002_service                     
+00008a11  OledSsd1306_showReq002Status       
+00008fdd  Nrf24Ptx_service                   
+000098d1  OledSsd1306_showTestPattern        
+0000a115  K230Link_service                   
+0000a759  LineTracking_service               
+0000acf9  OledSsd1306_forceAllPixelsOnSh1106 
+0000afa5  OledSsd1306_forceAllPixelsOn       
+0000b249  LineSensors_service                
+0000b68d  Pid_step                           
+0000b82f  ADC0_IRQHandler                    
+0000b82f  ADC1_IRQHandler                    
+0000b82f  AES_IRQHandler                     
+0000b82f  CANFD0_IRQHandler                  
+0000b82f  DAC0_IRQHandler                    
+0000b82f  DMA_IRQHandler                     
+0000b82f  Default_Handler                    
+0000b82f  GROUP0_IRQHandler                  
+0000b82f  HardFault_Handler                  
+0000b82f  I2C0_IRQHandler                    
+0000b82f  I2C1_IRQHandler                    
+0000b82f  NMI_Handler                        
+0000b82f  PendSV_Handler                     
+0000b82f  RTC_IRQHandler                     
+0000b82f  SPI0_IRQHandler                    
+0000b82f  SPI1_IRQHandler                    
+0000b82f  SVC_Handler                        
+0000b82f  TIMA0_IRQHandler                   
+0000b82f  TIMA1_IRQHandler                   
+0000b82f  TIMG0_IRQHandler                   
+0000b82f  TIMG12_IRQHandler                  
+0000b82f  TIMG6_IRQHandler                   
+0000b82f  TIMG7_IRQHandler                   
+0000b82f  TIMG8_IRQHandler                   
+0000b82f  UART2_IRQHandler                   
+0000b82f  UART3_IRQHandler                   
+0000b831  DiagConsole_reportBoot             
+0000bcbd  Encoders_speedShadowService        
+0000c0c1  MotorDriver_driveVehicleForward    
+0000c201  I2cDiag_scan                       
+0000c32d  Nrf24Ptx_captureDiagnosticChar     
+0000c797  __aeabi_idiv0                      
+0000c799  SYSCFG_DL_GPIO_init                
+0000c8a1  DL_Timer_initFourCCPWMMode         
+0000c9a5  main                               
+0000caa9  App_service                        
+0000cc81  Req002_init                        
+0000cd5d  __aeabi_fsub                       
+0000cd5d  __subsf3                           
+0000cd67  __addsf3                           
+0000cd67  __aeabi_fadd                       
+0000ce35  MotorDriver_setVehicleForwardDuties
+0000cefd  Encoders_speedShadowInit           
+0000d075  memcpy                             
+0000d111  OledSsd1306_clear                  
+0000d1a5  SYSCFG_DL_MOTOR_PWM_init           
+0000d239  K230Link_init                      
+0000d2c9  SYSCFG_DL_DIAG_UART_init           
+0000d355  SYSCFG_DL_K230_UART_init           
+0000d3e1  __cmpsf2                           
+0000d3e1  __eqsf2                            
+0000d3e1  __lesf2                            
+0000d3e1  __ltsf2                            
+0000d3e1  __nesf2                            
+0000d41b  __gesf2                            
+0000d41b  __gtsf2                            
+0000d457  __aeabi_fcmpun                     
+0000d457  __unordsf2                         
+0000d46d  __aeabi_fmul                       
+0000d46d  __mulsf3                           
+0000d4f9  Nrf24Ptx_init                      
+0000d57d  __aeabi_fdiv                       
+0000d57d  __divsf3                           
+0000d601  K230Link_snapshot                  
+0000d67d  Req002_abort                       
+0000d6f9  SYSCFG_DL_initPower                
+0000d775  __TI_decompress_lzss               
+0000d869  BoardSafety_service                
+0000d8d9  MotorTest_start                    
+0000d9b5  Encoders_init                      
+0000da7d  memset                             
+0000dae1  App_init                           
+0000db41  DL_I2C_fillControllerTXFIFO        
+0000dba1  DiagConsole_onUartInterrupt        
+0000dbfd  Encoders_snapshot                  
+0000dc59  SYSCFG_DL_RIGHT_QEI_init           
+0000dcb5  __aeabi_fcmpeq                     
+0000dcc7  __aeabi_fcmplt                     
+0000dcd9  __aeabi_fcmple                     
+0000dceb  __aeabi_fcmpge                     
+0000dcfd  __aeabi_fcmpgt                     
+0000dd11  MotorDriver_init                   
+0000dd69  MotorDriver_outputsStopped         
+0000ddc1  BoardSafety_stop                   
+0000de15  DL_SPI_drainRXFIFO8                
+0000de69  Nrf24Ptx_getStatus                 
+0000debd  Nrf24Ptx_readCoreRegisters         
+0000df11  SYSCFG_DL_LINE_I2C_init            
+0000df65  SYSCFG_DL_OLED_I2C_init            
+0000dfb9  BoardSafety_init                   
+0000e009  Nrf24Ptx_arm                       
+0000e059  SYSCFG_DL_RADIO_SPI_init           
+0000e0a5  SYSCFG_DL_init                     
+0000e0f1  StartButton_poll                   
+0000e13d  DL_UART_init                       
+0000e185  DiagConsole_init                   
+0000e1cd  K230Link_pushRxByteFromIsr         
+0000e215  LineTracking_init                  
+0000e2a5  DL_SPI_init                        
+0000e2e9  UART1_IRQHandler                   
+0000e32d  MotorDriver_stopAll                
+0000e36d  MotorTest_service                  
+0000e3ad  __aeabi_uidiv                      
+0000e3ad  __aeabi_uidivmod                   
+0000e3ed  DL_I2C_flushControllerTXFIFO       
+0000e429  Encoders_onLeftEncoderAInterrupt   
+0000e465  Nrf24Ptx_disarm                    
+0000e4a1  __TI_auto_init_nobinit_nopinit     
+0000e4dd  __muldsi3                          
+0000e551  __aeabi_f2iz                       
+0000e551  __fixsfsi                          
+0000e589  BoardSafety_outputsSafe            
+0000e5bd  K230Link_getStats                  
+0000e5f1  DL_I2C_flushControllerRXFIFO       
+0000e621  DL_UART_transmitDataBlocking       
+0000e651  MotorTest_onTimebaseTick           
+0000e681  SYSCFG_DL_SYSCTL_init              
+0000e6b1  Timebase_init                      
+0000e6e1  Nrf24Ptx_safeWhenDisarmed          
+0000e70d  _c_int00_noargs                    
+0000e735  __aeabi_ui2f                       
+0000e735  __floatunsisf                      
+0000e75d  DL_I2C_setClockConfig              
+0000e785  GROUP1_IRQHandler                  
+0000e7a9  MotorTest_abort                    
+0000e7c9  MotorTest_init                     
+0000e7e9  StartButton_init                   
+0000e809  memcmp                             
+0000e829  DL_SPI_receiveDataCheck8           
+0000e845  DL_SPI_transmitDataCheck8          
+0000e861  DL_Timer_setCaptCompUpdateMethod   
+0000e87d  DL_Timer_setClockConfig            
+0000e899  LineSensors_init                   
+0000e8b5  MotorTest_snapshot                 
+0000e8d1  Pid_init                           
+0000e8ed  __aeabi_memset                     
+0000e8ed  __aeabi_memset4                    
+0000e8ed  __aeabi_memset8                    
+0000e8fb  __aeabi_memclr                     
+0000e8fb  __aeabi_memclr4                    
+0000e8fb  __aeabi_memclr8                    
+0000e909  DL_Timer_setCaptureCompareOutCtl   
+0000e921  K230Link_pendingBytes              
+0000e939  LineSensors_snapshot               
+0000e951  MotorTest_stateName                
+0000e969  Req002_blockReasonName             
+0000e981  Req002_stateName                   
+0000e999  Encoders_speedShadowSnapshot       
+0000e9ad  StartButton_readHardwarePressed    
+0000e9c1  DL_SPI_setClockConfig              
+0000e9d3  DL_UART_setClockConfig             
+0000e9e5  __TI_decompress_none               
+0000e9f9  DL_Timer_getCaptureCompareValue    
+0000ea09  DL_Timer_setCaptureCompareValue    
+0000ea19  Pid_reset                          
+0000ea29  SysTick_Handler                    
+0000ea39  Timebase_onSysTick                 
+0000ea49  __TI_zero_init                     
+0000ea59  BoardSafety_faultLatched           
+0000ea65  Timebase_nowMs                     
+0000ea71  DL_Common_delayCycles              
+0000ea7b  StartButton_takePress              
+0000ea85  BoardSafety_buzzerPolicy           
+0000ea8d  LineTracking_getStatus             
+0000ea95  Req002_getStatus                   
+0000ea9d  Timebase_reached                   
+0000eaa5  UART0_IRQHandler                   
+0000eaad  __aeabi_memcpy                     
+0000eaad  __aeabi_memcpy4                    
+0000eaad  __aeabi_memcpy8                    
+0000eab5  abort                              
+0000eaba  C$$EXIT                            
+0000eabb  HOSTexit                           
+0000eabf  Reset_Handler                      
+0000eac3  _system_pre_init                   
+0000f850  __TI_Handler_Table_Base            
+0000f85c  __TI_Handler_Table_Limit           
+0000f86c  __TI_CINIT_Base                    
+0000f87c  __TI_CINIT_Limit                   
+0000f87c  __TI_CINIT_Warm                    
 20200000  __start___llvm_prf_bits            
 20200000  __start___llvm_prf_cnts            
 20200000  __stop___llvm_prf_bits             
 20200000  __stop___llvm_prf_cnts             
-20200300  gLEFT_CAPTUREBackup                
-202003bc  gMOTOR_PWMBackup                   
-20200478  gRIGHT_QEIBackup                   
-202006f8  gRADIO_SPIBackup                   
+20200300  gMOTOR_PWMBackup                   
+202003bc  gRIGHT_QEIBackup                   
+2020045c  gK230RuntimeDiag                   
+20200658  gEncoderSpeedShadow                
+2020080c  gRADIO_SPIBackup                   
 20207e00  __stack                            
 20208000  __STACK_END                        
 ffffffff  __TI_pprof_out_hndl                
@@ -984,4 +1032,4 @@ ffffffff  binit
 UNDEFED   __mpu_init                         
 UNDEFED   _system_post_cinit                 
 
-[213 symbols]
+[221 symbols]

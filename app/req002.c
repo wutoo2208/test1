@@ -1,10 +1,13 @@
-#include "app/req002.h"
+﻿#include "app/req002.h"
 
 #include <string.h>
+
+#include "algorithm/pid.h"
 
 #include "bsp/board_safety.h"
 #include "bsp/timebase.h"
 #include "config/firmware_config.h"
+#include "drivers/encoders.h"
 #include "drivers/motor_driver.h"
 
 #define REQ002_TRACKING_STALE_AFTER_MS \
@@ -18,6 +21,11 @@ static uint32_t gDepartSinceMs;
 static uint32_t gMarkerSinceMs;
 static bool gDepartPending;
 static bool gMarkerPending;
+static PidController gSpeedBalancePi;
+static uint32_t gSpeedBalanceSampleCount;
+static float gSpeedBalanceTrimPermille;
+
+static void speedBalanceReset(void);
 #endif
 
 static Req002BlockReason trackingBlockReason(
@@ -131,6 +139,10 @@ Req002ControlDecision Req002_evaluateTracking(
 
 void Req002_init(uint32_t nowMs)
 {
+#if REQ002_ACTUATION_BUILD
+    PidConfig speedPiConfig;
+#endif
+
     memset(&gStatus, 0, sizeof(gStatus));
     gStatus.state = REQ002_STATE_IDLE;
     gStatus.tracking = Req002_evaluateTracking(nowMs, NULL);
@@ -139,6 +151,18 @@ void Req002_init(uint32_t nowMs)
     gStatus.timeoutMs = REQ002_TIMEOUT_MS;
     gStatus.elapsedFrozen = true;
     gStatus.pidConfigured = (REQ002_PID_ENABLED != 0U);
+#if REQ002_ACTUATION_BUILD
+    speedPiConfig.kp = REQ002_SPEED_PI_KP;
+    speedPiConfig.ki = REQ002_SPEED_PI_KI;
+    speedPiConfig.kd = 0.0f;
+    speedPiConfig.outputMin = -REQ002_SPEED_PI_OUTPUT_LIMIT;
+    speedPiConfig.outputMax = REQ002_SPEED_PI_OUTPUT_LIMIT;
+    speedPiConfig.integralMin = -REQ002_SPEED_PI_INTEGRAL_LIMIT;
+    speedPiConfig.integralMax = REQ002_SPEED_PI_INTEGRAL_LIMIT;
+    speedPiConfig.derivativeAlpha = 1.0f;
+    Pid_init(&gSpeedBalancePi, &speedPiConfig);
+    speedBalanceReset();
+#endif
     setLocked(true);
 #if REQ002_ACTUATION_BUILD
     gDepartPending = false;
@@ -157,6 +181,7 @@ void Req002_abort(uint32_t nowMs)
     gStatus.blockReason = REQ002_BLOCK_NONE;
     setLocked(true);
 #if REQ002_ACTUATION_BUILD
+    speedBalanceReset();
     gDepartPending = false;
     gMarkerPending = false;
 #endif
@@ -198,12 +223,61 @@ static uint16_t clampDemand(float demand)
     return (uint16_t) demand;
 }
 
+static void speedBalanceReset(void)
+{
+    EncoderSpeedShadow speed = Encoders_speedShadowSnapshot();
+
+    gSpeedBalanceSampleCount = speed.sampleCount;
+    gSpeedBalanceTrimPermille = 0.0f;
+    Pid_reset(&gSpeedBalancePi, 0.0f);
+}
+
+static float speedBalanceStep(bool enabled)
+{
+    EncoderSpeedShadow speed;
+    float leftNormalized;
+    float rightNormalized;
+    float measurement;
+    float dtSeconds;
+
+    if (!enabled || (REQ002_SPEED_PI_ENABLED == 0U)) {
+        speedBalanceReset();
+        return 0.0f;
+    }
+
+    speed = Encoders_speedShadowSnapshot();
+    if ((speed.initialized == 0U) ||
+        (speed.sampleCount == gSpeedBalanceSampleCount)) {
+        return gSpeedBalanceTrimPermille;
+    }
+    gSpeedBalanceSampleCount = speed.sampleCount;
+
+    /* Do not integrate against a missing encoder. A 1x left sample is scaled
+     * to the right hardware QEI's 4x count domain before comparison. */
+    if ((speed.leftAbsDelta == 0U) || (speed.rightAbsDelta == 0U) ||
+        (speed.windowMs == 0U)) {
+        gSpeedBalanceTrimPermille = 0.0f;
+        Pid_reset(&gSpeedBalancePi, 0.0f);
+        return 0.0f;
+    }
+
+    leftNormalized = (float) speed.leftAbsDelta *
+        REQ002_LEFT_ENCODER_TO_QEI_SCALE;
+    rightNormalized = (float) speed.rightAbsDelta;
+    measurement = leftNormalized - rightNormalized;
+    dtSeconds = (float) speed.windowMs * 0.001f;
+    gSpeedBalanceTrimPermille = Pid_step(&gSpeedBalancePi, 0.0f,
+        measurement, dtSeconds, false);
+    return gSpeedBalanceTrimPermille;
+}
+
 static void stopWithFault(uint32_t nowMs, Req002BlockReason reason)
 {
     BoardSafety_stop(BOARD_SAFETY_STOP_FAULT);
     freezeElapsed(nowMs);
     gStatus.state = REQ002_STATE_FAULT;
     gStatus.blockReason = reason;
+    speedBalanceReset();
     setLocked(true);
 }
 
@@ -215,6 +289,7 @@ static void completeRun(uint32_t nowMs)
     gStatus.returnMarkerSeen = true;
     gStatus.state = REQ002_STATE_COMPLETE;
     gStatus.blockReason = REQ002_BLOCK_NONE;
+    speedBalanceReset();
     setLocked(true);
 }
 
@@ -222,6 +297,7 @@ static void tryStart(uint32_t nowMs)
 {
     Req002BlockReason reason = firstInvalidGate(&gStatus.tracking);
 
+    speedBalanceReset();
     gStatus.buttonAttempts++;
     if ((reason != REQ002_BLOCK_NONE) ||
         !markerDetected(&gStatus.tracking) ||
@@ -266,7 +342,9 @@ static bool applyControl(uint32_t nowMs)
     float rightBase;
     float leftDemand;
     float rightDemand;
+    float speedTrim;
     float rampScale = 1.0f;
+    bool speedBalanceEnabled;
     uint32_t elapsedMs;
 
     if (!Timebase_reached(nowMs, gNextControlMs)) return true;
@@ -303,6 +381,18 @@ static bool applyControl(uint32_t nowMs)
         (leftBase - (correction * turnAuthority));
     rightDemand = rampScale *
         (rightBase + (correction * turnAuthority));
+
+    speedBalanceEnabled =
+        (elapsedMs >= REQ002_SOFT_START_MS) &&
+        (correctionMagnitude <= REQ002_SPEED_PI_STRAIGHT_THRESHOLD) &&
+        (leftDemand >= (float) REQ002_SPEED_PI_MIN_DEMAND_PERMILLE) &&
+        (rightDemand >= (float) REQ002_SPEED_PI_MIN_DEMAND_PERMILLE);
+    speedTrim = speedBalanceStep(speedBalanceEnabled);
+
+    /* Positive trim means the right normalized count was higher: speed up
+     * the left wheel and slow the right wheel by the same bounded amount. */
+    leftDemand += speedTrim;
+    rightDemand -= speedTrim;
     gStatus.leftDemandPermille = clampDemand(leftDemand);
     gStatus.rightDemandPermille = clampDemand(rightDemand);
 

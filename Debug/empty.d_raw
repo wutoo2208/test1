@@ -84,7 +84,8 @@ empty.o: ..\empty.c \
   D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\driverlib\m0p\dl_systick.h \
   ..\app\app.h ..\app\motor_test.h \
   C:\Users\Administrator\workspace_ccstheia\test1_2.2_recovered\drivers\motor_driver.h \
-  ..\bsp\timebase.h ..\drivers\diag_console.h ..\drivers\encoders.h
+  ..\bsp\timebase.h ..\drivers\diag_console.h ..\drivers\encoders.h \
+  ..\drivers\k230_link.h
 C:\Users\Administrator\workspace_ccstheia\test1_2.2_recovered\Debug\ti_msp_dl_config.h:
 D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\devices\msp\msp.h:
 D:\AAADiansai\CCS\mspm0_sdk_2_11_00_07\source\ti\devices\DeviceFamily.h:
@@ -174,3 +175,4 @@ C:\Users\Administrator\workspace_ccstheia\test1_2.2_recovered\drivers\motor_driv
 ..\bsp\timebase.h:
 ..\drivers\diag_console.h:
 ..\drivers\encoders.h:
+..\drivers\k230_link.h:
