@@ -38,8 +38,15 @@ static float gSpeedBalanceTrimPermille;
 static bool gEncoderFeedbackMissing;
 static uint32_t gEncoderFeedbackMissingSinceMs;
 static bool gEncoderFeedbackFaulted;
+static bool gSharpRightTurnPending;
+static bool gSharpRightTurnActive;
+static bool gSharpRightTurnLatched;
+static uint32_t gSharpRightTurnPendingSinceMs;
+static uint32_t gSharpRightTurnStartMs;
+static bool gFinishBrakeEngaged;
 
 static void speedBalanceReset(void);
+static void sharpRightTurnReset(void);
 #endif
 
 static Req002BlockReason trackingBlockReason(
@@ -183,6 +190,8 @@ void Req002_init(uint32_t nowMs)
     speedPiConfig.integralMin = 0.0f;
     Pid_init(&gTurnLeftPi, &speedPiConfig);
     speedBalanceReset();
+    sharpRightTurnReset();
+    gFinishBrakeEngaged = false;
 #endif
     setLocked(true);
 #if REQ002_ACTUATION_BUILD
@@ -206,6 +215,8 @@ void Req002_abort(uint32_t nowMs)
     setLocked(true);
 #if REQ002_ACTUATION_BUILD
     speedBalanceReset();
+    sharpRightTurnReset();
+    gFinishBrakeEngaged = false;
     gDepartPending = false;
     gMarkerPending = false;
     gTrackingFaultPending = false;
@@ -262,6 +273,91 @@ static void speedBalanceReset(void)
     gEncoderFeedbackFaulted = false;
     Pid_reset(&gSpeedBalancePi, 0.0f);
     Pid_reset(&gTurnLeftPi, 0.0f);
+}
+
+static void sharpRightTurnReset(void)
+{
+    gSharpRightTurnPending = false;
+    gSharpRightTurnActive = false;
+    gSharpRightTurnLatched = false;
+    gSharpRightTurnPendingSinceMs = 0U;
+    gSharpRightTurnStartMs = 0U;
+}
+
+static bool sharpRightTurnRecovered(void)
+{
+    return gStatus.tracking.snapshot.centeredError <=
+        REQ002_SHARP_RIGHT_EXIT_ERROR;
+}
+
+static bool sharpRightTurnRequested(void)
+{
+    return (gStatus.tracking.snapshot.centeredError >=
+            REQ002_SHARP_RIGHT_ENTER_ERROR) &&
+        (gStatus.tracking.steeringRequest < 0.0f);
+}
+
+static void sharpRightTurnUpdate(uint32_t nowMs, uint32_t elapsedMs)
+{
+    if (sharpRightTurnRecovered()) {
+        sharpRightTurnReset();
+        return;
+    }
+
+    if (gSharpRightTurnActive) {
+        if (Timebase_reached(nowMs, gSharpRightTurnStartMs +
+                REQ002_SHARP_RIGHT_MAX_MS)) {
+            gSharpRightTurnActive = false;
+        }
+        return;
+    }
+    if (gSharpRightTurnLatched || (elapsedMs < REQ002_SOFT_START_MS)) {
+        gSharpRightTurnPending = false;
+        return;
+    }
+
+    if (!sharpRightTurnRequested()) {
+        gSharpRightTurnPending = false;
+        return;
+    }
+    if (!gSharpRightTurnPending) {
+        gSharpRightTurnPending = true;
+        gSharpRightTurnPendingSinceMs = nowMs;
+        return;
+    }
+    if (Timebase_reached(nowMs, gSharpRightTurnPendingSinceMs +
+            REQ002_SHARP_RIGHT_CONFIRM_MS)) {
+        gSharpRightTurnPending = false;
+        gSharpRightTurnActive = true;
+        gSharpRightTurnLatched = true;
+        gSharpRightTurnStartMs = nowMs;
+        speedBalanceReset();
+    }
+}
+
+static bool commandSharpRightTurn(void)
+{
+    /* Right 0% is intentional and bypasses the measured 1%..42% dead zone.
+     * Disable both speed PI paths and their missing-feedback watchdog while
+     * the inner wheel is deliberately unpowered. */
+    speedBalanceReset();
+    gStatus.leftDemandPermille =
+        REQ002_SHARP_RIGHT_LEFT_PULSE_PERMILLE;
+    gStatus.rightDemandPermille =
+        REQ002_SHARP_RIGHT_RIGHT_PULSE_PERMILLE;
+    gStatus.lastAppliedLeftDemandPermille = gStatus.leftDemandPermille;
+    gStatus.lastAppliedRightDemandPermille = gStatus.rightDemandPermille;
+    gStatus.controlSequence++;
+    return MotorDriver_setVehicleForwardDuties(
+        gStatus.leftDemandPermille, gStatus.rightDemandPermille) ==
+        MOTOR_DRIVER_OK;
+}
+
+static bool applySharpRightTurn(uint32_t nowMs)
+{
+    if (!Timebase_reached(nowMs, gNextControlMs)) return true;
+    gNextControlMs = nowMs + REQ002_CONTROL_PERIOD_MS;
+    return commandSharpRightTurn();
 }
 
 static void speedBalanceWatchdog(uint32_t nowMs, bool feedbackMissing)
@@ -372,6 +468,8 @@ static void stopWithFault(uint32_t nowMs, Req002BlockReason reason)
     gStatus.state = REQ002_STATE_FAULT;
     gStatus.blockReason = reason;
     speedBalanceReset();
+    sharpRightTurnReset();
+    gFinishBrakeEngaged = false;
     setLocked(true);
 }
 
@@ -384,7 +482,46 @@ static void completeRun(uint32_t nowMs)
     gStatus.state = REQ002_STATE_COMPLETE;
     gStatus.blockReason = REQ002_BLOCK_NONE;
     speedBalanceReset();
+    sharpRightTurnReset();
+    gFinishBrakeEngaged = false;
     setLocked(true);
+}
+
+static void serviceReturnMarker(uint32_t nowMs)
+{
+    setLocked(true);
+    if (!gFinishBrakeEngaged && Timebase_reached(nowMs,
+            gMarkerSinceMs + REQ002_FINISH_BRAKE_PREPARE_MS)) {
+        MotorDriver_engageBrakeAll();
+        gFinishBrakeEngaged = true;
+    }
+
+    /* Never let generic line-loss recovery overwrite terminal braking. If the
+     * tracking sample becomes invalid, keep braking through the confirmation
+     * window, then release to coast and report the real tracking fault. */
+    if (!gStatus.tracking.dataValid) {
+        if (Timebase_reached(nowMs,
+                gMarkerSinceMs + REQ002_MARKER_CONFIRM_MS)) {
+            Req002BlockReason reason = trackingBlockReason(&gStatus.tracking);
+
+            MotorDriver_releaseBrakeAll();
+            gFinishBrakeEngaged = false;
+            stopWithFault(nowMs, reason);
+        }
+        return;
+    }
+    if (!markerDetected(&gStatus.tracking)) {
+        MotorDriver_releaseBrakeAll();
+        gFinishBrakeEngaged = false;
+        gStatus.state = REQ002_STATE_LAP_ACTIVE;
+        gMarkerPending = false;
+        gNextControlMs = nowMs;
+    } else if (gMarkerPending && Timebase_reached(nowMs,
+            gMarkerSinceMs + REQ002_MARKER_CONFIRM_MS)) {
+        MotorDriver_releaseBrakeAll();
+        gFinishBrakeEngaged = false;
+        completeRun(nowMs);
+    }
 }
 
 static void tryStart(uint32_t nowMs)
@@ -392,6 +529,8 @@ static void tryStart(uint32_t nowMs)
     Req002BlockReason reason = firstInvalidGate(&gStatus.tracking);
 
     speedBalanceReset();
+    sharpRightTurnReset();
+    gFinishBrakeEngaged = false;
     gTrackingFaultPending = false;
     gTrackingFaultSinceMs = nowMs;
     gTrackingFaultReason = REQ002_BLOCK_NONE;
@@ -481,6 +620,11 @@ static bool applyControl(uint32_t nowMs)
     elapsedMs = nowMs - gStatus.startMs;
     if (elapsedMs < REQ002_SOFT_START_MS) {
         rampScale = (float) elapsedMs / (float) REQ002_SOFT_START_MS;
+    }
+
+    sharpRightTurnUpdate(nowMs, elapsedMs);
+    if (gSharpRightTurnActive) {
+        return commandSharpRightTurn();
     }
 
     correction = gStatus.tracking.steeringRequest;
@@ -610,6 +754,10 @@ void Req002_service(uint32_t nowMs, bool buttonPress,
         stopWithFault(nowMs, REQ002_BLOCK_TRACKING_TIMEOUT);
         return;
     }
+    if (gStatus.state == REQ002_STATE_RETURN_MARKER) {
+        serviceReturnMarker(nowMs);
+        return;
+    }
     if (!gStatus.tracking.dataValid) {
         Req002BlockReason reason = trackingBlockReason(&gStatus.tracking);
 
@@ -620,6 +768,19 @@ void Req002_service(uint32_t nowMs, bool buttonPress,
                 gTrackingFaultSinceMs = nowMs;
             }
             gTrackingFaultReason = reason;
+            if (gSharpRightTurnActive &&
+                !Timebase_reached(nowMs, gSharpRightTurnStartMs +
+                    REQ002_SHARP_RIGHT_MAX_MS)) {
+                setLocked(false);
+                if (!applySharpRightTurn(nowMs)) {
+                    stopWithFault(nowMs,
+                        REQ002_BLOCK_ACTUATION_GATE_INVALID);
+                }
+                return;
+            }
+            if (gSharpRightTurnActive) {
+                gSharpRightTurnActive = false;
+            }
             if (Timebase_reached(nowMs,
                     gTrackingFaultSinceMs +
                     REQ002_TRACKING_FAULT_CONFIRM_MS)) {
@@ -656,25 +817,19 @@ void Req002_service(uint32_t nowMs, bool buttonPress,
         }
     } else if (gStatus.state == REQ002_STATE_LAP_ACTIVE) {
         if (markerDetected(&gStatus.tracking)) {
-            BoardSafety_stop(BOARD_SAFETY_STOP_OPERATOR);
+            /* Begin terminal stopping immediately. Force both IN1 signals
+             * high, then assert both IN2 signals after one complete PWM period
+             * for DRV8870 1/1 electrical braking. */
             setLocked(true);
+            speedBalanceReset();
+            sharpRightTurnReset();
+            MotorDriver_prepareBrakeAll();
+            gFinishBrakeEngaged = false;
             gStatus.state = REQ002_STATE_RETURN_MARKER;
             gMarkerSinceMs = nowMs;
             gMarkerPending = true;
             return;
         }
-    } else if (gStatus.state == REQ002_STATE_RETURN_MARKER) {
-        BoardSafety_stop(BOARD_SAFETY_STOP_OPERATOR);
-        setLocked(true);
-        if (!markerDetected(&gStatus.tracking)) {
-            gStatus.state = REQ002_STATE_LAP_ACTIVE;
-            gMarkerPending = false;
-            gNextControlMs = nowMs;
-        } else if (gMarkerPending && Timebase_reached(nowMs,
-                gMarkerSinceMs + REQ002_MARKER_CONFIRM_MS)) {
-            completeRun(nowMs);
-        }
-        return;
     }
 
     if (!applyControl(nowMs)) {

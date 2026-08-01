@@ -19,6 +19,8 @@ typedef enum {
 typedef struct {
     uint16_t leftDutyPermille;
     uint16_t rightDutyPermille;
+    bool leftBraking;
+    bool rightBraking;
     bool pwmCounterRunning;
 } MotorDriverStatus;
 
@@ -29,6 +31,9 @@ MotorDriverResult MotorDriver_driveVehicleForward(MotorWheel wheel,
     uint16_t dutyPermille);
 MotorDriverResult MotorDriver_setVehicleForwardDuties(
     uint16_t leftDutyPermille, uint16_t rightDutyPermille);
+void MotorDriver_prepareBrakeAll(void);
+void MotorDriver_engageBrakeAll(void);
+void MotorDriver_releaseBrakeAll(void);
 void MotorDriver_stopAll(void);
 bool MotorDriver_outputsStopped(void);
 MotorDriverStatus MotorDriver_snapshot(void);

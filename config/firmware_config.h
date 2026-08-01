@@ -79,6 +79,9 @@
 #define REQ002_SOFT_START_MS                 (300U)
 #define REQ002_DEPART_CONFIRM_MS             (50U)
 #define REQ002_MARKER_CONFIRM_MS             (50U)
+/* Allow one complete 1 kHz PWM period for IN1 to become continuously high
+ * before IN2 is asserted high for DRV8870 1/1 electrical braking. */
+#define REQ002_FINISH_BRAKE_PREPARE_MS         (1U)
 #define REQ002_MARKER_MIN_BLACK              (4U)
 #define REQ002_BASE_PULSE_PERMILLE           (850U)
 #define REQ002_RIGHT_TRIM_PERMILLE            (420U)
@@ -91,6 +94,16 @@
 #define REQ002_RIGHT_TURN_PULSE_PERMILLE      (1340U)
 #define REQ002_LEFT_TURN_PULSE_PERMILLE       (800U)
 #define REQ002_TURN_MIN_CORRECTION             (0.25f)
+
+/* Ground-observed sharp-corner escape: duties below about 43% do not produce
+ * stable right-wheel motion. Use an explicit 0% command instead of the dead
+ * zone, and reduce the outer left wheel to limit apex entry momentum. */
+#define REQ002_SHARP_RIGHT_ENTER_ERROR          (0.15f)
+#define REQ002_SHARP_RIGHT_EXIT_ERROR           (0.05f)
+#define REQ002_SHARP_RIGHT_CONFIRM_MS           (10U)
+#define REQ002_SHARP_RIGHT_MAX_MS               (100U)
+#define REQ002_SHARP_RIGHT_LEFT_PULSE_PERMILLE  (800U)
+#define REQ002_SHARP_RIGHT_RIGHT_PULSE_PERMILLE (0U)
 
 /* Initial straight-line wheel-speed PI candidate. The left GPIO path counts
  * one A rising edge per encoder cycle; the right hardware QEI counts 4x. */

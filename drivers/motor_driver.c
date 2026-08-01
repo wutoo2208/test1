@@ -31,6 +31,7 @@ static void setLeftVehicleForwardDuty(uint16_t dutyPermille)
         DIAG_GPIO_MOTOR_BIN2_SAFE_PIN);
     setDuty(GPIO_MOTOR_PWM_C2_IDX, dutyPermille);
     gStatus.leftDutyPermille = dutyPermille;
+    gStatus.leftBraking = false;
 }
 
 static void setRightVehicleForwardDuty(uint16_t dutyPermille)
@@ -39,17 +40,57 @@ static void setRightVehicleForwardDuty(uint16_t dutyPermille)
         DIAG_GPIO_MOTOR_AIN2_SAFE_PIN);
     setDuty(GPIO_MOTOR_PWM_C0_IDX, dutyPermille);
     gStatus.rightDutyPermille = dutyPermille;
+    gStatus.rightBraking = false;
 }
 void MotorDriver_stopAll(void)
 {
-    setDuty(GPIO_MOTOR_PWM_C0_IDX, 0U);
-    setDuty(GPIO_MOTOR_PWM_C2_IDX, 0U);
+    /* Clear IN2 first. If this is called from 1/1 brake, the brief transition
+     * is toward the verified forward polarity rather than 0/1 reverse drive. */
     DL_GPIO_clearPins(DIAG_GPIO_MOTOR_AIN2_SAFE_PORT,
         DIAG_GPIO_MOTOR_AIN2_SAFE_PIN);
     DL_GPIO_clearPins(DIAG_GPIO_MOTOR_BIN2_SAFE_PORT,
         DIAG_GPIO_MOTOR_BIN2_SAFE_PIN);
+    setDuty(GPIO_MOTOR_PWM_C0_IDX, 0U);
+    setDuty(GPIO_MOTOR_PWM_C2_IDX, 0U);
     gStatus.leftDutyPermille = 0U;
     gStatus.rightDutyPermille = 0U;
+    gStatus.leftBraking = false;
+    gStatus.rightBraking = false;
+}
+
+void MotorDriver_prepareBrakeAll(void)
+{
+    /* With IN2 low, force both IN1 timer outputs continuously high. REQ-002
+     * waits one full PWM period before asserting IN2, avoiding PWM-low phases
+     * that would otherwise select reverse drive instead of pure 1/1 brake. */
+    DL_GPIO_clearPins(DIAG_GPIO_MOTOR_AIN2_SAFE_PORT,
+        DIAG_GPIO_MOTOR_AIN2_SAFE_PIN);
+    DL_GPIO_clearPins(DIAG_GPIO_MOTOR_BIN2_SAFE_PORT,
+        DIAG_GPIO_MOTOR_BIN2_SAFE_PIN);
+    setDuty(GPIO_MOTOR_PWM_C0_IDX, 1000U);
+    setDuty(GPIO_MOTOR_PWM_C2_IDX, 1000U);
+    gStatus.leftDutyPermille = 1000U;
+    gStatus.rightDutyPermille = 1000U;
+    gStatus.leftBraking = false;
+    gStatus.rightBraking = false;
+}
+
+void MotorDriver_engageBrakeAll(void)
+{
+    /* DRV8870 truth table: IN1=1 and IN2=1 selects electrical brake. */
+    DL_GPIO_setPins(DIAG_GPIO_MOTOR_AIN2_SAFE_PORT,
+        DIAG_GPIO_MOTOR_AIN2_SAFE_PIN);
+    DL_GPIO_setPins(DIAG_GPIO_MOTOR_BIN2_SAFE_PORT,
+        DIAG_GPIO_MOTOR_BIN2_SAFE_PIN);
+    gStatus.leftDutyPermille = 0U;
+    gStatus.rightDutyPermille = 0U;
+    gStatus.leftBraking = true;
+    gStatus.rightBraking = true;
+}
+
+void MotorDriver_releaseBrakeAll(void)
+{
+    MotorDriver_stopAll();
 }
 
 void MotorDriver_init(void)
@@ -139,7 +180,8 @@ MotorDriverResult MotorDriver_driveVehicleForward(MotorWheel wheel,
 }
 bool MotorDriver_outputsStopped(void)
 {
-    return (gStatus.leftDutyPermille == 0U) &&
+    return !gStatus.leftBraking && !gStatus.rightBraking &&
+        (gStatus.leftDutyPermille == 0U) &&
         (gStatus.rightDutyPermille == 0U) &&
         (DL_TimerA_getCaptureCompareValue(MOTOR_PWM_INST,
              GPIO_MOTOR_PWM_C0_IDX) == MOTOR_PWM_ZERO_COMPARE) &&

@@ -81,6 +81,16 @@ class FirmwareSafetyTests(unittest.TestCase):
         ):
             self.assertNotIn(forbidden, safety)
         self.assertIn("MotorDriver_stopAll", safety)
+        for token in (
+            "MotorDriver_prepareBrakeAll",
+            "MotorDriver_engageBrakeAll",
+            "MotorDriver_releaseBrakeAll",
+            "gStatus.leftBraking = true",
+            "gStatus.rightBraking = true",
+            "setDuty(GPIO_MOTOR_PWM_C0_IDX, 1000U)",
+            "setDuty(GPIO_MOTOR_PWM_C2_IDX, 1000U)",
+        ):
+            self.assertIn(token, driver + text("drivers/motor_driver.h"))
         self.assertNotIn("ti_msp_dl_config.h", motor_test)
         self.assertNotIn("DL_TimerA_", motor_test + console)
         self.assertIn("MotorTest_start", console)
@@ -223,6 +233,26 @@ class FirmwareSafetyTests(unittest.TestCase):
         self.assertIn("#define REQ002_RIGHT_TURN_PULSE_PERMILLE      (1340U)", config)
         self.assertIn("#define REQ002_LEFT_TURN_PULSE_PERMILLE       (800U)", config)
         self.assertIn("#define REQ002_TURN_MIN_CORRECTION             (0.25f)", config)
+        for token in (
+            "REQ002_SHARP_RIGHT_ENTER_ERROR          (0.15f)",
+            "REQ002_SHARP_RIGHT_EXIT_ERROR           (0.05f)",
+            "REQ002_SHARP_RIGHT_CONFIRM_MS           (10U)",
+            "REQ002_SHARP_RIGHT_MAX_MS               (100U)",
+            "REQ002_SHARP_RIGHT_LEFT_PULSE_PERMILLE  (800U)",
+            "REQ002_SHARP_RIGHT_RIGHT_PULSE_PERMILLE (0U)",
+        ):
+            self.assertIn(token, config)
+        for token in (
+            "gSharpRightTurnActive",
+            "sharpRightTurnRequested",
+            "sharpRightTurnUpdate",
+            "commandSharpRightTurn",
+            "applySharpRightTurn",
+            "REQ002_SHARP_RIGHT_LEFT_PULSE_PERMILLE",
+            "REQ002_SHARP_RIGHT_RIGHT_PULSE_PERMILLE",
+            "speedBalanceReset();",
+        ):
+            self.assertIn(token, req002)
         self.assertIn("correctionMagnitude", req002)
         self.assertIn("steeringCommand", req002)
         self.assertIn("steeringMagnitude", req002)
@@ -249,6 +279,20 @@ class FirmwareSafetyTests(unittest.TestCase):
         self.assertNotIn("leftOutput = 1000U", req002)
         self.assertNotIn("rightOutput = 1000U", req002)
         self.assertIn("Req002_abort(Timebase_nowMs());", console)
+        self.assertIn("REQ002_FINISH_BRAKE_PREPARE_MS         (1U)", config)
+        self.assertIn("serviceReturnMarker(nowMs);", req002)
+        self.assertLess(
+            req002.index("serviceReturnMarker(nowMs);"),
+            req002.index("if (!gStatus.tracking.dataValid) {",
+                         req002.index("void Req002_service")))
+        for token in (
+            "MotorDriver_prepareBrakeAll();",
+            "MotorDriver_engageBrakeAll();",
+            "MotorDriver_releaseBrakeAll();",
+            "gFinishBrakeEngaged",
+            "gMarkerSinceMs + REQ002_MARKER_CONFIRM_MS",
+        ):
+            self.assertIn(token, req002)
         for token in (
             "last_left=",
             "last_right=",
