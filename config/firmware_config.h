@@ -35,6 +35,9 @@
 
 #define START_BUTTON_DEBOUNCE_MS            (30U)
 #define REQ002_TIMEOUT_MS                   (20000U)
+#define REQ002_TRACKING_FAULT_CONFIRM_MS     (100U)
+#define REQ002_TRACKING_RECOVERY_LEFT_PERMILLE  (600U)
+#define REQ002_TRACKING_RECOVERY_RIGHT_PERMILLE (290U)
 
 #ifndef MOTOR_SELFTEST_BUILD
 #define MOTOR_SELFTEST_BUILD                (0U)
@@ -77,17 +80,17 @@
 #define REQ002_DEPART_CONFIRM_MS             (50U)
 #define REQ002_MARKER_CONFIRM_MS             (50U)
 #define REQ002_MARKER_MIN_BLACK              (4U)
-#define REQ002_BASE_PULSE_PERMILLE           (700U)
-#define REQ002_RIGHT_TRIM_PERMILLE            (80U)
+#define REQ002_BASE_PULSE_PERMILLE           (850U)
+#define REQ002_RIGHT_TRIM_PERMILLE            (420U)
 #define REQ002_RIGHT_CURVE_SLOWDOWN_PERMILLE  (220U)
 #define REQ002_LEFT_CURVE_SLOWDOWN_PERMILLE   (100U)
-#define REQ002_MAX_PULSE_PERMILLE             (800U)
-#define REQ002_RIGHT_TURN_PULSE_PERMILLE      (350U)
+#define REQ002_MAX_PULSE_PERMILLE             (850U)
+#define REQ002_RIGHT_TURN_PULSE_PERMILLE      (500U)
 #define REQ002_LEFT_TURN_PULSE_PERMILLE       (150U)
 
 /* Initial straight-line wheel-speed PI candidate. The left GPIO path counts
  * one A rising edge per encoder cycle; the right hardware QEI counts 4x. */
-#define REQ002_SPEED_PI_ENABLED                REQ002_ACTUATION_BUILD
+#define REQ002_SPEED_PI_ENABLED                (0U)
 #define REQ002_LEFT_ENCODER_TO_QEI_SCALE       (4.0f)
 #define REQ002_SPEED_PI_STRAIGHT_THRESHOLD     (0.10f)
 #define REQ002_SPEED_PI_MIN_DEMAND_PERMILLE    (250U)

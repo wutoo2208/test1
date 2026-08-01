@@ -400,7 +400,7 @@ story += [PT('2、球—杆系统控制理论',h2),PT('将钢球视为无滑动�
 story += [PT('三、电路与程序设计',h1),PT('1、电路与系统结构',h2),RLImage(str(FIG_SYS),width=15.5*cm,height=6.98*cm),PT('图3-1  系统总体框图',center)]
 story.append(table_pdf(['模块','主要接口','设计作用与关键约束'],[
 ['LineFollower_6CH','I²C0：PA28/PA31，5 V','六路循迹；总线异常重试，线序和极性需实测。'],['K230','UART1_RX：PA9，115200 8N1','14字节、CRC-8/ATM；输出球位、速度和置信度。'],['DRV8870','PB14/PB12/PA7/PB24','双H桥；功率线旁路扩展板，默认零输出。'],['左右编码器','PB4/PB5；PB10/PB11','左GPIO 1倍频、右TIMG8 QEI；测速和失速检测。'],['D36A','PA26/PA24/PB0','STEP/DIR/EN；必须限频、限角、限时。'],['MS42CG','PA29/PA30','A/B角度反馈；PWM/Z保留；3.3 V逻辑域。'],['OLED','I²C1：PB3/PB2','显示模式、时间、球位和故障码。'],],[2.9,4.5,8.7],fs=7.1))
-story += [PT('2、电源与安全设计',h2),PT('逻辑、视觉和功率执行器分域供电并共地；车轮与步进功率采用独立电源，不由开发板3.3V供电。电机支路设置保险和物理断能。上电默认PWM为0、D36A失能；故障均进入STOP，包括控制超期、丢线、编码器停滞、过流和棕断。',body),PT('K230控制链与场外视频展示链解耦；I2C0仅服务循迹模块，I2C1仅服务OLED，以减少共享故障。',body),PageBreak()]
+story += [PT('2、电源与安全设计',h2),PT('逻辑、视觉和功率执行器分域供电并共地；车轮与步进功率采用独立电源，不由开发板逻辑电源供电。电机支路设置保险和物理断能。上电默认PWM为0、D36A失能；故障均进入STOP，包括控制超期、丢线、编码器停滞、过流和棕断。',body),PT('K230控制链与场外视频展示链解耦；I2C0仅服务循迹模块，I2C1仅服务OLED，以减少共享故障。',body),PageBreak()]
 # p4
 story += [PT('三、电路与程序设计（续）',h1),PT('4、程序功能与分层设计',h2),PT('软件采用“应用状态机—算法—驱动—板级安全”四层结构。应用层负责任务互锁、计时和完成判据；算法层实现归一化循迹、PID和抗饱和；驱动层管理通信与执行器；安全层以SysTick持续强制安全输出。中断只完成采样入队和计数，解析与控制在前台周期任务中执行。',body),RLImage(str(FIG_FLOW),width=14.3*cm,height=7.82*cm),PT('图3-2  主程序状态机与安全处理流程',center)]
 story.append(table_pdf(['状态/机制','主要动作','转移或保护条件'],[
@@ -438,4 +438,5 @@ print(f'PAGE_BREAKS={page_breaks}; expected=5')
 print(f'FOOTERS={footer_parts}')
 for p in [DOCX_PATH,PDF_PATH,FIG_SYS,FIG_CTRL,FIG_FLOW,FIG_CAL]:
     print(p.name,p.stat().st_size,hashlib.sha256(p.read_bytes()).hexdigest().upper())
+
 

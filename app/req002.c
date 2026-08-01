@@ -21,6 +21,9 @@ static uint32_t gDepartSinceMs;
 static uint32_t gMarkerSinceMs;
 static bool gDepartPending;
 static bool gMarkerPending;
+static bool gTrackingFaultPending;
+static uint32_t gTrackingFaultSinceMs;
+static Req002BlockReason gTrackingFaultReason;
 static PidController gSpeedBalancePi;
 static uint32_t gSpeedBalanceSampleCount;
 static float gSpeedBalanceTrimPermille;
@@ -167,6 +170,9 @@ void Req002_init(uint32_t nowMs)
 #if REQ002_ACTUATION_BUILD
     gDepartPending = false;
     gMarkerPending = false;
+    gTrackingFaultPending = false;
+    gTrackingFaultSinceMs = nowMs;
+    gTrackingFaultReason = REQ002_BLOCK_NONE;
 #endif
 }
 
@@ -184,6 +190,9 @@ void Req002_abort(uint32_t nowMs)
     speedBalanceReset();
     gDepartPending = false;
     gMarkerPending = false;
+    gTrackingFaultPending = false;
+    gTrackingFaultSinceMs = nowMs;
+    gTrackingFaultReason = REQ002_BLOCK_NONE;
 #endif
 }
 
@@ -298,6 +307,9 @@ static void tryStart(uint32_t nowMs)
     Req002BlockReason reason = firstInvalidGate(&gStatus.tracking);
 
     speedBalanceReset();
+    gTrackingFaultPending = false;
+    gTrackingFaultSinceMs = nowMs;
+    gTrackingFaultReason = REQ002_BLOCK_NONE;
     gStatus.buttonAttempts++;
     if ((reason != REQ002_BLOCK_NONE) ||
         !markerDetected(&gStatus.tracking) ||
@@ -330,6 +342,25 @@ static void tryStart(uint32_t nowMs)
     gDepartPending = false;
     gMarkerPending = false;
     setLocked(false);
+}
+
+static bool applyTrackingRecovery(uint32_t nowMs)
+{
+    if (!Timebase_reached(nowMs, gNextControlMs)) return true;
+    gNextControlMs = nowMs + REQ002_CONTROL_PERIOD_MS;
+
+    /* A short invalid-line observation is usually a gap or edge transition.
+     * Continue at reduced speed with a slight clockwise/right bias, but only
+     * until the confirmation timer converts a persistent loss into FAULT. */
+    speedBalanceReset();
+    gStatus.leftDemandPermille =
+        REQ002_TRACKING_RECOVERY_LEFT_PERMILLE;
+    gStatus.rightDemandPermille =
+        REQ002_TRACKING_RECOVERY_RIGHT_PERMILLE;
+    gStatus.controlSequence++;
+    return MotorDriver_setVehicleForwardDuties(
+        gStatus.leftDemandPermille, gStatus.rightDemandPermille) ==
+        MOTOR_DRIVER_OK;
 }
 
 static bool applyControl(uint32_t nowMs)
@@ -421,6 +452,7 @@ void Req002_service(uint32_t nowMs, bool buttonPress,
     }
 
     if (!isActiveState(gStatus.state)) {
+        gTrackingFaultPending = false;
         setLocked(true);
         return;
     }
@@ -431,9 +463,35 @@ void Req002_service(uint32_t nowMs, bool buttonPress,
         return;
     }
     if (!gStatus.tracking.dataValid) {
-        stopWithFault(nowMs, trackingBlockReason(&gStatus.tracking));
+        Req002BlockReason reason = trackingBlockReason(&gStatus.tracking);
+
+        if ((reason == REQ002_BLOCK_SIGNAL_INSUFFICIENT) ||
+            (reason == REQ002_BLOCK_LINE_LOST)) {
+            if (!gTrackingFaultPending) {
+                gTrackingFaultPending = true;
+                gTrackingFaultSinceMs = nowMs;
+            }
+            gTrackingFaultReason = reason;
+            if (Timebase_reached(nowMs,
+                    gTrackingFaultSinceMs +
+                    REQ002_TRACKING_FAULT_CONFIRM_MS)) {
+                stopWithFault(nowMs, gTrackingFaultReason);
+                return;
+            }
+
+            setLocked(false);
+            if (!applyTrackingRecovery(nowMs)) {
+                stopWithFault(nowMs,
+                    REQ002_BLOCK_ACTUATION_GATE_INVALID);
+            }
+            return;
+        }
+
+        stopWithFault(nowMs, reason);
         return;
     }
+    gTrackingFaultPending = false;
+    gTrackingFaultReason = REQ002_BLOCK_NONE;
     setLocked(false);
 
     if (gStatus.state == REQ002_STATE_DEPART_A) {

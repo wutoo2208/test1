@@ -183,18 +183,32 @@ class FirmwareSafetyTests(unittest.TestCase):
             "REQ002_SOFT_START_MS",
             "REQ002_TIMEOUT_MS",
             "if (buttonPress && isActiveState",
+            "gTrackingFaultPending",
+            "REQ002_TRACKING_FAULT_CONFIRM_MS",
+            "applyTrackingRecovery",
+            "REQ002_TRACKING_RECOVERY_LEFT_PERMILLE",
+            "REQ002_TRACKING_RECOVERY_RIGHT_PERMILLE",
+            "reason == REQ002_BLOCK_SIGNAL_INSUFFICIENT",
+            "reason == REQ002_BLOCK_LINE_LOST",
         ):
             self.assertIn(token, req002)
 
         self.assertIn(
             "#define REQ002_MARKER_MIN_BLACK              (4U)", config)
         self.assertIn("#define REQ002_SOFT_START_MS                 (300U)", config)
-        self.assertIn("#define REQ002_BASE_PULSE_PERMILLE           (700U)", config)
-        self.assertIn("#define REQ002_RIGHT_TRIM_PERMILLE            (80U)", config)
+        self.assertIn("#define REQ002_TRACKING_FAULT_CONFIRM_MS     (100U)", config)
+        self.assertIn(
+            "#define REQ002_TRACKING_RECOVERY_LEFT_PERMILLE  (600U)",
+            config)
+        self.assertIn(
+            "#define REQ002_TRACKING_RECOVERY_RIGHT_PERMILLE (290U)",
+            config)
+        self.assertIn("#define REQ002_BASE_PULSE_PERMILLE           (850U)", config)
+        self.assertIn("#define REQ002_RIGHT_TRIM_PERMILLE            (420U)", config)
         self.assertIn("#define REQ002_RIGHT_CURVE_SLOWDOWN_PERMILLE  (220U)", config)
         self.assertIn("#define REQ002_LEFT_CURVE_SLOWDOWN_PERMILLE   (100U)", config)
-        self.assertIn("#define REQ002_MAX_PULSE_PERMILLE             (800U)", config)
-        self.assertIn("#define REQ002_RIGHT_TURN_PULSE_PERMILLE      (350U)", config)
+        self.assertIn("#define REQ002_MAX_PULSE_PERMILLE             (850U)", config)
+        self.assertIn("#define REQ002_RIGHT_TURN_PULSE_PERMILLE      (500U)", config)
         self.assertIn("#define REQ002_LEFT_TURN_PULSE_PERMILLE       (150U)", config)
         self.assertIn("correctionMagnitude", req002)
         self.assertIn("if (correction < 0.0f)", req002)
