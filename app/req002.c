@@ -16,8 +16,6 @@ static Req002Status gStatus;
 static uint32_t gNextControlMs;
 static uint32_t gDepartSinceMs;
 static uint32_t gMarkerSinceMs;
-static uint32_t gLeftPulseAccumulator;
-static uint32_t gRightPulseAccumulator;
 static bool gDepartPending;
 static bool gMarkerPending;
 #endif
@@ -145,8 +143,6 @@ void Req002_init(uint32_t nowMs)
 #if REQ002_ACTUATION_BUILD
     gDepartPending = false;
     gMarkerPending = false;
-    gLeftPulseAccumulator = 0U;
-    gRightPulseAccumulator = 0U;
 #endif
 }
 
@@ -163,8 +159,6 @@ void Req002_abort(uint32_t nowMs)
 #if REQ002_ACTUATION_BUILD
     gDepartPending = false;
     gMarkerPending = false;
-    gLeftPulseAccumulator = 0U;
-    gRightPulseAccumulator = 0U;
 #endif
 }
 
@@ -198,7 +192,9 @@ static bool markerDetected(const Req002ControlDecision *decision)
 static uint16_t clampDemand(float demand)
 {
     if (demand <= 0.0f) return 0U;
-    if (demand >= 1000.0f) return 1000U;
+    if (demand >= (float) REQ002_MAX_PULSE_PERMILLE) {
+        return REQ002_MAX_PULSE_PERMILLE;
+    }
     return (uint16_t) demand;
 }
 
@@ -257,55 +253,62 @@ static void tryStart(uint32_t nowMs)
     gNextControlMs = nowMs;
     gDepartPending = false;
     gMarkerPending = false;
-    gLeftPulseAccumulator = 0U;
-    gRightPulseAccumulator = 0U;
     setLocked(false);
 }
 
 static bool applyControl(uint32_t nowMs)
 {
     float correction;
+    float correctionMagnitude;
+    float curveSlowdown;
+    float turnAuthority;
+    float leftBase;
+    float rightBase;
     float leftDemand;
     float rightDemand;
-    uint16_t leftOutput = 0U;
-    uint16_t rightOutput = 0U;
+    float rampScale = 1.0f;
+    uint32_t elapsedMs;
 
     if (!Timebase_reached(nowMs, gNextControlMs)) return true;
     gNextControlMs = nowMs + REQ002_CONTROL_PERIOD_MS;
 
-    if ((nowMs - gStatus.startMs) < REQ002_START_KICK_MS) {
-        gStatus.leftDemandPermille = 1000U;
-        gStatus.rightDemandPermille = 1000U;
-        leftOutput = 1000U;
-        rightOutput = 1000U;
-    } else {
-        correction = gStatus.tracking.steeringRequest;
-        if (correction > 1.0f) correction = 1.0f;
-        if (correction < -1.0f) correction = -1.0f;
-
-        /* Verified sign: line left gives positive correction, so slow the
-         * left wheel and speed the right wheel to steer left. */
-        leftDemand = (float) REQ002_BASE_PULSE_PERMILLE -
-            (correction * (float) REQ002_TURN_PULSE_PERMILLE);
-        rightDemand = (float) REQ002_BASE_PULSE_PERMILLE +
-            (correction * (float) REQ002_TURN_PULSE_PERMILLE);
-        gStatus.leftDemandPermille = clampDemand(leftDemand);
-        gStatus.rightDemandPermille = clampDemand(rightDemand);
-
-        gLeftPulseAccumulator += gStatus.leftDemandPermille;
-        gRightPulseAccumulator += gStatus.rightDemandPermille;
-        if (gLeftPulseAccumulator >= 1000U) {
-            gLeftPulseAccumulator -= 1000U;
-            leftOutput = 1000U;
-        }
-        if (gRightPulseAccumulator >= 1000U) {
-            gRightPulseAccumulator -= 1000U;
-            rightOutput = 1000U;
-        }
+    elapsedMs = nowMs - gStatus.startMs;
+    if (elapsedMs < REQ002_SOFT_START_MS) {
+        rampScale = (float) elapsedMs / (float) REQ002_SOFT_START_MS;
     }
 
+    correction = gStatus.tracking.steeringRequest;
+    if (correction > 1.0f) correction = 1.0f;
+    if (correction < -1.0f) correction = -1.0f;
+
+    correctionMagnitude = (correction >= 0.0f) ? correction : -correction;
+    if (correction < 0.0f) {
+        /* Clockwise course: line on the right requires the dominant turn.
+         * Slow the vehicle harder and apply greater left/right differential. */
+        curveSlowdown = correctionMagnitude *
+            (float) REQ002_RIGHT_CURVE_SLOWDOWN_PERMILLE;
+        turnAuthority = (float) REQ002_RIGHT_TURN_PULSE_PERMILLE;
+    } else {
+        /* Left steering remains only as a weaker recovery correction. */
+        curveSlowdown = correctionMagnitude *
+            (float) REQ002_LEFT_CURVE_SLOWDOWN_PERMILLE;
+        turnAuthority = (float) REQ002_LEFT_TURN_PULSE_PERMILLE;
+    }
+    leftBase = (float) REQ002_BASE_PULSE_PERMILLE - curveSlowdown;
+    rightBase = leftBase - (float) REQ002_RIGHT_TRIM_PERMILLE;
+
+    /* Ground observation: the right wheel runs faster at equal PWM. The
+     * permanent trim counters that leftward bias before steering is mixed. */
+    leftDemand = rampScale *
+        (leftBase - (correction * turnAuthority));
+    rightDemand = rampScale *
+        (rightBase + (correction * turnAuthority));
+    gStatus.leftDemandPermille = clampDemand(leftDemand);
+    gStatus.rightDemandPermille = clampDemand(rightDemand);
+
     gStatus.controlSequence++;
-    return MotorDriver_setVehicleForwardDuties(leftOutput, rightOutput) ==
+    return MotorDriver_setVehicleForwardDuties(
+        gStatus.leftDemandPermille, gStatus.rightDemandPermille) ==
         MOTOR_DRIVER_OK;
 }
 #endif
@@ -370,8 +373,6 @@ void Req002_service(uint32_t nowMs, bool buttonPress,
         if (!markerDetected(&gStatus.tracking)) {
             gStatus.state = REQ002_STATE_LAP_ACTIVE;
             gMarkerPending = false;
-            gLeftPulseAccumulator = 0U;
-            gRightPulseAccumulator = 0U;
             gNextControlMs = nowMs;
         } else if (gMarkerPending && Timebase_reached(nowMs,
                 gMarkerSinceMs + REQ002_MARKER_CONFIRM_MS)) {

@@ -73,11 +73,16 @@
 
 /* Initial bench-only actuator parameters; ground tuning is separately gated. */
 #define REQ002_CONTROL_PERIOD_MS             (5U)
-#define REQ002_START_KICK_MS                 (120U)
+#define REQ002_SOFT_START_MS                 (300U)
 #define REQ002_DEPART_CONFIRM_MS             (50U)
 #define REQ002_MARKER_CONFIRM_MS             (50U)
 #define REQ002_MARKER_MIN_BLACK              (4U)
-#define REQ002_BASE_PULSE_PERMILLE           (650U)
-#define REQ002_TURN_PULSE_PERMILLE           (350U)
+#define REQ002_BASE_PULSE_PERMILLE           (600U)
+#define REQ002_RIGHT_TRIM_PERMILLE            (60U)
+#define REQ002_RIGHT_CURVE_SLOWDOWN_PERMILLE  (220U)
+#define REQ002_LEFT_CURVE_SLOWDOWN_PERMILLE   (100U)
+#define REQ002_MAX_PULSE_PERMILLE             (800U)
+#define REQ002_RIGHT_TURN_PULSE_PERMILLE      (350U)
+#define REQ002_LEFT_TURN_PULSE_PERMILLE       (150U)
 
 #endif /* CONFIG_FIRMWARE_CONFIG_H_ */

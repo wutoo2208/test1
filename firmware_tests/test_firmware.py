@@ -180,7 +180,7 @@ class FirmwareSafetyTests(unittest.TestCase):
             "blackCount",
             "REQ002_DEPART_CONFIRM_MS",
             "REQ002_MARKER_CONFIRM_MS",
-            "REQ002_START_KICK_MS",
+            "REQ002_SOFT_START_MS",
             "REQ002_TIMEOUT_MS",
             "if (buttonPress && isActiveState",
         ):
@@ -188,8 +188,29 @@ class FirmwareSafetyTests(unittest.TestCase):
 
         self.assertIn(
             "#define REQ002_MARKER_MIN_BLACK              (4U)", config)
-        self.assertIn("REQ002_BASE_PULSE_PERMILLE", config)
-        self.assertIn("REQ002_TURN_PULSE_PERMILLE", config)
+        self.assertIn("#define REQ002_SOFT_START_MS                 (300U)", config)
+        self.assertIn("#define REQ002_BASE_PULSE_PERMILLE           (600U)", config)
+        self.assertIn("#define REQ002_RIGHT_TRIM_PERMILLE            (60U)", config)
+        self.assertIn("#define REQ002_RIGHT_CURVE_SLOWDOWN_PERMILLE  (220U)", config)
+        self.assertIn("#define REQ002_LEFT_CURVE_SLOWDOWN_PERMILLE   (100U)", config)
+        self.assertIn("#define REQ002_MAX_PULSE_PERMILLE             (800U)", config)
+        self.assertIn("#define REQ002_RIGHT_TURN_PULSE_PERMILLE      (350U)", config)
+        self.assertIn("#define REQ002_LEFT_TURN_PULSE_PERMILLE       (150U)", config)
+        self.assertIn("correctionMagnitude", req002)
+        self.assertIn("if (correction < 0.0f)", req002)
+        self.assertIn("rightBase = leftBase -", req002)
+        self.assertIn("REQ002_RIGHT_TRIM_PERMILLE", req002)
+        self.assertIn("REQ002_RIGHT_CURVE_SLOWDOWN_PERMILLE", req002)
+        self.assertIn("REQ002_LEFT_CURVE_SLOWDOWN_PERMILLE", req002)
+        self.assertIn("REQ002_RIGHT_TURN_PULSE_PERMILLE", req002)
+        self.assertIn("REQ002_LEFT_TURN_PULSE_PERMILLE", req002)
+        self.assertIn("rampScale", req002)
+        self.assertIn(
+            "gStatus.leftDemandPermille, gStatus.rightDemandPermille", req002)
+        self.assertNotIn("REQ002_START_KICK_MS", config + req002)
+        self.assertNotIn("PulseAccumulator", req002)
+        self.assertNotIn("leftOutput = 1000U", req002)
+        self.assertNotIn("rightOutput = 1000U", req002)
         self.assertIn("Req002_abort(Timebase_nowMs());", console)
         self.assertIn("Ground-verified vehicle-forward polarity", motor)
         self.assertIn("DIAG_GPIO_MOTOR_BIN2_SAFE", motor)
