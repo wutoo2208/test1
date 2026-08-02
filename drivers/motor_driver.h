@@ -34,6 +34,9 @@ MotorDriverResult MotorDriver_setVehicleForwardDuties(
 void MotorDriver_prepareBrakeAll(void);
 void MotorDriver_engageBrakeAll(void);
 void MotorDriver_releaseBrakeAll(void);
+MotorDriverResult MotorDriver_prepareRightBrake(uint16_t leftDutyPermille);
+MotorDriverResult MotorDriver_engageRightBrake(uint16_t leftDutyPermille);
+void MotorDriver_releaseRightBrake(void);
 void MotorDriver_stopAll(void);
 bool MotorDriver_outputsStopped(void);
 MotorDriverStatus MotorDriver_snapshot(void);

@@ -93,6 +93,54 @@ void MotorDriver_releaseBrakeAll(void)
     MotorDriver_stopAll();
 }
 
+MotorDriverResult MotorDriver_prepareRightBrake(
+    uint16_t leftDutyPermille)
+{
+    if (leftDutyPermille > 1000U) {
+        MotorDriver_stopAll();
+        return MOTOR_DRIVER_INVALID_DUTY;
+    }
+
+    setLeftVehicleForwardDuty(leftDutyPermille);
+    /* Keep AIN2 low while forcing AIN1 continuously high. The caller waits at
+     * least one complete 1 kHz PWM period before engaging 1/1 brake. */
+    DL_GPIO_clearPins(DIAG_GPIO_MOTOR_AIN2_SAFE_PORT,
+        DIAG_GPIO_MOTOR_AIN2_SAFE_PIN);
+    setDuty(GPIO_MOTOR_PWM_C0_IDX, 1000U);
+    gStatus.rightDutyPermille = 1000U;
+    gStatus.rightBraking = false;
+    return MOTOR_DRIVER_OK;
+}
+
+MotorDriverResult MotorDriver_engageRightBrake(
+    uint16_t leftDutyPermille)
+{
+    if (leftDutyPermille > 1000U) {
+        MotorDriver_stopAll();
+        return MOTOR_DRIVER_INVALID_DUTY;
+    }
+
+    setLeftVehicleForwardDuty(leftDutyPermille);
+    setDuty(GPIO_MOTOR_PWM_C0_IDX, 1000U);
+    /* DRV8870 A channel: AIN1=1 and AIN2=1 electrically brakes right wheel. */
+    DL_GPIO_setPins(DIAG_GPIO_MOTOR_AIN2_SAFE_PORT,
+        DIAG_GPIO_MOTOR_AIN2_SAFE_PIN);
+    gStatus.rightDutyPermille = 0U;
+    gStatus.rightBraking = true;
+    return MOTOR_DRIVER_OK;
+}
+
+void MotorDriver_releaseRightBrake(void)
+{
+    /* Clear AIN2 before returning AIN1 to zero, so the transition leaves 1/1
+     * through verified forward polarity and finishes at 0/0 coast. */
+    DL_GPIO_clearPins(DIAG_GPIO_MOTOR_AIN2_SAFE_PORT,
+        DIAG_GPIO_MOTOR_AIN2_SAFE_PIN);
+    setDuty(GPIO_MOTOR_PWM_C0_IDX, 0U);
+    gStatus.rightDutyPermille = 0U;
+    gStatus.rightBraking = false;
+}
+
 void MotorDriver_init(void)
 {
     gStatus.pwmCounterRunning = false;

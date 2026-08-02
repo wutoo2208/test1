@@ -139,3 +139,11 @@ Evidence path:
 Limitations:
 Follow-up:
 ```
+
+## 13. 2026-08-01 REQ-002 第二问最终提交版本
+
+| ID | 类型 | 检查/动作 | 结果 | 证据与局限 |
+|---|---|---|---|---|
+| `TEST-027` | 构建验证 | 单轮急弯制动版本经固件静态测试和 CCS `MotorSelfTest` 构建。 | PASS | 静态单元测试 11/11；CCS gmake/链接成功；SysConfig 生成文件报告 Unchanged。最终 ELF 大小 `630476 bytes`，SHA-256 `BDE6EFE861A40E0AA3DACCFC68093E32AB54C026FA8DA3B825545ECBB15FEBAA`。 |
+| `TEST-028` | 台架工具实测 | 使用 Horco CMSIS-DAP `da941ca0`、MSPM0G3507、TI Pack、100 kHz、sector erase、ELF、`--no-reset` 烧录最终 ELF。 | PASS | pyOCD 退出码 0；擦除/编程均为 `72704 bytes`、71 sectors/pages。见 `docs/handoffs/2026-08-01-req002-right-wheel-brake-flash-complete.md`；只证明写入成功。 |
+| `TEST-029` | 用户运动场景陈述 | 用户报告该版本循迹第二问“效果很好”，并明确决定最终作品使用该版本。 | RECORDED | 作为最终版本选择依据；未由代理取得完整视频、正式计时和停车偏差测量，不能替代 `REQ-002` 正式验收。最终冻结见 `docs/handoffs/2026-08-01-req002-final-submission-freeze.md`。 |

@@ -18,9 +18,17 @@ static Req002Status gStatus;
 #if REQ002_ACTUATION_BUILD
 typedef enum {
     SPEED_BALANCE_MODE_DISABLED = 0,
-    SPEED_BALANCE_MODE_STRAIGHT,
-    SPEED_BALANCE_MODE_RIGHT_TURN
+    SPEED_BALANCE_MODE_STRAIGHT
 } SpeedBalanceMode;
+
+typedef enum {
+    RIGHT_CURVE_IDLE = 0,
+    RIGHT_CURVE_APPROACH,
+    RIGHT_CURVE_ARC,
+    RIGHT_CURVE_SHARP_PREPARE,
+    RIGHT_CURVE_SHARP_BRAKE,
+    RIGHT_CURVE_RECOVER
+} RightCurvePhase;
 
 static uint32_t gNextControlMs;
 static uint32_t gDepartSinceMs;
@@ -31,22 +39,25 @@ static bool gTrackingFaultPending;
 static uint32_t gTrackingFaultSinceMs;
 static Req002BlockReason gTrackingFaultReason;
 static PidController gSpeedBalancePi;
-static PidController gTurnLeftPi;
 static SpeedBalanceMode gSpeedBalanceMode;
 static uint32_t gSpeedBalanceSampleCount;
 static float gSpeedBalanceTrimPermille;
 static bool gEncoderFeedbackMissing;
 static uint32_t gEncoderFeedbackMissingSinceMs;
 static bool gEncoderFeedbackFaulted;
-static bool gSharpRightTurnPending;
-static bool gSharpRightTurnActive;
-static bool gSharpRightTurnLatched;
-static uint32_t gSharpRightTurnPendingSinceMs;
-static uint32_t gSharpRightTurnStartMs;
+static RightCurvePhase gRightCurvePhase;
+static bool gRightCurvePending;
+static bool gRightCurveRecenterPending;
+static bool gRightSharpPending;
+static bool gRightSharpLatched;
+static uint32_t gRightCurvePendingSinceMs;
+static uint32_t gRightSharpPendingSinceMs;
+static uint32_t gRightCurvePhaseStartMs;
+static uint32_t gRightCurveRecenterSinceMs;
 static bool gFinishBrakeEngaged;
 
 static void speedBalanceReset(void);
-static void sharpRightTurnReset(void);
+static void rightCurveReset(void);
 #endif
 
 static Req002BlockReason trackingBlockReason(
@@ -183,14 +194,10 @@ void Req002_init(uint32_t nowMs)
     speedPiConfig.derivativeAlpha = 1.0f;
     Pid_init(&gSpeedBalancePi, &speedPiConfig);
 
-    /* The turn controller may only add a small amount to the outer left
-     * wheel. It reuses the field-tested gains and 5% output limit, but its
-     * one-sided limits prevent it from weakening the 93% turn feed-forward. */
-    speedPiConfig.outputMin = 0.0f;
-    speedPiConfig.integralMin = 0.0f;
-    Pid_init(&gTurnLeftPi, &speedPiConfig);
+    /* Wheel-speed PI is deliberately straight-only. Every right-curve phase
+     * uses fixed feed-forward so encoder trim cannot restore apex speed. */
     speedBalanceReset();
-    sharpRightTurnReset();
+    rightCurveReset();
     gFinishBrakeEngaged = false;
 #endif
     setLocked(true);
@@ -215,7 +222,7 @@ void Req002_abort(uint32_t nowMs)
     setLocked(true);
 #if REQ002_ACTUATION_BUILD
     speedBalanceReset();
-    sharpRightTurnReset();
+    rightCurveReset();
     gFinishBrakeEngaged = false;
     gDepartPending = false;
     gMarkerPending = false;
@@ -272,92 +279,282 @@ static void speedBalanceReset(void)
     gEncoderFeedbackMissingSinceMs = 0U;
     gEncoderFeedbackFaulted = false;
     Pid_reset(&gSpeedBalancePi, 0.0f);
-    Pid_reset(&gTurnLeftPi, 0.0f);
 }
 
-static void sharpRightTurnReset(void)
+static void rightCurveReset(void)
 {
-    gSharpRightTurnPending = false;
-    gSharpRightTurnActive = false;
-    gSharpRightTurnLatched = false;
-    gSharpRightTurnPendingSinceMs = 0U;
-    gSharpRightTurnStartMs = 0U;
+    gRightCurvePhase = RIGHT_CURVE_IDLE;
+    gRightCurvePending = false;
+    gRightCurveRecenterPending = false;
+    gRightSharpPending = false;
+    gRightSharpLatched = false;
+    gRightCurvePendingSinceMs = 0U;
+    gRightSharpPendingSinceMs = 0U;
+    gRightCurvePhaseStartMs = 0U;
+    gRightCurveRecenterSinceMs = 0U;
 }
 
-static bool sharpRightTurnRecovered(void)
+static bool rightCurveRequested(float threshold)
 {
-    return gStatus.tracking.snapshot.centeredError <=
-        REQ002_SHARP_RIGHT_EXIT_ERROR;
-}
-
-static bool sharpRightTurnRequested(void)
-{
-    return (gStatus.tracking.snapshot.centeredError >=
-            REQ002_SHARP_RIGHT_ENTER_ERROR) &&
+    return (gStatus.tracking.snapshot.centeredError >= threshold) &&
         (gStatus.tracking.steeringRequest < 0.0f);
 }
 
-static void sharpRightTurnUpdate(uint32_t nowMs, uint32_t elapsedMs)
+static bool rightSharpBrakeTriggerConfirmed(uint32_t nowMs)
 {
-    if (sharpRightTurnRecovered()) {
-        sharpRightTurnReset();
-        return;
+    if (gRightSharpLatched ||
+        !rightCurveRequested(REQ002_RIGHT_SHARP_ENTER_ERROR)) {
+        gRightSharpPending = false;
+        return false;
     }
+    if (!gRightSharpPending) {
+        gRightSharpPending = true;
+        gRightSharpPendingSinceMs = nowMs;
+        return false;
+    }
+    return Timebase_reached(nowMs, gRightSharpPendingSinceMs +
+        REQ002_RIGHT_SHARP_CONFIRM_MS);
+}
 
-    if (gSharpRightTurnActive) {
-        if (Timebase_reached(nowMs, gSharpRightTurnStartMs +
-                REQ002_SHARP_RIGHT_MAX_MS)) {
-            gSharpRightTurnActive = false;
-        }
-        return;
-    }
-    if (gSharpRightTurnLatched || (elapsedMs < REQ002_SOFT_START_MS)) {
-        gSharpRightTurnPending = false;
-        return;
-    }
+static void rightCurveEnter(RightCurvePhase phase, uint32_t nowMs)
+{
+    gRightCurvePhase = phase;
+    gRightCurvePending = false;
+    gRightCurveRecenterPending = false;
+    gRightCurvePendingSinceMs = 0U;
+    gRightCurvePhaseStartMs = nowMs;
+    gRightCurveRecenterSinceMs = 0U;
+    speedBalanceReset();
+}
 
-    if (!sharpRightTurnRequested()) {
-        gSharpRightTurnPending = false;
-        return;
-    }
-    if (!gSharpRightTurnPending) {
-        gSharpRightTurnPending = true;
-        gSharpRightTurnPendingSinceMs = nowMs;
-        return;
-    }
-    if (Timebase_reached(nowMs, gSharpRightTurnPendingSinceMs +
-            REQ002_SHARP_RIGHT_CONFIRM_MS)) {
-        gSharpRightTurnPending = false;
-        gSharpRightTurnActive = true;
-        gSharpRightTurnLatched = true;
-        gSharpRightTurnStartMs = nowMs;
-        speedBalanceReset();
+static void rightCurveUpdate(uint32_t nowMs, uint32_t elapsedMs)
+{
+    uint32_t phaseElapsedMs = nowMs - gRightCurvePhaseStartMs;
+
+    switch (gRightCurvePhase) {
+        case RIGHT_CURVE_IDLE:
+            if (elapsedMs < REQ002_SOFT_START_MS) {
+                gRightCurvePending = false;
+                return;
+            }
+            if (!rightCurveRequested(REQ002_RIGHT_APPROACH_ENTER_ERROR)) {
+                gRightCurvePending = false;
+                return;
+            }
+            if (!gRightCurvePending) {
+                gRightCurvePending = true;
+                gRightCurvePendingSinceMs = nowMs;
+                return;
+            }
+            if (Timebase_reached(nowMs, gRightCurvePendingSinceMs +
+                    REQ002_RIGHT_APPROACH_CONFIRM_MS)) {
+                rightCurveEnter(RIGHT_CURVE_APPROACH, nowMs);
+            }
+            return;
+
+        case RIGHT_CURVE_APPROACH:
+            if (rightSharpBrakeTriggerConfirmed(nowMs)) {
+                gRightSharpPending = false;
+                gRightSharpLatched = true;
+                rightCurveEnter(RIGHT_CURVE_SHARP_PREPARE, nowMs);
+                return;
+            }
+            if (rightCurveRequested(REQ002_RIGHT_ARC_ENTER_ERROR)) {
+                if (!gRightCurvePending) {
+                    gRightCurvePending = true;
+                    gRightCurvePendingSinceMs = nowMs;
+                } else if (Timebase_reached(nowMs,
+                        gRightCurvePendingSinceMs +
+                            REQ002_RIGHT_ARC_CONFIRM_MS)) {
+                    rightCurveEnter(RIGHT_CURVE_ARC, nowMs);
+                    return;
+                }
+            } else {
+                gRightCurvePending = false;
+            }
+
+            if (Timebase_reached(nowMs, gRightCurvePhaseStartMs +
+                    REQ002_RIGHT_APPROACH_MAX_MS)) {
+                if (rightCurveRequested(
+                        REQ002_RIGHT_APPROACH_ENTER_ERROR)) {
+                    rightCurveEnter(RIGHT_CURVE_ARC, nowMs);
+                } else {
+                    rightCurveReset();
+                }
+            } else if ((gStatus.tracking.snapshot.centeredError <=
+                    REQ002_RIGHT_ARC_EXIT_ERROR) &&
+                (gStatus.tracking.steeringRequest >= 0.0f)) {
+                rightCurveReset();
+            }
+            return;
+
+        case RIGHT_CURVE_ARC:
+            if (rightSharpBrakeTriggerConfirmed(nowMs)) {
+                gRightSharpPending = false;
+                gRightSharpLatched = true;
+                rightCurveEnter(RIGHT_CURVE_SHARP_PREPARE, nowMs);
+                return;
+            }
+            if (Timebase_reached(nowMs, gRightCurvePhaseStartMs +
+                    REQ002_RIGHT_ARC_MAX_MS)) {
+                rightCurveEnter(RIGHT_CURVE_RECOVER, nowMs);
+                return;
+            }
+            if (phaseElapsedMs < REQ002_RIGHT_ARC_MIN_MS) {
+                gRightCurveRecenterPending = false;
+                return;
+            }
+            if (gStatus.tracking.snapshot.centeredError >
+                    REQ002_RIGHT_ARC_EXIT_ERROR) {
+                gRightCurveRecenterPending = false;
+                return;
+            }
+            if (!gRightCurveRecenterPending) {
+                gRightCurveRecenterPending = true;
+                gRightCurveRecenterSinceMs = nowMs;
+                return;
+            }
+            if (Timebase_reached(nowMs, gRightCurveRecenterSinceMs +
+                    REQ002_RIGHT_ARC_RECENTER_MS)) {
+                rightCurveEnter(RIGHT_CURVE_RECOVER, nowMs);
+            }
+            return;
+
+        case RIGHT_CURVE_SHARP_PREPARE:
+            if (Timebase_reached(nowMs, gRightCurvePhaseStartMs +
+                    REQ002_RIGHT_SHARP_PREPARE_MS)) {
+                rightCurveEnter(RIGHT_CURVE_SHARP_BRAKE, nowMs);
+            }
+            return;
+
+        case RIGHT_CURVE_SHARP_BRAKE:
+            if (Timebase_reached(nowMs, gRightCurvePhaseStartMs +
+                    REQ002_RIGHT_SHARP_BRAKE_MS)) {
+                MotorDriver_releaseRightBrake();
+                rightCurveEnter(RIGHT_CURVE_ARC, nowMs);
+            }
+            return;
+
+        case RIGHT_CURVE_RECOVER:
+            if (rightCurveRequested(REQ002_RIGHT_ARC_ENTER_ERROR)) {
+                rightCurveEnter(RIGHT_CURVE_ARC, nowMs);
+                return;
+            }
+            if (Timebase_reached(nowMs, gRightCurvePhaseStartMs +
+                    REQ002_RIGHT_RECOVER_MS)) {
+                rightCurveReset();
+            }
+            return;
+
+        default:
+            rightCurveReset();
+            return;
     }
 }
 
-static bool commandSharpRightTurn(void)
+static bool commandRightCurveDuties(uint16_t leftPermille,
+    uint16_t rightPermille)
 {
-    /* Right 0% is intentional and bypasses the measured 1%..42% dead zone.
-     * Disable both speed PI paths and their missing-feedback watchdog while
-     * the inner wheel is deliberately unpowered. */
     speedBalanceReset();
-    gStatus.leftDemandPermille =
-        REQ002_SHARP_RIGHT_LEFT_PULSE_PERMILLE;
-    gStatus.rightDemandPermille =
-        REQ002_SHARP_RIGHT_RIGHT_PULSE_PERMILLE;
-    gStatus.lastAppliedLeftDemandPermille = gStatus.leftDemandPermille;
-    gStatus.lastAppliedRightDemandPermille = gStatus.rightDemandPermille;
+    gStatus.leftDemandPermille = leftPermille;
+    gStatus.rightDemandPermille = rightPermille;
+    gStatus.lastAppliedLeftDemandPermille = leftPermille;
+    gStatus.lastAppliedRightDemandPermille = rightPermille;
     gStatus.controlSequence++;
-    return MotorDriver_setVehicleForwardDuties(
-        gStatus.leftDemandPermille, gStatus.rightDemandPermille) ==
+    return MotorDriver_setVehicleForwardDuties(leftPermille, rightPermille) ==
         MOTOR_DRIVER_OK;
 }
 
-static bool applySharpRightTurn(uint32_t nowMs)
+static bool commandRightSharpPrepare(uint32_t nowMs)
+{
+    MotorDriverResult result;
+
+    speedBalanceReset();
+    gStatus.leftDemandPermille = REQ002_RIGHT_SHARP_LEFT_PERMILLE;
+    /* During the one-period preparation interval right IN1 is continuously
+     * high with AIN2 low, so report the actual brief forward command. */
+    gStatus.rightDemandPermille = 1000U;
+    gStatus.lastAppliedLeftDemandPermille = gStatus.leftDemandPermille;
+    gStatus.lastAppliedRightDemandPermille = gStatus.rightDemandPermille;
+    gStatus.controlSequence++;
+    result = MotorDriver_prepareRightBrake(
+        REQ002_RIGHT_SHARP_LEFT_PERMILLE);
+    if (result == MOTOR_DRIVER_OK) {
+        /* Override the normal 5 ms control cadence to limit preparation to one
+         * complete 1 kHz PWM period. */
+        gNextControlMs = nowMs + REQ002_RIGHT_SHARP_PREPARE_MS;
+    }
+    return result == MOTOR_DRIVER_OK;
+}
+
+static bool commandRightSharpBrake(void)
+{
+    speedBalanceReset();
+    gStatus.leftDemandPermille = REQ002_RIGHT_SHARP_LEFT_PERMILLE;
+    gStatus.rightDemandPermille = 0U;
+    gStatus.lastAppliedLeftDemandPermille = gStatus.leftDemandPermille;
+    gStatus.lastAppliedRightDemandPermille = 0U;
+    gStatus.controlSequence++;
+    return MotorDriver_engageRightBrake(
+        REQ002_RIGHT_SHARP_LEFT_PERMILLE) == MOTOR_DRIVER_OK;
+}
+
+static bool commandRightCurve(uint32_t nowMs)
+{
+    uint32_t phaseElapsedMs;
+    float progress;
+    float leftDemand;
+    float rightDemand;
+    float straightRightDemand;
+
+    switch (gRightCurvePhase) {
+        case RIGHT_CURVE_APPROACH:
+            return commandRightCurveDuties(
+                REQ002_RIGHT_APPROACH_LEFT_PERMILLE,
+                REQ002_RIGHT_APPROACH_RIGHT_PERMILLE);
+        case RIGHT_CURVE_ARC:
+            /* Right 0% is deliberate coast, not electrical braking. */
+            return commandRightCurveDuties(
+                REQ002_RIGHT_ARC_LEFT_PERMILLE,
+                REQ002_RIGHT_ARC_RIGHT_PERMILLE);
+        case RIGHT_CURVE_SHARP_PREPARE:
+            return commandRightSharpPrepare(nowMs);
+        case RIGHT_CURVE_SHARP_BRAKE:
+            return commandRightSharpBrake();
+        case RIGHT_CURVE_RECOVER:
+            phaseElapsedMs = nowMs - gRightCurvePhaseStartMs;
+            if (phaseElapsedMs > REQ002_RIGHT_RECOVER_MS) {
+                phaseElapsedMs = REQ002_RIGHT_RECOVER_MS;
+            }
+            progress = (float) phaseElapsedMs /
+                (float) REQ002_RIGHT_RECOVER_MS;
+            straightRightDemand = (float) REQ002_BASE_PULSE_PERMILLE -
+                (float) REQ002_RIGHT_TRIM_PERMILLE;
+            leftDemand = (float)
+                REQ002_RIGHT_RECOVER_LEFT_START_PERMILLE +
+                (((float) REQ002_BASE_PULSE_PERMILLE -
+                    (float) REQ002_RIGHT_RECOVER_LEFT_START_PERMILLE) *
+                    progress);
+            rightDemand = (float)
+                REQ002_RIGHT_RECOVER_RIGHT_START_PERMILLE +
+                ((straightRightDemand -
+                    (float) REQ002_RIGHT_RECOVER_RIGHT_START_PERMILLE) *
+                    progress);
+            return commandRightCurveDuties(
+                clampDemand(leftDemand, REQ002_MAX_PULSE_PERMILLE),
+                clampDemand(rightDemand, REQ002_MAX_PULSE_PERMILLE));
+        case RIGHT_CURVE_IDLE:
+        default:
+            return true;
+    }
+}
+
+static bool applyRightArcDuringLineLoss(uint32_t nowMs)
 {
     if (!Timebase_reached(nowMs, gNextControlMs)) return true;
     gNextControlMs = nowMs + REQ002_CONTROL_PERIOD_MS;
-    return commandSharpRightTurn();
+    return commandRightCurveDuties(REQ002_RIGHT_ARC_LEFT_PERMILLE,
+        REQ002_RIGHT_ARC_RIGHT_PERMILLE);
 }
 
 static void speedBalanceWatchdog(uint32_t nowMs, bool feedbackMissing)
@@ -389,7 +586,6 @@ static float speedBalanceStep(SpeedBalanceMode mode, bool monitorEnabled,
     float targetRatio, uint32_t nowMs)
 {
     EncoderSpeedShadow speed;
-    PidController *controller;
     float leftNormalized;
     float rightNormalized;
     float measurement;
@@ -407,7 +603,6 @@ static float speedBalanceStep(SpeedBalanceMode mode, bool monitorEnabled,
         gSpeedBalanceMode = mode;
         gSpeedBalanceTrimPermille = 0.0f;
         Pid_reset(&gSpeedBalancePi, 0.0f);
-        Pid_reset(&gTurnLeftPi, 0.0f);
     }
 
     speed = Encoders_speedShadowSnapshot();
@@ -430,8 +625,8 @@ static float speedBalanceStep(SpeedBalanceMode mode, bool monitorEnabled,
     rightMissing = speed.rightAbsDelta == 0U;
     speedBalanceWatchdog(nowMs, leftMissing || rightMissing);
 
-    /* Feedback monitoring stays active through all steering states. PI output
-     * is produced only for straight travel or the dominant right turn. */
+    /* Right-curve phases bypass this function. Encoder PI and its watchdog
+     * are used only for straight travel. */
     if (mode == SPEED_BALANCE_MODE_DISABLED) {
         gSpeedBalanceTrimPermille = 0.0f;
         return 0.0f;
@@ -448,9 +643,7 @@ static float speedBalanceStep(SpeedBalanceMode mode, bool monitorEnabled,
     rightNormalized = (float) speed.rightAbsDelta;
     measurement = leftNormalized - (rightNormalized * targetRatio);
     dtSeconds = (float) speed.windowMs * 0.001f;
-    controller = (mode == SPEED_BALANCE_MODE_RIGHT_TURN) ?
-        &gTurnLeftPi : &gSpeedBalancePi;
-    gSpeedBalanceTrimPermille = Pid_step(controller, 0.0f,
+    gSpeedBalanceTrimPermille = Pid_step(&gSpeedBalancePi, 0.0f,
         measurement, dtSeconds, false);
 
     gStatus.lastSpeedTrimPermille = gSpeedBalanceTrimPermille;
@@ -468,7 +661,7 @@ static void stopWithFault(uint32_t nowMs, Req002BlockReason reason)
     gStatus.state = REQ002_STATE_FAULT;
     gStatus.blockReason = reason;
     speedBalanceReset();
-    sharpRightTurnReset();
+    rightCurveReset();
     gFinishBrakeEngaged = false;
     setLocked(true);
 }
@@ -482,7 +675,7 @@ static void completeRun(uint32_t nowMs)
     gStatus.state = REQ002_STATE_COMPLETE;
     gStatus.blockReason = REQ002_BLOCK_NONE;
     speedBalanceReset();
-    sharpRightTurnReset();
+    rightCurveReset();
     gFinishBrakeEngaged = false;
     setLocked(true);
 }
@@ -529,7 +722,7 @@ static void tryStart(uint32_t nowMs)
     Req002BlockReason reason = firstInvalidGate(&gStatus.tracking);
 
     speedBalanceReset();
-    sharpRightTurnReset();
+    rightCurveReset();
     gFinishBrakeEngaged = false;
     gTrackingFaultPending = false;
     gTrackingFaultSinceMs = nowMs;
@@ -606,7 +799,6 @@ static bool applyControl(uint32_t nowMs)
     float leftDemand;
     float rightDemand;
     float speedTrim;
-    float speedTargetRatio;
     float rightTurnMinimum;
     float rampScale = 1.0f;
     SpeedBalanceMode speedBalanceMode;
@@ -622,9 +814,9 @@ static bool applyControl(uint32_t nowMs)
         rampScale = (float) elapsedMs / (float) REQ002_SOFT_START_MS;
     }
 
-    sharpRightTurnUpdate(nowMs, elapsedMs);
-    if (gSharpRightTurnActive) {
-        return commandSharpRightTurn();
+    rightCurveUpdate(nowMs, elapsedMs);
+    if (gRightCurvePhase != RIGHT_CURVE_IDLE) {
+        return commandRightCurve(nowMs);
     }
 
     correction = gStatus.tracking.steeringRequest;
@@ -651,7 +843,9 @@ static bool applyControl(uint32_t nowMs)
             (float) REQ002_RIGHT_CURVE_SLOWDOWN_PERMILLE;
         turnAuthority = (float) REQ002_RIGHT_TURN_PULSE_PERMILLE;
     } else {
-        /* Left steering remains only as a weaker recovery correction. */
+        /* No physical left curves exist. Keep only a weak recovery correction
+         * so a transient sign change at the half-circle apex cannot cancel the
+         * latched right-turn trajectory. */
         curveSlowdown = steeringMagnitude *
             (float) REQ002_LEFT_CURVE_SLOWDOWN_PERMILLE;
         turnAuthority = (float) REQ002_LEFT_TURN_PULSE_PERMILLE;
@@ -681,38 +875,29 @@ static bool applyControl(uint32_t nowMs)
             rightDemand = rightTurnMinimum;
         }
     }
+    if ((correction < -REQ002_SPEED_PI_STRAIGHT_THRESHOLD) &&
+        (leftDemand > (float)
+            REQ002_RIGHT_TURN_LEFT_BASE_MAX_PERMILLE)) {
+        /* Hard cap the ordinary right-turn command before the dedicated
+         * approach state takes over. Curve phases do not run wheel-speed PI. */
+        leftDemand = (float) REQ002_RIGHT_TURN_LEFT_BASE_MAX_PERMILLE;
+    }
 
     feedbackMonitorEnabled =
         (elapsedMs >= REQ002_SOFT_START_MS) &&
+        (correctionMagnitude <= REQ002_SPEED_PI_STRAIGHT_THRESHOLD) &&
         (leftDemand >= (float) REQ002_SPEED_PI_MIN_DEMAND_PERMILLE) &&
         (rightDemand >= (float) REQ002_SPEED_PI_MIN_DEMAND_PERMILLE);
-    speedBalanceMode = SPEED_BALANCE_MODE_DISABLED;
-    speedTargetRatio = REQ002_LEFT_SPEED_TARGET_RATIO;
-    if (feedbackMonitorEnabled &&
-        (correctionMagnitude <= REQ002_SPEED_PI_STRAIGHT_THRESHOLD)) {
-        speedBalanceMode = SPEED_BALANCE_MODE_STRAIGHT;
-    } else if (feedbackMonitorEnabled &&
-        (correction < -REQ002_SPEED_PI_STRAIGHT_THRESHOLD) &&
-        (rightDemand > 0.0f)) {
-        /* Preserve the commanded turn ratio while allowing encoder PI to add
-         * at most 5% to the outer left wheel. The calibrated straight ratio
-         * compensates for the different 1x/4x encoder paths and wheel load. */
-        speedBalanceMode = SPEED_BALANCE_MODE_RIGHT_TURN;
-        speedTargetRatio = REQ002_LEFT_SPEED_TARGET_RATIO *
-            (leftDemand / rightDemand);
-    }
+    speedBalanceMode = feedbackMonitorEnabled ?
+        SPEED_BALANCE_MODE_STRAIGHT : SPEED_BALANCE_MODE_DISABLED;
     speedTrim = speedBalanceStep(speedBalanceMode,
-        feedbackMonitorEnabled, speedTargetRatio, nowMs);
+        feedbackMonitorEnabled, REQ002_LEFT_SPEED_TARGET_RATIO, nowMs);
     if (gEncoderFeedbackFaulted) return false;
 
     if (speedBalanceMode == SPEED_BALANCE_MODE_STRAIGHT) {
         /* Positive trim means the right normalized count was higher. */
         leftDemand += speedTrim;
         rightDemand -= speedTrim;
-    } else if (speedBalanceMode == SPEED_BALANCE_MODE_RIGHT_TURN) {
-        /* Turn PI is one-sided: keep the 93% feed-forward and only boost the
-         * outer left wheel when encoder feedback says it is lagging. */
-        leftDemand += speedTrim;
     }
     gStatus.leftDemandPermille = clampDemand(leftDemand, demandLimitPermille);
     gStatus.rightDemandPermille = clampDemand(rightDemand, demandLimitPermille);
@@ -768,18 +953,22 @@ void Req002_service(uint32_t nowMs, bool buttonPress,
                 gTrackingFaultSinceMs = nowMs;
             }
             gTrackingFaultReason = reason;
-            if (gSharpRightTurnActive &&
-                !Timebase_reached(nowMs, gSharpRightTurnStartMs +
-                    REQ002_SHARP_RIGHT_MAX_MS)) {
+            if ((gRightCurvePhase == RIGHT_CURVE_SHARP_PREPARE) ||
+                (gRightCurvePhase == RIGHT_CURVE_SHARP_BRAKE)) {
+                MotorDriver_releaseRightBrake();
+                rightCurveEnter(RIGHT_CURVE_ARC, nowMs);
+            }
+            if ((gRightCurvePhase == RIGHT_CURVE_ARC) &&
+                !Timebase_reached(nowMs, gTrackingFaultSinceMs +
+                    REQ002_RIGHT_CURVE_LINE_LOSS_HOLD_MS)) {
+                /* All physical curves are right-hand. Preserve the latched
+                 * arc briefly instead of choosing a direction from stale data. */
                 setLocked(false);
-                if (!applySharpRightTurn(nowMs)) {
+                if (!applyRightArcDuringLineLoss(nowMs)) {
                     stopWithFault(nowMs,
                         REQ002_BLOCK_ACTUATION_GATE_INVALID);
                 }
                 return;
-            }
-            if (gSharpRightTurnActive) {
-                gSharpRightTurnActive = false;
             }
             if (Timebase_reached(nowMs,
                     gTrackingFaultSinceMs +
@@ -822,7 +1011,7 @@ void Req002_service(uint32_t nowMs, bool buttonPress,
              * for DRV8870 1/1 electrical braking. */
             setLocked(true);
             speedBalanceReset();
-            sharpRightTurnReset();
+            rightCurveReset();
             MotorDriver_prepareBrakeAll();
             gFinishBrakeEngaged = false;
             gStatus.state = REQ002_STATE_RETURN_MARKER;

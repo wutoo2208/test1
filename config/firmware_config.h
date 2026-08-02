@@ -89,21 +89,40 @@
 #define REQ002_LEFT_CURVE_SLOWDOWN_PERMILLE   (100U)
 #define REQ002_MAX_PULSE_PERMILLE             (900U)
 #define REQ002_TURN_MAX_PULSE_PERMILLE        (1000U)
-#define REQ002_TURN_RIGHT_MIN_PULSE_PERMILLE   (430U)
+#define REQ002_TURN_RIGHT_MIN_PULSE_PERMILLE   (420U)
+#define REQ002_RIGHT_TURN_LEFT_BASE_MAX_PERMILLE (880U)
 #define REQ002_TURN_BASE_PULSE_PERMILLE        (650U)
 #define REQ002_RIGHT_TURN_PULSE_PERMILLE      (1340U)
-#define REQ002_LEFT_TURN_PULSE_PERMILLE       (800U)
+#define REQ002_LEFT_TURN_PULSE_PERMILLE       (400U)
 #define REQ002_TURN_MIN_CORRECTION             (0.25f)
 
-/* Ground-observed sharp-corner escape: duties below about 43% do not produce
- * stable right-wheel motion. Use an explicit 0% command instead of the dead
- * zone, and reduce the outer left wheel to limit apex entry momentum. */
-#define REQ002_SHARP_RIGHT_ENTER_ERROR          (0.15f)
-#define REQ002_SHARP_RIGHT_EXIT_ERROR           (0.05f)
-#define REQ002_SHARP_RIGHT_CONFIRM_MS           (10U)
-#define REQ002_SHARP_RIGHT_MAX_MS               (100U)
-#define REQ002_SHARP_RIGHT_LEFT_PULSE_PERMILLE  (800U)
-#define REQ002_SHARP_RIGHT_RIGHT_PULSE_PERMILLE (0U)
+/* Clockwise-only course optimization. The approach stage slows the vehicle
+ * before the half-circle, the arc stage latches through a transient centered
+ * sample at the apex, and recovery ramps back to straight travel. */
+#define REQ002_RIGHT_APPROACH_ENTER_ERROR          (0.06f)
+#define REQ002_RIGHT_APPROACH_CONFIRM_MS           (10U)
+#define REQ002_RIGHT_APPROACH_MAX_MS              (150U)
+#define REQ002_RIGHT_APPROACH_LEFT_PERMILLE       (820U)
+#define REQ002_RIGHT_APPROACH_RIGHT_PERMILLE      (420U)
+#define REQ002_RIGHT_ARC_ENTER_ERROR               (0.10f)
+#define REQ002_RIGHT_ARC_CONFIRM_MS                 (5U)
+#define REQ002_RIGHT_ARC_EXIT_ERROR                (0.04f)
+#define REQ002_RIGHT_ARC_MIN_MS                   (300U)
+#define REQ002_RIGHT_ARC_MAX_MS                   (700U)
+#define REQ002_RIGHT_ARC_RECENTER_MS               (60U)
+#define REQ002_RIGHT_ARC_LEFT_PERMILLE            (800U)
+#define REQ002_RIGHT_ARC_RIGHT_PERMILLE             (0U)
+/* Strict v1-style severe-right trigger. Right-wheel braking is one-shot per
+ * latched curve and returns to the normal 80/0 arc after the bounded pulse. */
+#define REQ002_RIGHT_SHARP_ENTER_ERROR             (0.15f)
+#define REQ002_RIGHT_SHARP_CONFIRM_MS              (10U)
+#define REQ002_RIGHT_SHARP_PREPARE_MS               (1U)
+#define REQ002_RIGHT_SHARP_BRAKE_MS               (100U)
+#define REQ002_RIGHT_SHARP_LEFT_PERMILLE          (800U)
+#define REQ002_RIGHT_RECOVER_MS                   (200U)
+#define REQ002_RIGHT_RECOVER_LEFT_START_PERMILLE  (800U)
+#define REQ002_RIGHT_RECOVER_RIGHT_START_PERMILLE (450U)
+#define REQ002_RIGHT_CURVE_LINE_LOSS_HOLD_MS      (100U)
 
 /* Initial straight-line wheel-speed PI candidate. The left GPIO path counts
  * one A rising edge per encoder cycle; the right hardware QEI counts 4x. */

@@ -85,6 +85,9 @@ class FirmwareSafetyTests(unittest.TestCase):
             "MotorDriver_prepareBrakeAll",
             "MotorDriver_engageBrakeAll",
             "MotorDriver_releaseBrakeAll",
+            "MotorDriver_prepareRightBrake",
+            "MotorDriver_engageRightBrake",
+            "MotorDriver_releaseRightBrake",
             "gStatus.leftBraking = true",
             "gStatus.rightBraking = true",
             "setDuty(GPIO_MOTOR_PWM_C0_IDX, 1000U)",
@@ -225,34 +228,63 @@ class FirmwareSafetyTests(unittest.TestCase):
             "#define REQ002_TURN_MAX_PULSE_PERMILLE        (1000U)",
             config)
         self.assertIn(
-            "#define REQ002_TURN_RIGHT_MIN_PULSE_PERMILLE   (430U)",
+            "#define REQ002_TURN_RIGHT_MIN_PULSE_PERMILLE   (420U)",
             config)
         self.assertIn(
             "#define REQ002_TURN_BASE_PULSE_PERMILLE        (650U)",
             config)
         self.assertIn("#define REQ002_RIGHT_TURN_PULSE_PERMILLE      (1340U)", config)
-        self.assertIn("#define REQ002_LEFT_TURN_PULSE_PERMILLE       (800U)", config)
+        self.assertIn(
+            "#define REQ002_RIGHT_TURN_LEFT_BASE_MAX_PERMILLE (880U)",
+            config)
+        self.assertIn("#define REQ002_LEFT_TURN_PULSE_PERMILLE       (400U)", config)
         self.assertIn("#define REQ002_TURN_MIN_CORRECTION             (0.25f)", config)
         for token in (
-            "REQ002_SHARP_RIGHT_ENTER_ERROR          (0.15f)",
-            "REQ002_SHARP_RIGHT_EXIT_ERROR           (0.05f)",
-            "REQ002_SHARP_RIGHT_CONFIRM_MS           (10U)",
-            "REQ002_SHARP_RIGHT_MAX_MS               (100U)",
-            "REQ002_SHARP_RIGHT_LEFT_PULSE_PERMILLE  (800U)",
-            "REQ002_SHARP_RIGHT_RIGHT_PULSE_PERMILLE (0U)",
+            "REQ002_RIGHT_APPROACH_ENTER_ERROR          (0.06f)",
+            "REQ002_RIGHT_APPROACH_CONFIRM_MS           (10U)",
+            "REQ002_RIGHT_APPROACH_MAX_MS              (150U)",
+            "REQ002_RIGHT_APPROACH_LEFT_PERMILLE       (820U)",
+            "REQ002_RIGHT_APPROACH_RIGHT_PERMILLE      (420U)",
+            "REQ002_RIGHT_ARC_ENTER_ERROR               (0.10f)",
+            "REQ002_RIGHT_ARC_CONFIRM_MS                 (5U)",
+            "REQ002_RIGHT_ARC_EXIT_ERROR                (0.04f)",
+            "REQ002_RIGHT_ARC_MIN_MS                   (300U)",
+            "REQ002_RIGHT_ARC_MAX_MS                   (700U)",
+            "REQ002_RIGHT_ARC_RECENTER_MS               (60U)",
+            "REQ002_RIGHT_ARC_LEFT_PERMILLE            (800U)",
+            "REQ002_RIGHT_ARC_RIGHT_PERMILLE             (0U)",
+            "REQ002_RIGHT_SHARP_ENTER_ERROR             (0.15f)",
+            "REQ002_RIGHT_SHARP_CONFIRM_MS              (10U)",
+            "REQ002_RIGHT_SHARP_PREPARE_MS               (1U)",
+            "REQ002_RIGHT_SHARP_BRAKE_MS               (100U)",
+            "REQ002_RIGHT_SHARP_LEFT_PERMILLE          (800U)",
+            "REQ002_RIGHT_RECOVER_MS                   (200U)",
+            "REQ002_RIGHT_CURVE_LINE_LOSS_HOLD_MS      (100U)",
         ):
             self.assertIn(token, config)
         for token in (
-            "gSharpRightTurnActive",
-            "sharpRightTurnRequested",
-            "sharpRightTurnUpdate",
-            "commandSharpRightTurn",
-            "applySharpRightTurn",
-            "REQ002_SHARP_RIGHT_LEFT_PULSE_PERMILLE",
-            "REQ002_SHARP_RIGHT_RIGHT_PULSE_PERMILLE",
+            "RIGHT_CURVE_APPROACH",
+            "RIGHT_CURVE_ARC",
+            "RIGHT_CURVE_SHARP_PREPARE",
+            "RIGHT_CURVE_SHARP_BRAKE",
+            "RIGHT_CURVE_RECOVER",
+            "rightCurveRequested",
+            "rightSharpBrakeTriggerConfirmed",
+            "rightCurveUpdate",
+            "commandRightCurve",
+            "commandRightSharpPrepare",
+            "commandRightSharpBrake",
+            "MotorDriver_prepareRightBrake",
+            "MotorDriver_engageRightBrake",
+            "MotorDriver_releaseRightBrake",
+            "applyRightArcDuringLineLoss",
+            "REQ002_RIGHT_APPROACH_LEFT_PERMILLE",
+            "REQ002_RIGHT_ARC_LEFT_PERMILLE",
             "speedBalanceReset();",
         ):
             self.assertIn(token, req002)
+        self.assertNotIn("SPEED_BALANCE_MODE_RIGHT_TURN", req002)
+        self.assertNotIn("gTurnLeftPi", req002)
         self.assertIn("correctionMagnitude", req002)
         self.assertIn("steeringCommand", req002)
         self.assertIn("steeringMagnitude", req002)
@@ -260,6 +292,7 @@ class FirmwareSafetyTests(unittest.TestCase):
         self.assertIn("demandLimitPermille", req002)
         self.assertIn("REQ002_TURN_MAX_PULSE_PERMILLE", req002)
         self.assertIn("REQ002_TURN_RIGHT_MIN_PULSE_PERMILLE", req002)
+        self.assertIn("REQ002_RIGHT_TURN_LEFT_BASE_MAX_PERMILLE", req002)
         self.assertIn("REQ002_TURN_BASE_PULSE_PERMILLE", req002)
         self.assertIn("rightBase = leftBase;", req002)
         self.assertIn("rightTurnMinimum", req002)
@@ -432,11 +465,7 @@ class FirmwareSafetyTests(unittest.TestCase):
             "encoderFeedbackMissingMaxMs",
             "peakSpeedTrimPermille",
             "Pid_init(&gSpeedBalancePi",
-            "Pid_step(controller",
-            "Pid_init(&gTurnLeftPi",
-            "SPEED_BALANCE_MODE_RIGHT_TURN",
-            "speedTargetRatio = REQ002_LEFT_SPEED_TARGET_RATIO *",
-            "leftDemand / rightDemand",
+            "Pid_step(&gSpeedBalancePi",
             "speedBalanceStep",
             "feedbackMonitorEnabled",
             "speedBalanceStep(speedBalanceMode,",
@@ -447,11 +476,8 @@ class FirmwareSafetyTests(unittest.TestCase):
         ):
             self.assertIn(token, config + req002 + header)
         self.assertIn("leftMissing && rightMissing", req002)
-        self.assertIn("speedPiConfig.outputMin = 0.0f", req002)
-        self.assertIn("speedPiConfig.integralMin = 0.0f", req002)
-        self.assertIn("&gTurnLeftPi : &gSpeedBalancePi", req002)
-        self.assertIn(
-            "speedBalanceMode == SPEED_BALANCE_MODE_RIGHT_TURN", req002)
+        self.assertNotIn("gTurnLeftPi", req002)
+        self.assertNotIn("SPEED_BALANCE_MODE_RIGHT_TURN", req002)
         self.assertIn("speedBalanceWatchdog(nowMs, leftMissing || rightMissing)", req002)
         self.assertNotIn(
             "if ((speed.leftAbsDelta == 0U) || (speed.rightAbsDelta == 0U)",
